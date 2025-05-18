@@ -60,7 +60,6 @@ services:
       retries: 5
     networks:
       - animalsys-net
-
   frontend:
     build: ./frontend
     container_name: animalsys-frontend
