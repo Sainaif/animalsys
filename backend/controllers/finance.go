@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"animalsys/config"
 	"animalsys/middlewares"
 	"animalsys/models"
 	"animalsys/utils"
@@ -23,10 +24,10 @@ type FinanceRequest struct {
 	Category    string  `json:"category"`
 }
 
-func RegisterFinanceRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterFinanceRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	finances := db.Collection("finances")
 
-	rg.GET("/", middlewares.AuthMiddleware, func(c *gin.Context) {
+	rg.GET("/", middlewares.AuthMiddleware(cfg), func(c *gin.Context) {
 		cur, err := finances.Find(context.Background(), bson.M{})
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "DB error")
@@ -40,7 +41,7 @@ func RegisterFinanceRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, result)
 	})
 
-	rg.POST("/", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.POST("/", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		var req FinanceRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid input")
@@ -64,7 +65,7 @@ func RegisterFinanceRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, finance)
 	})
 
-	rg.GET("/report/csv", middlewares.AuthMiddleware, func(c *gin.Context) {
+	rg.GET("/report/csv", middlewares.AuthMiddleware(cfg), func(c *gin.Context) {
 		cur, err := finances.Find(context.Background(), bson.M{})
 		if err != nil {
 			c.String(http.StatusInternalServerError, "DB error")

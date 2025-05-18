@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"animalsys/config"
 	"animalsys/middlewares"
 	"animalsys/models"
 	"animalsys/utils"
@@ -14,10 +15,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterUserRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterUserRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	users := db.Collection("users")
 
-	rg.Use(middlewares.AuthMiddleware)
+	rg.Use(middlewares.AuthMiddleware(cfg))
 
 	rg.GET("/", middlewares.RBACMiddleware("admin"), func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

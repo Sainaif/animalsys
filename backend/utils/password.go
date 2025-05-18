@@ -48,7 +48,7 @@ func VerifyPassword(password, encodedHash string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	calcHash := argon2.IDKey([]byte(password), salt, time, memory, threads, uint32(len(hash)))
+	calcHash := argon2.IDKey([]byte(password), salt, time, memory, uint8(threads), uint32(len(hash)))
 	if !compareHash(hash, calcHash) {
 		return false, nil
 	}

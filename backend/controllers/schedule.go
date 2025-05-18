@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"animalsys/config"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,7 +23,7 @@ type ScheduleRequest struct {
 	Tasks      []string `json:"tasks" binding:"required"`
 }
 
-type StatusRequest struct {
+type ScheduleStatusRequest struct {
 	Status string `json:"status" binding:"required"`
 }
 
@@ -33,10 +35,10 @@ type AbsenceRequest struct {
 	Reason string `json:"reason" binding:"required"`
 }
 
-func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	schedules := db.Collection("schedules")
 
-	rg.GET("/", middlewares.AuthMiddleware, func(c *gin.Context) {
+	rg.GET("/", middlewares.AuthMiddleware(cfg), func(c *gin.Context) {
 		role := c.GetString("role")
 		userID := c.GetString("user_id")
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -59,7 +61,7 @@ func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, result)
 	})
 
-	rg.POST("/", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.POST("/", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		var req ScheduleRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid input")
@@ -88,7 +90,7 @@ func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, schedule)
 	})
 
-	rg.PUT("/:id/swap", middlewares.AuthMiddleware, middlewares.RBACMiddleware("volunteer"), func(c *gin.Context) {
+	rg.PUT("/:id/swap", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("volunteer"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
@@ -115,7 +117,7 @@ func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, "swap requested")
 	})
 
-	rg.PUT("/:id/absence", middlewares.AuthMiddleware, middlewares.RBACMiddleware("volunteer"), func(c *gin.Context) {
+	rg.PUT("/:id/absence", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("volunteer"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
@@ -137,14 +139,14 @@ func RegisterScheduleRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, "absence requested")
 	})
 
-	rg.PUT("/:id/status", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.PUT("/:id/status", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid ID")
 			return
 		}
-		var req StatusRequest
+		var req ScheduleStatusRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid input")
 			return

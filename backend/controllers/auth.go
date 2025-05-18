@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -61,8 +62,8 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Conf
 			utils.Error(c, http.StatusInternalServerError, "DB error")
 			return
 		}
-		id := res.InsertedID
-		token, err := utils.GenerateJWT(id.(interface{ String() string }).String(), user.Username, user.Role, cfg.JWTSecret)
+		user.ID = res.InsertedID.(primitive.ObjectID)
+		token, err := utils.GenerateJWT(user.ID.Hex(), user.Username, user.Role, cfg.JWTSecret)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "JWT error")
 			return
@@ -127,9 +128,9 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Conf
 				utils.Error(c, http.StatusInternalServerError, "DB error")
 				return
 			}
-			user.ID = res.InsertedID.(interface{ Hex() string })
+			user.ID = res.InsertedID.(primitive.ObjectID)
 		}
-		token, err := utils.GenerateJWT(user.ID.(interface{ Hex() string }).Hex(), user.Username, user.Role, cfg.JWTSecret)
+		token, err := utils.GenerateJWT(user.ID.Hex(), user.Username, user.Role, cfg.JWTSecret)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "JWT error")
 			return

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"animalsys/config"
 	"animalsys/middlewares"
 	"animalsys/models"
 	"animalsys/utils"
@@ -14,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterAnimalRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterAnimalRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	animals := db.Collection("animals")
 
 	rg.GET("/", func(c *gin.Context) {
@@ -51,7 +52,7 @@ func RegisterAnimalRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, animal)
 	})
 
-	rg.POST("/", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.POST("/", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		var animal models.Animal
 		if err := c.ShouldBindJSON(&animal); err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid input")
@@ -69,7 +70,7 @@ func RegisterAnimalRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, animal)
 	})
 
-	rg.PUT("/:id", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.PUT("/:id", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
@@ -99,7 +100,7 @@ func RegisterAnimalRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, "updated")
 	})
 
-	rg.DELETE("/:id", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.DELETE("/:id", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {

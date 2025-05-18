@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"animalsys/config"
 	"animalsys/middlewares"
 	"animalsys/models"
 	"animalsys/utils"
@@ -19,11 +20,11 @@ type AdoptionRequest struct {
 	ApplicationData map[string]interface{} `json:"application_data" binding:"required"`
 }
 
-type StatusRequest struct {
+type AdoptionStatusRequest struct {
 	Status string `json:"status" binding:"required"` // approved | rejected
 }
 
-func RegisterAdoptionRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterAdoptionRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	adoptions := db.Collection("adoptions")
 	animals := db.Collection("animals")
 
@@ -99,14 +100,14 @@ func RegisterAdoptionRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, adoption)
 	})
 
-	rg.PUT("/:id/status", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.PUT("/:id/status", middlewares.AuthMiddleware(cfg), middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid ID")
 			return
 		}
-		var req StatusRequest
+		var req AdoptionStatusRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			utils.Error(c, http.StatusBadRequest, "Invalid input")
 			return
@@ -121,7 +122,7 @@ func RegisterAdoptionRoutes(rg *gin.RouterGroup, db *mongo.Database) {
 		utils.Success(c, "status updated")
 	})
 
-	rg.POST("/:id/contract", middlewares.AuthMiddleware, middlewares.RBACMiddleware("admin", "employee"), func(c *gin.Context) {
+	rg.POST("/:id/contract", func(c *gin.Context) {
 		id := c.Param("id")
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {

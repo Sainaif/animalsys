@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"animalsys/config"
 	"animalsys/middlewares"
 	"animalsys/models"
 	"animalsys/utils"
@@ -18,11 +19,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterDocumentRoutes(rg *gin.RouterGroup, db *mongo.Database) {
+func RegisterDocumentRoutes(rg *gin.RouterGroup, db *mongo.Database, cfg config.Config) {
 	documents := db.Collection("documents")
 	os.MkdirAll("./uploads", 0755)
 
-	rg.POST("/", middlewares.AuthMiddleware, func(c *gin.Context) {
+	rg.POST("/", middlewares.AuthMiddleware(cfg), func(c *gin.Context) {
 		file, err := c.FormFile("file")
 		if err != nil {
 			utils.Error(c, http.StatusBadRequest, "No file uploaded")
