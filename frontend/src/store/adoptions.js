@@ -1,4 +1,4 @@
-import axios from '../utils/api';
+import api from '../utils/api';
 
 const state = {
   adoptions: []
@@ -19,16 +19,15 @@ const mutations = {
 
 const actions = {
   async fetchAdoptions({ commit }) {
-    const res = await axios.get('/adoptions');
+    const res = await api.get('/adoptions');
     commit('SET_ADOPTIONS', res.data.data);
   },
   async applyForAdoption({ commit }, { animal_id, application_data }) {
-    const res = await axios.post('/adoptions', { animal_id, application_data });
+    const res = await api.post('/adoptions', { animal_id, application_data });
     commit('ADD_ADOPTION', res.data.data);
   },
   async updateAdoptionStatus({ commit }, { id, status }) {
-    await axios.put(`/adoptions/${id}/status`, { status });
-    // Optionally refetch or update locally
+    await api.put(`/adoptions/${id}/status`, { status });
   }
 };
 
@@ -42,4 +41,4 @@ export default {
   mutations,
   actions,
   getters
-}; 
+};

@@ -1,4 +1,4 @@
-import axios from '../utils/api';
+import api from '../utils/api';
 
 const state = {
   animals: []
@@ -22,19 +22,19 @@ const mutations = {
 
 const actions = {
   async fetchAnimals({ commit }) {
-    const res = await axios.get('/animals');
+    const res = await api.get('/animals');
     commit('SET_ANIMALS', res.data.data);
   },
   async addAnimal({ commit }, animal) {
-    const res = await axios.post('/animals', animal);
+    const res = await api.post('/animals', animal);
     commit('ADD_ANIMAL', res.data.data);
   },
   async updateAnimal({ commit }, animal) {
-    await axios.put(`/animals/${animal.id}`, animal);
+    await api.put(`/animals/${animal.id}`, animal);
     commit('UPDATE_ANIMAL', animal);
   },
   async deleteAnimal({ commit }, id) {
-    await axios.delete(`/animals/${id}`);
+    await api.delete(`/animals/${id}`);
     commit('DELETE_ANIMAL', id);
   }
 };
@@ -49,4 +49,4 @@ export default {
   mutations,
   actions,
   getters
-}; 
+};

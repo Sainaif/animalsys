@@ -1,4 +1,4 @@
-import axios from '../utils/api';
+import api from '../utils/api';
 
 const state = {
   token: localStorage.getItem('token') || '',
@@ -14,8 +14,12 @@ const mutations = {
     localStorage.setItem('token', token);
     localStorage.setItem('role', role);
   },
-  SET_USER(state, user) {
+  SET_USER(state, { token, role, user }) {
+    state.token = token;
+    state.role = role;
     state.user = user;
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role);
   },
   SET_ERROR(state, error) {
     state.error = error;
@@ -32,27 +36,28 @@ const mutations = {
 const actions = {
   async login({ commit }, { username, password }) {
     try {
-      const res = await axios.post('/auth/login', { username, password });
-      commit('SET_AUTH', res.data.data);
+      const res = await api.post('/auth/login', { username, password });
+      const { token, role } = res.data.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      commit('SET_AUTH', { token, role });
       commit('SET_ERROR', null);
-      return true;
-    } catch (e) {
-      commit('SET_ERROR', e.response?.data?.error || 'Błąd logowania');
-      return false;
+    } catch (err) {
+      commit('SET_ERROR', err.response?.data?.message || 'Login failed');
     }
   },
   async register({ commit }, { username, email, password }) {
     try {
-      const res = await axios.post('/auth/register', { username, email, password });
-      commit('SET_AUTH', res.data.data);
+      const res = await api.post('/auth/register', { username, email, password });
+      commit('SET_USER', { token: res.data.data.token, role: res.data.data.role, user: res.data.data.user });
       commit('SET_ERROR', null);
-      return true;
-    } catch (e) {
-      commit('SET_ERROR', e.response?.data?.error || 'Błąd rejestracji');
-      return false;
+    } catch (err) {
+      commit('SET_ERROR', err.response?.data?.message || 'Registration failed');
     }
   },
   logout({ commit }) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
     commit('LOGOUT');
   }
 };
@@ -69,4 +74,4 @@ export default {
   mutations,
   actions,
   getters
-}; 
+};

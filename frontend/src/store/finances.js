@@ -1,4 +1,4 @@
-import axios from '../utils/api';
+import api from '../utils/api';
 
 const state = {
   finances: []
@@ -15,15 +15,15 @@ const mutations = {
 
 const actions = {
   async fetchFinances({ commit }) {
-    const res = await axios.get('/finances');
+    const res = await api.get('/finances');
     commit('SET_FINANCES', res.data.data);
   },
   async addFinance({ commit }, finance) {
-    const res = await axios.post('/finances', finance);
+    const res = await api.post('/finances', finance);
     commit('ADD_FINANCE', res.data.data);
   },
   async exportCsv() {
-    const res = await axios.get('/finances/report/csv', { responseType: 'blob' });
+    const res = await api.get('/finances/report/csv', { responseType: 'blob' });
     const url = window.URL.createObjectURL(new Blob([res.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -44,4 +44,4 @@ export default {
   mutations,
   actions,
   getters
-}; 
+};

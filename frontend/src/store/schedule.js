@@ -1,4 +1,4 @@
-import axios from '../utils/api';
+import api from '../utils/api';
 
 const state = {
   schedules: []
@@ -19,21 +19,21 @@ const mutations = {
 
 const actions = {
   async fetchSchedules({ commit }) {
-    const res = await axios.get('/schedules');
+    const res = await api.get('/schedules');
     commit('SET_SCHEDULES', res.data.data);
   },
   async addSchedule({ commit }, schedule) {
-    const res = await axios.post('/schedules', schedule);
+    const res = await api.post('/schedules', schedule);
     commit('ADD_SCHEDULE', res.data.data);
   },
   async requestSwap({ commit }, { id, target_employee_id }) {
-    await axios.put(`/schedules/${id}/swap`, { target_employee_id });
+    await api.put(`/schedules/${id}/swap`, { target_employee_id });
   },
   async requestAbsence({ commit }, { id, reason }) {
-    await axios.put(`/schedules/${id}/absence`, { reason });
+    await api.put(`/schedules/${id}/absence`, { reason });
   },
   async updateScheduleStatus({ commit }, { id, status }) {
-    await axios.put(`/schedules/${id}/status`, { status });
+    await api.put(`/schedules/${id}/status`, { status });
   }
 };
 
@@ -47,4 +47,4 @@ export default {
   mutations,
   actions,
   getters
-}; 
+};
