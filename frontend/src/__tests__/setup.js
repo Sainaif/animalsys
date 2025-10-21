@@ -12,8 +12,15 @@ global.localStorage = localStorageMock
 
 // Reset mocks before each test
 beforeEach(() => {
+  // Clear all stored data
+  Object.keys(localStorageMock).forEach((key) => {
+    if (key !== 'getItem' && key !== 'setItem' && key !== 'removeItem' && key !== 'clear') {
+      delete localStorageMock[key]
+    }
+  })
+
   localStorageMock.getItem.mockImplementation((key) => {
-    return localStorageMock[key] || null
+    return localStorageMock[key] !== undefined ? localStorageMock[key] : null
   })
   localStorageMock.setItem.mockImplementation((key, value) => {
     localStorageMock[key] = value

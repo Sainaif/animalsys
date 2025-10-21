@@ -1,8 +1,8 @@
 import api from '../../utils/api'
 
-const state = {
+const state = () => ({
   animals: []
-}
+})
 
 const mutations = {
   SET_ANIMALS(state, animals) {
