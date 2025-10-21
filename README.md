@@ -1,5 +1,9 @@
 # AnimalSys
 
+[![CI/CD Pipeline](https://github.com/Sainaif/animalsys/actions/workflows/ci.yml/badge.svg)](https://github.com/Sainaif/animalsys/actions/workflows/ci.yml)
+[![PR Checks](https://github.com/Sainaif/animalsys/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Sainaif/animalsys/actions/workflows/pr-checks.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A full-stack, containerized animal welfare management system.
 
 ## Overview
@@ -37,6 +41,8 @@ AnimalSys is a comprehensive web application designed to streamline operations f
 - **Containerization**: Docker
 - **Orchestration**: Docker Compose
 - **Database UI**: Mongo Express
+- **CI/CD**: GitHub Actions
+- **Dependency Management**: Dependabot
 
 ## Quick Start
 
@@ -210,13 +216,66 @@ LDAP_BIND_DN=cn=admin,dc=example,dc=com
 LDAP_BIND_PASSWORD=yourpassword
 ```
 
+## CI/CD and Automation
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### Automated Testing
+
+Every push to `main` and every pull request triggers:
+- **Backend Tests**: Go unit tests with coverage reporting
+- **Frontend Tests**: npm test suite
+- **Code Quality**: Go formatting checks and `go vet`
+- **Docker Builds**: Verification that all containers build successfully
+- **Integration Tests**: Full stack testing with Docker Compose
+- **Security Scans**: Trivy vulnerability scanning
+
+### Pull Request Automation
+
+Pull requests automatically receive:
+- **Size Labeling**: Automatic labels based on PR size (XS, S, M, L, XL)
+- **Code Review Checklist**: Automated checklist for reviewers
+- **File-based Labels**: Automatic labels based on changed files (backend, frontend, database, etc.)
+- **Branch Validation**: Checks for merge conflicts and naming conventions
+
+### Dependency Management
+
+Dependabot is configured to:
+- **Weekly Updates**: Check for dependency updates every Monday
+- **Go Modules**: Backend dependency updates
+- **npm Packages**: Frontend dependency updates
+- **Docker Images**: Base image updates
+- **GitHub Actions**: Workflow action updates
+
+### Workflow Files
+
+- `.github/workflows/ci.yml` - Main CI/CD pipeline
+- `.github/workflows/pr-checks.yml` - Pull request validation
+- `.github/workflows/auto-label.yml` - Automatic issue and PR labeling
+- `.github/dependabot.yml` - Dependency update configuration
+- `.github/CODEOWNERS` - Automatic reviewer assignment
+
 ## License
 
 MIT
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please follow these guidelines:
+
+1. **Fork the repository** and create a feature branch
+2. **Follow naming conventions**: `feature/`, `bugfix/`, `hotfix/`, or `claude/`
+3. **Write tests** for new functionality
+4. **Ensure all tests pass** before submitting a PR
+5. **Follow conventional commit format** (optional but recommended)
+6. **Wait for CI checks** to pass
+7. **Request review** from code owners
+
+All pull requests must pass automated checks before merging:
+- All tests must pass
+- Code must be properly formatted
+- Docker builds must succeed
+- No merge conflicts with main
 
 ## Support
 

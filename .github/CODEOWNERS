@@ -1,0 +1,24 @@
+# This file defines code owners for the repository
+# Code owners are automatically requested for review when someone opens a pull request
+
+# Global owners - will be requested for review on all PRs
+* @Sainaif
+
+# Backend code owners
+/backend/ @Sainaif
+
+# Frontend code owners
+/frontend/ @Sainaif
+
+# Infrastructure and DevOps
+/docker-compose.yml @Sainaif
+/backend/Dockerfile @Sainaif
+/frontend/Dockerfile @Sainaif
+/.github/ @Sainaif
+
+# Database
+/mongo/ @Sainaif
+
+# Documentation
+*.md @Sainaif
+/docs/ @Sainaif
