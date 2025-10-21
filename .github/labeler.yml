@@ -1,0 +1,59 @@
+# Configuration for automatic PR labeling based on changed files
+
+backend:
+  - changed-files:
+    - any-glob-to-any-file: 'backend/**/*'
+
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/**/*'
+
+database:
+  - changed-files:
+    - any-glob-to-any-file: 'mongo/**/*'
+
+infrastructure:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docker-compose.yml'
+      - '**/Dockerfile'
+      - '.github/workflows/**/*'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'backend/go.mod'
+      - 'backend/go.sum'
+      - 'frontend/package.json'
+      - 'frontend/package-lock.json'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'backend/tests/**/*'
+      - 'frontend/**/*.test.js'
+      - 'frontend/**/*.spec.js'
+
+go:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.go'
+
+javascript:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.js'
+      - '**/*.vue'
+
+configuration:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
+      - '**/.env*'

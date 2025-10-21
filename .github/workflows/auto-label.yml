@@ -1,0 +1,90 @@
+name: Auto Label
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issues:
+    types: [opened]
+
+jobs:
+  label-pr:
+    name: Label Pull Requests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Label based on changed files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+  label-issue:
+    name: Label Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+
+    steps:
+      - name: Auto-label new issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            const labels = [];
+
+            // Bug detection
+            if (title.includes('bug') || title.includes('error') || title.includes('issue') ||
+                body.includes('bug') || body.includes('error')) {
+              labels.push('bug');
+            }
+
+            // Feature request detection
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('add') ||
+                body.includes('feature request') || body.includes('enhancement')) {
+              labels.push('enhancement');
+            }
+
+            // Documentation detection
+            if (title.includes('docs') || title.includes('documentation') ||
+                body.includes('documentation')) {
+              labels.push('documentation');
+            }
+
+            // Question detection
+            if (title.includes('question') || title.includes('help') || title.includes('how to') ||
+                body.includes('question')) {
+              labels.push('question');
+            }
+
+            // Component detection
+            if (title.includes('backend') || body.includes('backend') || body.includes('api')) {
+              labels.push('backend');
+            }
+
+            if (title.includes('frontend') || body.includes('frontend') || body.includes('ui')) {
+              labels.push('frontend');
+            }
+
+            if (title.includes('docker') || body.includes('docker') || body.includes('container')) {
+              labels.push('infrastructure');
+            }
+
+            // Priority detection
+            if (title.includes('urgent') || title.includes('critical') || body.includes('urgent')) {
+              labels.push('priority: high');
+            }
+
+            // Add labels if any were found
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }

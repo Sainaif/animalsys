@@ -1,0 +1,192 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+
+          # Check if PR title follows conventional commit format (optional)
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?: ]]; then
+            echo "⚠️ Warning: PR title doesn't follow conventional commit format"
+            echo "Consider using: feat|fix|docs|style|refactor|perf|test|chore|ci|build: description"
+          fi
+
+      - name: Check branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH_NAME"
+
+          # Allow specific branch name patterns
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|bugfix|hotfix|release|claude)/ ]]; then
+            echo "⚠️ Warning: Branch name doesn't follow naming convention"
+            echo "Consider using: feature/*, bugfix/*, hotfix/*, release/*, claude/*"
+          fi
+
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            if git merge-tree $(git merge-base origin/main HEAD) origin/main HEAD | grep -q '<<<<<<<'; then
+              echo "❌ This PR has merge conflicts with main branch"
+              exit 1
+            fi
+          fi
+          echo "✅ No merge conflicts detected"
+
+      - name: Check file changes
+        run: |
+          FILES_CHANGED=$(git diff --name-only origin/main...HEAD | wc -l)
+          echo "Files changed: $FILES_CHANGED"
+
+          if [ $FILES_CHANGED -eq 0 ]; then
+            echo "❌ No files changed in this PR"
+            exit 1
+          fi
+
+          if [ $FILES_CHANGED -gt 50 ]; then
+            echo "⚠️ Warning: This PR changes $FILES_CHANGED files. Consider splitting into smaller PRs."
+          fi
+
+      - name: Check for large files
+        run: |
+          LARGE_FILES=$(find . -type f -size +1M -not -path "*/node_modules/*" -not -path "*/.git/*" | wc -l)
+          if [ $LARGE_FILES -gt 0 ]; then
+            echo "⚠️ Warning: Large files detected (>1MB):"
+            find . -type f -size +1M -not -path "*/node_modules/*" -not -path "*/.git/*"
+          fi
+
+  code-review-checklist:
+    name: Code Review Checklist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Post review checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const checklist = `
+            ## 📋 Code Review Checklist
+
+            Please review the following before merging:
+
+            - [ ] Code follows project coding standards
+            - [ ] Tests are included and passing
+            - [ ] Documentation is updated (if needed)
+            - [ ] No sensitive data or credentials are committed
+            - [ ] Breaking changes are documented
+            - [ ] Performance impact is acceptable
+            - [ ] Security implications are considered
+            - [ ] Error handling is appropriate
+            - [ ] Code is properly commented
+            - [ ] Dependencies are up to date
+
+            ---
+            *This checklist is automatically generated for all PRs.*
+            `;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Code Review Checklist')
+            );
+
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: checklist
+              });
+            }
+
+  size-label:
+    name: PR Size Labeling
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Label PR by size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            let additions = 0;
+            let deletions = 0;
+
+            files.forEach(file => {
+              additions += file.additions;
+              deletions += file.deletions;
+            });
+
+            const totalChanges = additions + deletions;
+            let sizeLabel = '';
+
+            if (totalChanges < 10) {
+              sizeLabel = 'size/XS';
+            } else if (totalChanges < 50) {
+              sizeLabel = 'size/S';
+            } else if (totalChanges < 250) {
+              sizeLabel = 'size/M';
+            } else if (totalChanges < 1000) {
+              sizeLabel = 'size/L';
+            } else {
+              sizeLabel = 'size/XL';
+            }
+
+            const labels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const sizeLabels = labels.data.filter(label => label.name.startsWith('size/'));
+
+            for (const label of sizeLabels) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: label.name,
+              });
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [sizeLabel],
+            });
+
+            console.log(`PR labeled as ${sizeLabel} (${totalChanges} total changes)`);
