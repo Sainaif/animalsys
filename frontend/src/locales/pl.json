@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "animals": "Zwierzęta",
+    "adoptions": "Adopcje",
+    "schedules": "Harmonogramy",
+    "documents": "Dokumenty",
+    "finances": "Finanse",
+    "users": "Użytkownicy",
+    "logout": "Wyloguj"
+  },
+  "home": {
+    "title": "AnimalSys",
+    "welcome": "Witamy w systemie zarządzania opieką nad zwierzętami",
+    "animals": "Zwierzęta",
+    "manageAnimals": "Zarządzaj zwierzętami w systemie",
+    "adoptions": "Adopcje",
+    "manageAdoptions": "Zarządzaj wnioskami adopcyjnymi",
+    "schedules": "Harmonogramy",
+    "manageSchedules": "Zarządzaj harmonogramami pracowników",
+    "view": "Zobacz"
+  },
+  "login": {
+    "title": "Logowanie",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "submit": "Zaloguj",
+    "noAccount": "Nie masz konta?",
+    "register": "Zarejestruj się tutaj"
+  },
+  "register": {
+    "title": "Rejestracja",
+    "username": "Nazwa użytkownika",
+    "email": "Email",
+    "password": "Hasło",
+    "submit": "Zarejestruj",
+    "hasAccount": "Masz już konto?",
+    "login": "Zaloguj się tutaj"
+  },
+  "animals": {
+    "title": "Zwierzęta",
+    "add": "Dodaj zwierzę",
+    "addNew": "Dodaj nowe zwierzę",
+    "name": "Imię",
+    "species": "Gatunek",
+    "breed": "Rasa",
+    "age": "Wiek",
+    "status": "Status",
+    "actions": "Akcje",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń"
+  },
+  "adoptions": {
+    "title": "Adopcje",
+    "add": "Dodaj adopcję",
+    "addNew": "Dodaj nową adopcję",
+    "animalId": "ID zwierzęcia",
+    "userId": "ID użytkownika",
+    "status": "Status",
+    "actions": "Akcje",
+    "save": "Zapisz",
+    "cancel": "Anuluj"
+  },
+  "schedules": {
+    "title": "Harmonogramy",
+    "employeeId": "ID pracownika",
+    "date": "Data",
+    "time": "Godzina",
+    "tasks": "Zadania",
+    "status": "Status"
+  },
+  "documents": {
+    "title": "Dokumenty",
+    "filename": "Nazwa pliku",
+    "type": "Typ",
+    "uploadDate": "Data przesłania",
+    "size": "Rozmiar"
+  },
+  "finances": {
+    "title": "Finanse",
+    "date": "Data",
+    "type": "Typ",
+    "amount": "Kwota",
+    "description": "Opis",
+    "category": "Kategoria"
+  },
+  "users": {
+    "title": "Użytkownicy",
+    "username": "Nazwa użytkownika",
+    "email": "Email",
+    "role": "Rola",
+    "actions": "Akcje",
+    "delete": "Usuń"
+  }
+}

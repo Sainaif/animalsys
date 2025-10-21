@@ -40,12 +40,28 @@ describe('App Component', () => {
 
     i18n = createI18n({
       legacy: false,
-      locale: 'en',
+      locale: 'pl',
+      fallbackLocale: 'en',
       messages: {
+        pl: {
+          nav: {
+            home: 'Strona główna',
+            animals: 'Zwierzęta',
+            adoptions: 'Adopcje',
+            schedules: 'Harmonogramy',
+            documents: 'Dokumenty',
+            finances: 'Finanse',
+            users: 'Użytkownicy',
+            logout: 'Wyloguj'
+          }
+        },
         en: {
           nav: {
             home: 'Home',
             animals: 'Animals',
+            adoptions: 'Adoptions',
+            schedules: 'Schedules',
+            documents: 'Documents',
             finances: 'Finances',
             users: 'Users',
             logout: 'Logout'
