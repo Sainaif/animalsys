@@ -1,9 +1,9 @@
 import api from '../../utils/api'
 
-const state = {
+const state = () => ({
   token: localStorage.getItem('token') || null,
   user: JSON.parse(localStorage.getItem('user')) || null
-}
+})
 
 const getters = {
   isAuthenticated: state => !!state.token,

@@ -2,11 +2,13 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { createRouter, createMemoryHistory } from 'vue-router'
+import { createI18n } from 'vue-i18n'
 import App from '../../App.vue'
 
 describe('App Component', () => {
   let store
   let router
+  let i18n
 
   beforeEach(() => {
     store = createStore({
@@ -35,12 +37,28 @@ describe('App Component', () => {
         { path: '/login', component: { template: '<div>Login</div>' } }
       ]
     })
+
+    i18n = createI18n({
+      legacy: false,
+      locale: 'en',
+      messages: {
+        en: {
+          nav: {
+            home: 'Home',
+            animals: 'Animals',
+            finances: 'Finances',
+            users: 'Users',
+            logout: 'Logout'
+          }
+        }
+      }
+    })
   })
 
   it('should render the app container', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [store, router]
+        plugins: [store, router, i18n]
       }
     })
 
@@ -50,7 +68,7 @@ describe('App Component', () => {
   it('should not show navigation when not authenticated', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [store, router]
+        plugins: [store, router, i18n]
       }
     })
 
@@ -63,7 +81,7 @@ describe('App Component', () => {
 
     const wrapper = mount(App, {
       global: {
-        plugins: [store, router]
+        plugins: [store, router, i18n]
       }
     })
 
