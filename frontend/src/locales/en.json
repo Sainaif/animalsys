@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "home": "Home",
+    "animals": "Animals",
+    "adoptions": "Adoptions",
+    "schedules": "Schedules",
+    "documents": "Documents",
+    "finances": "Finances",
+    "users": "Users",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "AnimalSys",
+    "welcome": "Welcome to the Animal Welfare Management System",
+    "animals": "Animals",
+    "manageAnimals": "Manage animals in the system",
+    "adoptions": "Adoptions",
+    "manageAdoptions": "Manage adoption applications",
+    "schedules": "Schedules",
+    "manageSchedules": "Manage employee schedules",
+    "view": "View"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "noAccount": "Don't have an account?",
+    "register": "Register here"
+  },
+  "register": {
+    "title": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Register",
+    "hasAccount": "Already have an account?",
+    "login": "Login here"
+  },
+  "animals": {
+    "title": "Animals",
+    "add": "Add Animal",
+    "addNew": "Add New Animal",
+    "name": "Name",
+    "species": "Species",
+    "breed": "Breed",
+    "age": "Age",
+    "status": "Status",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "adoptions": {
+    "title": "Adoptions",
+    "add": "Add Adoption",
+    "addNew": "Add New Adoption",
+    "animalId": "Animal ID",
+    "userId": "User ID",
+    "status": "Status",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "schedules": {
+    "title": "Schedules",
+    "employeeId": "Employee ID",
+    "date": "Date",
+    "time": "Time",
+    "tasks": "Tasks",
+    "status": "Status"
+  },
+  "documents": {
+    "title": "Documents",
+    "filename": "Filename",
+    "type": "Type",
+    "uploadDate": "Upload Date",
+    "size": "Size"
+  },
+  "finances": {
+    "title": "Finances",
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "description": "Description",
+    "category": "Category"
+  },
+  "users": {
+    "title": "Users",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "actions": "Actions",
+    "delete": "Delete"
+  }
+}
