@@ -1,0 +1,106 @@
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: animalsys-mongodb-prod
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: animalsys
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - animalsys-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: animalsys-redis-prod
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - animalsys-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend (Go)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: animalsys-backend-prod
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      - ENVIRONMENT=production
+      - DB_URI=mongodb://mongodb:27017
+      - REDIS_HOST=redis
+    volumes:
+      - backend_uploads:/home/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - animalsys-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend (Vue.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: animalsys-frontend-prod
+    restart: always
+    networks:
+      - animalsys-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: animalsys-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - backend_uploads:/app/uploads:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - animalsys-network
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  backend_uploads:
+
+networks:
+  animalsys-network:
+    driver: bridge

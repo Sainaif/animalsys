@@ -1,0 +1,13 @@
+Animal Foundation CRM - API Test Report
+========================================
+Date: Sat Nov  8 07:17:45 PM CET 2025
+
+Summary:
+  Total Tests: 2
+  Passed: 0
+  Failed: 1
+  Success Rate: 0%
+
+Detailed Results:
+  [SKIP] POST /auth/register
+  [FAIL] POST /auth/login

@@ -1,192 +1,114 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { api } from '../api/client'
-import router from '../router'
-
-const ROLE_HIERARCHY = {
-  'super_admin': 6,
-  'admin': 5,
-  'employee': 4,
-  'volunteer': 3,
-  'user': 2,
-  'guest': 1,
-}
+import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref(null)
   const accessToken = ref(localStorage.getItem('access_token') || null)
   const refreshToken = ref(localStorage.getItem('refresh_token') || null)
-  const loading = ref(false)
-  const error = ref(null)
 
   // Getters
-  const isAuthenticated = computed(() => !!accessToken.value && !!user.value)
-  const userRole = computed(() => user.value?.role || 'guest')
-  const userRoleLevel = computed(() => ROLE_HIERARCHY[userRole.value] || 0)
+  const isAuthenticated = computed(() => !!accessToken.value)
+  const userRole = computed(() => user.value?.role || null)
+  const isAdmin = computed(() => {
+    const role = userRole.value
+    return role === 'super_admin' || role === 'admin'
+  })
+  const isSuperAdmin = computed(() => userRole.value === 'super_admin')
 
   // Actions
-  async function login(credentials) {
-    loading.value = true
-    error.value = null
-
+  async function login(email, password) {
     try {
-      const response = await api.post('/auth/login', credentials)
+      const response = await api.post('/auth/login', { email, password })
+      const { access_token, refresh_token, user: userData } = response.data
 
-      accessToken.value = response.data.access_token
-      refreshToken.value = response.data.refresh_token
-      user.value = response.data.user
-
-      // Save to localStorage
-      localStorage.setItem('access_token', accessToken.value)
-      localStorage.setItem('refresh_token', refreshToken.value)
-      localStorage.setItem('user', JSON.stringify(user.value))
-
-      // Set default auth header
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken.value}`
+      setTokens(access_token, refresh_token)
+      user.value = userData
 
       return response.data
-    } catch (err) {
-      error.value = err.response?.data?.error || 'Login failed'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function register(userData) {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await api.post('/auth/register', userData)
-      return response.data
-    } catch (err) {
-      error.value = err.response?.data?.error || 'Registration failed'
-      throw err
-    } finally {
-      loading.value = false
+    } catch (error) {
+      throw error
     }
   }
 
   async function logout() {
-    // Clear state
-    user.value = null
-    accessToken.value = null
-    refreshToken.value = null
-
-    // Clear localStorage
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('user')
-
-    // Clear auth header
-    delete api.defaults.headers.common['Authorization']
-
-    // Redirect to login
-    router.push({ name: 'login' })
+    try {
+      await api.post('/auth/logout')
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      clearAuth()
+    }
   }
 
-  async function refreshAccessToken() {
-    if (!refreshToken.value) {
-      throw new Error('No refresh token available')
-    }
-
+  async function refreshTokenAction() {
     try {
       const response = await api.post('/auth/refresh', {
         refresh_token: refreshToken.value
       })
 
-      accessToken.value = response.data.access_token
-      localStorage.setItem('access_token', accessToken.value)
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken.value}`
+      const { access_token, refresh_token: newRefreshToken } = response.data
 
-      return accessToken.value
-    } catch (err) {
-      // If refresh fails, logout
-      await logout()
-      throw err
+      setTokens(access_token, newRefreshToken || refreshToken.value)
+
+      return response.data
+    } catch (error) {
+      clearAuth()
+      throw error
     }
   }
 
-  async function fetchProfile() {
+  async function getCurrentUser() {
     try {
-      const response = await api.get('/auth/profile')
+      const response = await api.get('/auth/me')
       user.value = response.data
-      localStorage.setItem('user', JSON.stringify(user.value))
-      return user.value
-    } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch profile'
-      throw err
+      return response.data
+    } catch (error) {
+      clearAuth()
+      throw error
     }
   }
 
-  async function updateProfile(userData) {
-    loading.value = true
-    error.value = null
-
+  async function updateProfile(data) {
     try {
-      const response = await api.put(`/users/${user.value.user_id}`, userData)
-      user.value = { ...user.value, ...response.data }
-      localStorage.setItem('user', JSON.stringify(user.value))
-      return user.value
-    } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to update profile'
-      throw err
-    } finally {
-      loading.value = false
+      const response = await api.put(`/users/${user.value.id}`, data)
+      user.value = response.data
+      return response.data
+    } catch (error) {
+      throw error
     }
   }
 
-  async function changePassword(passwordData) {
-    loading.value = true
-    error.value = null
-
+  async function changePassword(oldPassword, newPassword) {
     try {
-      await api.post('/auth/change-password', passwordData)
-    } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to change password'
-      throw err
-    } finally {
-      loading.value = false
+      await api.put('/auth/change-password', {
+        old_password: oldPassword,
+        new_password: newPassword
+      })
+    } catch (error) {
+      throw error
     }
   }
 
-  async function initAuth() {
-    // Try to restore session from localStorage
-    const storedToken = localStorage.getItem('access_token')
-    const storedUser = localStorage.getItem('user')
-
-    if (storedToken && storedUser) {
-      accessToken.value = storedToken
-      user.value = JSON.parse(storedUser)
-      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-
-      // Fetch fresh profile to verify token
-      try {
-        await fetchProfile()
-      } catch (err) {
-        // Token might be expired, try refresh
-        try {
-          await refreshAccessToken()
-          await fetchProfile()
-        } catch {
-          // Both failed, logout
-          await logout()
-        }
-      }
-    }
+  function setTokens(access, refresh) {
+    accessToken.value = access
+    refreshToken.value = refresh
+    localStorage.setItem('access_token', access)
+    localStorage.setItem('refresh_token', refresh)
   }
 
-  function hasRole(requiredRole) {
-    const requiredLevel = ROLE_HIERARCHY[requiredRole] || 0
-    return userRoleLevel.value >= requiredLevel
+  function clearAuth() {
+    user.value = null
+    accessToken.value = null
+    refreshToken.value = null
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
   }
 
-  function can(permission) {
-    // Permission checking logic
-    // For now, simple role-based
-    return hasRole(permission)
+  // Initialize user if token exists
+  if (accessToken.value) {
+    getCurrentUser().catch(() => clearAuth())
   }
 
   return {
@@ -194,24 +116,17 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     accessToken,
     refreshToken,
-    loading,
-    error,
-
     // Getters
     isAuthenticated,
     userRole,
-    userRoleLevel,
-
+    isAdmin,
+    isSuperAdmin,
     // Actions
     login,
-    register,
     logout,
-    refreshAccessToken,
-    fetchProfile,
+    refreshToken: refreshTokenAction,
+    getCurrentUser,
     updateProfile,
-    changePassword,
-    initAuth,
-    hasRole,
-    can,
+    changePassword
   }
 })

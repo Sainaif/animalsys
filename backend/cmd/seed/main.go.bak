@@ -1,0 +1,104 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/rs/zerolog/log"
+	"github.com/sainaif/animalsys/backend/internal/domain/entities"
+	"github.com/sainaif/animalsys/backend/internal/infrastructure/config"
+	"github.com/sainaif/animalsys/backend/internal/infrastructure/database/mongodb"
+	"github.com/sainaif/animalsys/backend/internal/infrastructure/database/mongodb/repositories"
+	"github.com/sainaif/animalsys/backend/internal/infrastructure/logger"
+	"github.com/sainaif/animalsys/backend/pkg/security"
+	"go.mongodb.org/mongo-driver/bson"
+)
+
+func main() {
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load configuration")
+	}
+
+	// Initialize logger
+	logger.Init(cfg.Log.Level, cfg.Environment)
+
+	log.Info().Msg("Starting database seed")
+
+	// Initialize database
+	ctx := context.Background()
+	db, err := mongodb.Connect(ctx, cfg.Database)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to connect to database")
+	}
+	defer func() {
+		if err := db.Disconnect(ctx); err != nil {
+			log.Error().Err(err).Msg("Error disconnecting from database")
+		}
+	}()
+
+	log.Info().Msg("Successfully connected to MongoDB")
+
+	// Initialize repository
+	userRepo := repositories.NewUserRepository(db)
+	passwordService := security.NewPasswordService()
+
+	// Ensure indexes
+	if err := userRepo.EnsureIndexes(ctx); err != nil {
+		log.Fatal().Err(err).Msg("Failed to create indexes")
+	}
+
+	// Check if super admin exists
+	collection := db.Collection(mongodb.Collections.Users)
+	count, err := collection.CountDocuments(ctx, bson.M{"role": entities.RoleSuperAdmin})
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to check for super admin")
+	}
+
+	if count > 0 {
+		log.Info().Msg("Super admin user already exists. Skipping seed.")
+		return
+	}
+
+	// Create super admin user
+	defaultEmail := "admin@animalsys.local"
+	defaultPassword := "Admin123!"
+
+	// Hash password
+	passwordHash, err := passwordService.HashPassword(defaultPassword)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to hash password")
+	}
+
+	superAdmin := &entities.User{
+		Email:        defaultEmail,
+		PasswordHash: passwordHash,
+		FirstName:    "Super",
+		LastName:     "Admin",
+		Role:         entities.RoleSuperAdmin,
+		Status:       entities.StatusActive,
+		Language:     "en",
+		Theme:        "light",
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+
+	if err := userRepo.Create(ctx, superAdmin); err != nil {
+		log.Fatal().Err(err).Msg("Failed to create super admin user")
+	}
+
+	log.Info().
+		Str("email", defaultEmail).
+		Msg("Super admin user created successfully")
+
+	fmt.Println("\n===========================================")
+	fmt.Println("Super Admin User Created Successfully!")
+	fmt.Println("===========================================")
+	fmt.Printf("Email:    %s\n", defaultEmail)
+	fmt.Printf("Password: %s\n", defaultPassword)
+	fmt.Println("===========================================")
+	fmt.Println("IMPORTANT: Please change the password after first login!")
+	fmt.Println("===========================================\n")
+}

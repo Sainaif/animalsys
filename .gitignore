@@ -1,26 +1,12 @@
-# Environment variables
+# Environment files
 .env
 .env.local
-.env.*.local
+.env.production
+*.env
 
-# Dependencies
-node_modules/
-vendor/
-
-# Build outputs
-dist/
-build/
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Go
-*.test
-*.out
-/backend/bin/
-/backend/tmp/
+# OS files
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
@@ -28,39 +14,50 @@ build/
 *.swp
 *.swo
 *~
-.DS_Store
-.claude
-CLAUDE.md
+
+# Backend (Go)
+backend/tmp/
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/*.test
+backend/*.out
+backend/vendor/
+backend/build-errors.log
+
+# Frontend (Node.js)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
 
 # Logs
 *.log
 logs/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Test coverage
-coverage/
-*.cover
-*.coverage
-.nyc_output/
-
-# MongoDB data
-/data/
-/mongodb_data/
-
-# Temporary files
-/tmp/
-*.tmp
-
-# OS
-Thumbs.db
-.DS_Store
+# Database backups
+*.archive
+backup_*.archive
 
 # Docker
-docker-compose.override.yml
+.docker/
 
-# Uploads
-/uploads/
-/backend/uploads/
-/frontend/public/uploads/
+# Testing
+coverage/
+*.cover
+.nyc_output/
+
+# Build files
+build/
+dist/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
