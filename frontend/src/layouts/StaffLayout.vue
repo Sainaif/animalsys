@@ -20,7 +20,7 @@
           <i class="pi pi-heart"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.animals') }}</span>
         </router-link>
-        <router-link to="/veterinary" class="nav-item">
+        <router-link to="/staff/veterinary" class="nav-item">
           <i class="pi pi-plus"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.veterinary') }}</span>
         </router-link>

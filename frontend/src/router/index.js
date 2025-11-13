@@ -51,9 +51,27 @@ const router = createRouter({
     },
     // Veterinary routes
     {
-      path: '/veterinary',
+      path: '/staff/veterinary',
       name: 'veterinary',
-      component: () => import('@/views/veterinary/VeterinaryList.vue'),
+      component: () => import('@/views/staff/veterinary/VeterinaryDashboard.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/veterinary/visits',
+      name: 'veterinary-visits',
+      component: () => import('@/views/staff/veterinary/VisitList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/veterinary/visits/new',
+      name: 'veterinary-visit-create',
+      component: () => import('@/views/staff/veterinary/VisitForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/veterinary/visits/:id/edit',
+      name: 'veterinary-visit-edit',
+      component: () => import('@/views/staff/veterinary/VisitForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Adoption routes
