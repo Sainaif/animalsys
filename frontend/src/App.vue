@@ -1,10 +1,21 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import PublicLayout from '@/layouts/PublicLayout.vue'
+import StaffLayout from '@/layouts/StaffLayout.vue'
+
+const route = useRoute()
+
+const layout = computed(() => {
+  return route.meta.layout || 'staff'
+})
 </script>
 
 <template>
   <div id="app">
-    <RouterView />
+    <component :is="layout === 'public' ? PublicLayout : layout === 'staff' ? StaffLayout : 'div'">
+      <RouterView />
+    </component>
   </div>
 </template>
 

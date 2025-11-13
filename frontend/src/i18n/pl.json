@@ -16,7 +16,12 @@
     "actions": "Akcje",
     "status": "Status",
     "createdAt": "Data utworzenia",
-    "updatedAt": "Data aktualizacji"
+    "updatedAt": "Data aktualizacji",
+    "viewMore": "Zobacz więcej",
+    "learnMore": "Dowiedz się więcej",
+    "donate": "Wspomóż",
+    "adoptNow": "Adoptuj teraz",
+    "readMore": "Czytaj więcej"
   },
   "auth": {
     "login": "Zaloguj",
@@ -27,9 +32,11 @@
     "forgotPassword": "Zapomniałeś hasła?",
     "loginTitle": "Witaj w CRM Fundacji Zwierząt",
     "loginSubtitle": "Zaloguj się aby kontynuować",
-    "invalidCredentials": "Nieprawidłowy email lub hasło"
+    "invalidCredentials": "Nieprawidłowy email lub hasło",
+    "staffLogin": "Panel pracownika"
   },
   "nav": {
+    "home": "Strona główna",
     "dashboard": "Pulpit",
     "animals": "Zwierzęta",
     "veterinary": "Weterynaria",
@@ -45,7 +52,93 @@
     "reports": "Raporty",
     "settings": "Ustawienia",
     "users": "Użytkownicy",
-    "profile": "Profil"
+    "profile": "Profil",
+    "aboutUs": "O nas",
+    "adoptAnimal": "Adoptuj zwierzę",
+    "howToHelp": "Jak pomóc",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "hero": {
+      "title": "Ratujemy Życie, Jedno Łapki po Drugim",
+      "subtitle": "Dołącz do naszej misji ratowania, rehabilitacji i znajdowania domów dla zwierząt w potrzebie",
+      "cta": "Zobacz zwierzęta do adopcji",
+      "donateCta": "Wspomóż naszą misję"
+    },
+    "about": {
+      "title": "O naszej fundacji",
+      "subtitle": "Oddani dobru zwierząt od samego początku",
+      "mission": "Naszą misją jest zapewnienie schronienia, opieki medycznej i miłości porzuconym i maltretowanym zwierzętom, oraz znalezienie dla nich kochających domów na zawsze.",
+      "vision": "Wizją jest świat, w którym każde zwierzę ma kochający dom i właściwą opiekę.",
+      "values": "Współczucie, Zaangażowanie, Przejrzystość, Społeczność"
+    },
+    "statistics": {
+      "title": "Nasz wpływ",
+      "subtitle": "Razem zrobiliśmy różnicę",
+      "animalsRescued": "Uratowanych zwierząt",
+      "successfulAdoptions": "Udanych adopcji",
+      "activeVolunteers": "Aktywnych wolontariuszy",
+      "donationsReceived": "Łączna kwota darowizn"
+    },
+    "adoptions": {
+      "title": "Poznaj nasze zwierzęta",
+      "subtitle": "Znajdź swojego nowego najlepszego przyjaciela",
+      "available": "Dostępne do adopcji",
+      "viewProfile": "Zobacz profil",
+      "allAnimals": "Zobacz wszystkie zwierzęta",
+      "age": "Wiek",
+      "gender": "Płeć",
+      "breed": "Rasa",
+      "years": "lat",
+      "months": "miesięcy",
+      "male": "Samiec",
+      "female": "Samica"
+    },
+    "howToHelp": {
+      "title": "Jak możesz pomóc",
+      "subtitle": "Każdy wkład ma znaczenie",
+      "donate": {
+        "title": "Przekaż darowiznę",
+        "description": "Twoje wsparcie finansowe pomaga nam zapewnić jedzenie, opiekę medyczną i schronienie"
+      },
+      "volunteer": {
+        "title": "Zostań wolontariuszem",
+        "description": "Dołącz do naszego zespołu i pomóż w opiece nad zwierzętami w potrzebie"
+      },
+      "adopt": {
+        "title": "Adoptuj zwierzę",
+        "description": "Daj uratowanemu zwierzęciu kochający dom na zawsze"
+      },
+      "spread": {
+        "title": "Rozgłaszaj",
+        "description": "Udostępnij naszą misję w mediach społecznościowych i pomóż nam dotrzeć do większej liczby osób"
+      }
+    },
+    "donation": {
+      "title": "Wspomóż naszą misję",
+      "subtitle": "Twoja darowizna pomaga nam ratować więcej istnień",
+      "oneTime": "Jednorazowa",
+      "monthly": "Miesięczna",
+      "amount": "Kwota",
+      "customAmount": "Inna kwota",
+      "yourInfo": "Twoje informacje",
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "email": "Email",
+      "phone": "Telefon (opcjonalnie)",
+      "message": "Wiadomość (opcjonalnie)",
+      "submit": "Przekaż darowiznę",
+      "thankYou": "Dziękujemy za Twoje wsparcie!",
+      "processing": "Przetwarzanie darowizny..."
+    },
+    "footer": {
+      "about": "O nas",
+      "contact": "Kontakt",
+      "privacy": "Polityka prywatności",
+      "terms": "Regulamin",
+      "followUs": "Śledź nas",
+      "rights": "Wszelkie prawa zastrzeżone"
+    }
   },
   "animal": {
     "title": "Zwierzęta",
@@ -59,6 +152,28 @@
     "gender": "Płeć",
     "status": "Status",
     "location": "Lokalizacja",
-    "intakeDate": "Data przyjęcia"
+    "intakeDate": "Data przyjęcia",
+    "description": "Opis",
+    "medicalHistory": "Historia medyczna",
+    "available": "Dostępne",
+    "adopted": "Adoptowane",
+    "underTreatment": "W trakcie leczenia",
+    "fostered": "W domu tymczasowym"
+  },
+  "dashboard": {
+    "title": "Panel pracownika",
+    "welcome": "Witaj ponownie",
+    "overview": "Przegląd",
+    "quickStats": "Szybkie statystyki",
+    "recentActivity": "Ostatnia aktywność",
+    "upcomingTasks": "Nadchodzące zadania",
+    "totalAnimals": "Wszystkie zwierzęta",
+    "availableAnimals": "Dostępne do adopcji",
+    "adoptionsThisMonth": "Adopcje w tym miesiącu",
+    "upcomingVaccinations": "Nadchodzące szczepienia",
+    "activeVolunteers": "Aktywni wolontariusze",
+    "donationsThisMonth": "Darowizny w tym miesiącu",
+    "pendingApplications": "Oczekujące wnioski",
+    "animalsInTreatment": "Zwierzęta w leczeniu"
   }
 }

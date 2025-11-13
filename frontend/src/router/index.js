@@ -4,87 +4,91 @@ import { useAuthStore } from '@/stores/auth'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Public routes
+    {
+      path: '/',
+      name: 'home',
+      component: () => import('@/views/home/Home.vue'),
+      meta: { requiresAuth: false, layout: 'public' }
+    },
     {
       path: '/login',
       name: 'login',
       component: () => import('@/views/auth/Login.vue'),
       meta: { requiresAuth: false, layout: 'blank' }
     },
-    {
-      path: '/',
-      redirect: '/dashboard'
-    },
+    // Staff routes
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/dashboard/Dashboard.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // Animal routes
     {
       path: '/animals',
       name: 'animals',
       component: () => import('@/views/animal/AnimalList.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     {
       path: '/animals/new',
       name: 'animal-create',
       component: () => import('@/views/animal/AnimalForm.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     {
       path: '/animals/:id',
       name: 'animal-detail',
       component: () => import('@/views/animal/AnimalDetail.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     {
       path: '/animals/:id/edit',
       name: 'animal-edit',
       component: () => import('@/views/animal/AnimalForm.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // Veterinary routes
     {
       path: '/veterinary',
       name: 'veterinary',
       component: () => import('@/views/veterinary/VeterinaryList.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // Adoption routes
     {
       path: '/adoptions',
       name: 'adoptions',
       component: () => import('@/views/adoption/AdoptionList.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // Contact routes
     {
       path: '/contacts',
       name: 'contacts',
       component: () => import('@/views/contact/ContactList.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // Settings routes
     {
       path: '/settings',
       name: 'settings',
       component: () => import('@/views/settings/Settings.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, layout: 'staff' }
     },
     // User routes
     {
       path: '/users',
       name: 'users',
       component: () => import('@/views/user/UserList.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true, layout: 'staff' }
     },
     {
       path: '/profile',
       name: 'profile',
       component: () => import('@/views/user/Profile.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, layout: 'staff' }
     },
     // 404
     {

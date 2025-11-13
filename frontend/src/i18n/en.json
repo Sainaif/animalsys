@@ -16,7 +16,12 @@
     "actions": "Actions",
     "status": "Status",
     "createdAt": "Created At",
-    "updatedAt": "Updated At"
+    "updatedAt": "Updated At",
+    "viewMore": "View More",
+    "learnMore": "Learn More",
+    "donate": "Donate",
+    "adoptNow": "Adopt Now",
+    "readMore": "Read More"
   },
   "auth": {
     "login": "Login",
@@ -27,9 +32,11 @@
     "forgotPassword": "Forgot Password?",
     "loginTitle": "Welcome to Animal Foundation CRM",
     "loginSubtitle": "Please sign in to continue",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "staffLogin": "Staff Login"
   },
   "nav": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "animals": "Animals",
     "veterinary": "Veterinary",
@@ -45,7 +52,93 @@
     "reports": "Reports",
     "settings": "Settings",
     "users": "Users",
-    "profile": "Profile"
+    "profile": "Profile",
+    "aboutUs": "About Us",
+    "adoptAnimal": "Adopt an Animal",
+    "howToHelp": "How to Help",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "Saving Lives, One Paw at a Time",
+      "subtitle": "Join us in our mission to rescue, rehabilitate, and rehome animals in need",
+      "cta": "See Animals for Adoption",
+      "donateCta": "Support Our Mission"
+    },
+    "about": {
+      "title": "About Our Foundation",
+      "subtitle": "Dedicated to Animal Welfare Since Day One",
+      "mission": "Our mission is to provide shelter, medical care, and love to abandoned and mistreated animals while finding them forever homes.",
+      "vision": "We envision a world where every animal has a loving home and proper care.",
+      "values": "Compassion, Dedication, Transparency, Community"
+    },
+    "statistics": {
+      "title": "Our Impact",
+      "subtitle": "Together, we've made a difference",
+      "animalsRescued": "Animals Rescued",
+      "successfulAdoptions": "Successful Adoptions",
+      "activeVolunteers": "Active Volunteers",
+      "donationsReceived": "Total Donations"
+    },
+    "adoptions": {
+      "title": "Meet Our Animals",
+      "subtitle": "Find your new best friend",
+      "available": "Available for Adoption",
+      "viewProfile": "View Profile",
+      "allAnimals": "See All Animals",
+      "age": "Age",
+      "gender": "Gender",
+      "breed": "Breed",
+      "years": "years",
+      "months": "months",
+      "male": "Male",
+      "female": "Female"
+    },
+    "howToHelp": {
+      "title": "How You Can Help",
+      "subtitle": "Every contribution makes a difference",
+      "donate": {
+        "title": "Make a Donation",
+        "description": "Your financial support helps us provide food, medical care, and shelter"
+      },
+      "volunteer": {
+        "title": "Become a Volunteer",
+        "description": "Join our team and help care for animals in need"
+      },
+      "adopt": {
+        "title": "Adopt an Animal",
+        "description": "Give a rescued animal a loving forever home"
+      },
+      "spread": {
+        "title": "Spread the Word",
+        "description": "Share our mission on social media and help us reach more people"
+      }
+    },
+    "donation": {
+      "title": "Support Our Mission",
+      "subtitle": "Your donation helps us save more lives",
+      "oneTime": "One-Time",
+      "monthly": "Monthly",
+      "amount": "Amount",
+      "customAmount": "Custom Amount",
+      "yourInfo": "Your Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "message": "Message (optional)",
+      "submit": "Complete Donation",
+      "thankYou": "Thank you for your support!",
+      "processing": "Processing your donation..."
+    },
+    "footer": {
+      "about": "About",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "followUs": "Follow Us",
+      "rights": "All rights reserved"
+    }
   },
   "animal": {
     "title": "Animals",
@@ -59,6 +152,28 @@
     "gender": "Gender",
     "status": "Status",
     "location": "Location",
-    "intakeDate": "Intake Date"
+    "intakeDate": "Intake Date",
+    "description": "Description",
+    "medicalHistory": "Medical History",
+    "available": "Available",
+    "adopted": "Adopted",
+    "underTreatment": "Under Treatment",
+    "fostered": "Fostered"
+  },
+  "dashboard": {
+    "title": "Staff Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "quickStats": "Quick Statistics",
+    "recentActivity": "Recent Activity",
+    "upcomingTasks": "Upcoming Tasks",
+    "totalAnimals": "Total Animals",
+    "availableAnimals": "Available for Adoption",
+    "adoptionsThisMonth": "Adoptions This Month",
+    "upcomingVaccinations": "Upcoming Vaccinations",
+    "activeVolunteers": "Active Volunteers",
+    "donationsThisMonth": "Donations This Month",
+    "pendingApplications": "Pending Applications",
+    "animalsInTreatment": "Animals in Treatment"
   }
 }
