@@ -105,6 +105,13 @@ const router = createRouter({
       component: () => import('@/views/staff/adoptions/AdoptionList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
+    // Finance routes
+    {
+      path: '/staff/finance',
+      name: 'finance',
+      component: () => import('@/views/staff/finance/FinanceDashboard.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
     // Contact routes
     {
       path: '/contacts',

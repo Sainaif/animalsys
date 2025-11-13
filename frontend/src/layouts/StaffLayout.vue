@@ -28,6 +28,10 @@
           <i class="pi pi-users"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.adoptions') }}</span>
         </router-link>
+        <router-link to="/staff/finance" class="nav-item">
+          <i class="pi pi-money-bill"></i>
+          <span v-if="!sidebarCollapsed">Finance</span>
+        </router-link>
         <router-link to="/contacts" class="nav-item">
           <i class="pi pi-phone"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.contacts') }}</span>
