@@ -16,7 +16,7 @@
           <i class="pi pi-th-large"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.dashboard') }}</span>
         </router-link>
-        <router-link to="/animals" class="nav-item">
+        <router-link to="/staff/animals" class="nav-item">
           <i class="pi pi-heart"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.animals') }}</span>
         </router-link>

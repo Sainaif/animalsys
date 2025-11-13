@@ -26,27 +26,27 @@ const router = createRouter({
     },
     // Animal routes
     {
-      path: '/animals',
+      path: '/staff/animals',
       name: 'animals',
-      component: () => import('@/views/animal/AnimalList.vue'),
+      component: () => import('@/views/staff/animals/AnimalList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
-      path: '/animals/new',
+      path: '/staff/animals/new',
       name: 'animal-create',
-      component: () => import('@/views/animal/AnimalForm.vue'),
+      component: () => import('@/views/staff/animals/AnimalForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
-      path: '/animals/:id',
+      path: '/staff/animals/:id',
       name: 'animal-detail',
-      component: () => import('@/views/animal/AnimalDetail.vue'),
+      component: () => import('@/views/staff/animals/AnimalDetail.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
-      path: '/animals/:id/edit',
+      path: '/staff/animals/:id/edit',
       name: 'animal-edit',
-      component: () => import('@/views/animal/AnimalForm.vue'),
+      component: () => import('@/views/staff/animals/AnimalForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Veterinary routes
