@@ -24,7 +24,10 @@
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <div class="action-buttons">
+                <Button icon="pi pi-eye" class="p-button-rounded p-button-text" @click="router.push(`/staff/events/${slotProps.data.id}`)" />
+                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              </div>
             </template>
           </Column>
         </DataTable>

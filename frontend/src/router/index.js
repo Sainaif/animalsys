@@ -131,15 +131,51 @@ const router = createRouter({
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
+      path: '/staff/finance/donors/new',
+      name: 'finance-donor-create',
+      component: () => import('@/views/staff/finance/DonorForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/donors/:id/edit',
+      name: 'finance-donor-edit',
+      component: () => import('@/views/staff/finance/DonorForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
       path: '/staff/finance/donations',
       name: 'finance-donations',
       component: () => import('@/views/staff/finance/DonationList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
+      path: '/staff/finance/donations/new',
+      name: 'finance-donation-create',
+      component: () => import('@/views/staff/finance/DonationForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/donations/:id/edit',
+      name: 'finance-donation-edit',
+      component: () => import('@/views/staff/finance/DonationForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
       path: '/staff/finance/campaigns',
       name: 'finance-campaigns',
       component: () => import('@/views/staff/finance/CampaignList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/campaigns/new',
+      name: 'finance-campaign-create',
+      component: () => import('@/views/staff/finance/CampaignForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/campaigns/:id/edit',
+      name: 'finance-campaign-edit',
+      component: () => import('@/views/staff/finance/CampaignForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Events routes
@@ -150,9 +186,107 @@ const router = createRouter({
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
+      path: '/staff/events/:id',
+      name: 'event-detail',
+      component: () => import('@/views/staff/events/EventDetail.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
       path: '/staff/volunteers',
       name: 'volunteers',
       component: () => import('@/views/staff/events/VolunteerList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/volunteers/:id',
+      name: 'volunteer-detail',
+      component: () => import('@/views/staff/events/VolunteerDetail.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    // Communication routes
+    {
+      path: '/staff/communication',
+      name: 'communication',
+      component: () => import('@/views/staff/communication/CommunicationDashboard.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/templates',
+      name: 'communication-templates',
+      component: () => import('@/views/staff/communication/EmailTemplateList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/templates/new',
+      name: 'communication-template-create',
+      component: () => import('@/views/staff/communication/EmailTemplateForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/templates/:id/edit',
+      name: 'communication-template-edit',
+      component: () => import('@/views/staff/communication/EmailTemplateForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/campaigns',
+      name: 'communication-campaigns',
+      component: () => import('@/views/staff/communication/EmailCampaignList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/campaigns/new',
+      name: 'communication-campaign-create',
+      component: () => import('@/views/staff/communication/EmailCampaignForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/campaigns/:id/edit',
+      name: 'communication-campaign-edit',
+      component: () => import('@/views/staff/communication/EmailCampaignForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/logs',
+      name: 'communication-logs',
+      component: () => import('@/views/staff/communication/CommunicationLogList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/logs/new',
+      name: 'communication-log-create',
+      component: () => import('@/views/staff/communication/CommunicationLogForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/communication/logs/:id/edit',
+      name: 'communication-log-edit',
+      component: () => import('@/views/staff/communication/CommunicationLogForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    // Partner routes
+    {
+      path: '/staff/partners',
+      name: 'partners',
+      component: () => import('@/views/staff/partners/PartnerList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/partners/new',
+      name: 'partner-create',
+      component: () => import('@/views/staff/partners/PartnerForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/partners/:id/edit',
+      name: 'partner-edit',
+      component: () => import('@/views/staff/partners/PartnerForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/partners/transfers',
+      name: 'animal-transfers',
+      component: () => import('@/views/staff/partners/AnimalTransferList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Contact routes
