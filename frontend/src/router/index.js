@@ -112,6 +112,13 @@ const router = createRouter({
       component: () => import('@/views/staff/finance/FinanceDashboard.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
+    // Events routes
+    {
+      path: '/staff/events',
+      name: 'events',
+      component: () => import('@/views/staff/events/EventDashboard.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
     // Contact routes
     {
       path: '/contacts',
