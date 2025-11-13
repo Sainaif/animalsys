@@ -24,7 +24,7 @@
           <i class="pi pi-plus"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.veterinary') }}</span>
         </router-link>
-        <router-link to="/adoptions" class="nav-item">
+        <router-link to="/staff/adoptions/applications" class="nav-item">
           <i class="pi pi-users"></i>
           <span v-if="!sidebarCollapsed">{{ $t('nav.adoptions') }}</span>
         </router-link>

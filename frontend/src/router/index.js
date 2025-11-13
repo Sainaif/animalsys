@@ -58,9 +58,33 @@ const router = createRouter({
     },
     // Adoption routes
     {
-      path: '/adoptions',
+      path: '/staff/adoptions/applications',
+      name: 'adoption-applications',
+      component: () => import('@/views/staff/adoptions/ApplicationList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/adoptions/applications/:id',
+      name: 'adoption-application-detail',
+      component: () => import('@/views/staff/adoptions/ApplicationDetail.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/adoptions',
       name: 'adoptions',
-      component: () => import('@/views/adoption/AdoptionList.vue'),
+      component: () => import('@/views/staff/adoptions/AdoptionList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/adoptions/new',
+      name: 'adoption-create',
+      component: () => import('@/views/staff/adoptions/AdoptionForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/adoptions/:id',
+      name: 'adoption-detail',
+      component: () => import('@/views/staff/adoptions/AdoptionList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Contact routes
