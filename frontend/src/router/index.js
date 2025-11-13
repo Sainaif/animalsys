@@ -74,6 +74,18 @@ const router = createRouter({
       component: () => import('@/views/staff/veterinary/VisitForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
+    {
+      path: '/staff/veterinary/vaccinations',
+      name: 'veterinary-vaccinations',
+      component: () => import('@/views/staff/veterinary/VaccinationList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/veterinary/medications',
+      name: 'veterinary-medications',
+      component: () => import('@/views/staff/veterinary/MedicationList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
     // Adoption routes
     {
       path: '/staff/adoptions/applications',
@@ -112,11 +124,35 @@ const router = createRouter({
       component: () => import('@/views/staff/finance/FinanceDashboard.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
+    {
+      path: '/staff/finance/donors',
+      name: 'finance-donors',
+      component: () => import('@/views/staff/finance/DonorList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/donations',
+      name: 'finance-donations',
+      component: () => import('@/views/staff/finance/DonationList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/finance/campaigns',
+      name: 'finance-campaigns',
+      component: () => import('@/views/staff/finance/CampaignList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
     // Events routes
     {
       path: '/staff/events',
       name: 'events',
-      component: () => import('@/views/staff/events/EventDashboard.vue'),
+      component: () => import('@/views/staff/events/EventList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/volunteers',
+      name: 'volunteers',
+      component: () => import('@/views/staff/events/VolunteerList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Contact routes
