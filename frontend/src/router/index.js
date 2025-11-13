@@ -289,6 +289,20 @@ const router = createRouter({
       component: () => import('@/views/staff/partners/AnimalTransferList.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
+    // Inventory routes
+    {
+      path: '/staff/inventory',
+      name: 'inventory',
+      component: () => import('@/views/staff/inventory/InventoryList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    // Reports routes
+    {
+      path: '/staff/reports',
+      name: 'reports',
+      component: () => import('@/views/staff/reports/ReportsDashboard.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
     // Contact routes
     {
       path: '/contacts',
