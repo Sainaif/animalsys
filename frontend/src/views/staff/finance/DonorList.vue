@@ -2,12 +2,16 @@
   <div class="donor-list">
     <div class="page-header">
       <h1>{{ $t('finance.donors') }}</h1>
-      <Button :label="$t('finance.addDonor')" icon="pi pi-plus" @click="router.push('/staff/finance/donors/new')" />
+      <div class="header-actions">
+        <Button :label="$t('common.export')" icon="pi pi-download" class="p-button-secondary" @click="exportDonors" />
+        <Button :label="$t('finance.addDonor')" icon="pi pi-plus" @click="router.push('/staff/finance/donors/new')" />
+      </div>
     </div>
 
     <Card class="filters-card">
       <template #content>
         <div class="filters">
+          <InputText v-model="filters.search" :placeholder="$t('common.search')" @input="handleSearch" />
           <Dropdown v-model="filters.donor_type" :options="donorTypeOptions" :placeholder="$t('finance.donorType')" option-label="label" option-value="value" show-clear @change="loadDonors" />
           <Dropdown v-model="filters.donor_status" :options="statusOptions" :placeholder="$t('finance.donorStatus')" option-label="label" option-value="value" show-clear @change="loadDonors" />
         </div>
@@ -57,8 +61,10 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { financeService } from '@/services/financeService'
+import { exportService } from '@/services/exportService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -74,7 +80,7 @@ const confirm = useConfirm()
 
 const donors = ref([])
 const loading = ref(true)
-const filters = reactive({ donor_type: null, donor_status: null })
+const filters = reactive({ search: '', donor_type: null, donor_status: null })
 
 const donorTypeOptions = [
   { label: t('finance.individual'), value: 'individual' },
@@ -121,6 +127,40 @@ const confirmDelete = (donor) => {
   })
 }
 
+let searchTimeout = null
+const handleSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    loadDonors()
+  }, 500)
+}
+
+const exportDonors = () => {
+  try {
+    if (donors.value.length === 0) {
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'No donors to export', life: 3000 })
+      return
+    }
+
+    const columns = [
+      { field: 'first_name', header: 'Name' },
+      { field: 'email', header: 'Email' },
+      { field: 'phone', header: 'Phone' },
+      { field: 'donor_type', header: 'Donor Type' },
+      { field: 'total_donated', header: 'Total Donated' },
+      { field: 'donation_count', header: 'Donation Count' },
+      { field: 'donor_status', header: 'Status' }
+    ]
+
+    const timestamp = new Date().toISOString().split('T')[0]
+    exportService.exportToCSV(donors.value, `donors_${timestamp}.csv`, columns)
+
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Donors exported successfully', life: 3000 })
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to export donors', life: 3000 })
+  }
+}
+
 onMounted(loadDonors)
 </script>
 
@@ -128,6 +168,8 @@ onMounted(loadDonors)
 .donor-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.header-actions { display: flex; gap: 0.75rem; }
 .filters-card { margin-bottom: 1.5rem; }
-.filters { display: flex; gap: 1rem; }
+.filters { display: flex; gap: 1rem; flex-wrap: wrap; }
+.filters > * { min-width: 200px; flex: 1; }
 </style>

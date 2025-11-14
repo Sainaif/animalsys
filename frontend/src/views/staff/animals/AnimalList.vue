@@ -2,11 +2,19 @@
   <div class="animal-list">
     <div class="page-header">
       <h1>{{ $t('animal.title') }}</h1>
-      <Button
-        :label="$t('animal.addAnimal')"
-        icon="pi pi-plus"
-        @click="router.push('/staff/animals/new')"
-      />
+      <div class="header-actions">
+        <Button
+          :label="$t('common.export')"
+          icon="pi pi-download"
+          class="p-button-secondary"
+          @click="exportAnimals"
+        />
+        <Button
+          :label="$t('animal.addAnimal')"
+          icon="pi pi-plus"
+          @click="router.push('/staff/animals/new')"
+        />
+      </div>
     </div>
 
     <!-- Filters -->
@@ -162,6 +170,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { animalService } from '@/services/animalService'
+import { exportService } from '@/services/exportService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -313,6 +322,47 @@ const confirmDelete = (animal) => {
   })
 }
 
+const exportAnimals = () => {
+  try {
+    if (animals.value.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'No animals to export',
+        life: 3000
+      })
+      return
+    }
+
+    const columns = [
+      { field: 'name', header: 'Name' },
+      { field: 'species', header: 'Species' },
+      { field: 'breed', header: 'Breed' },
+      { field: 'sex', header: 'Gender' },
+      { field: 'status', header: 'Status' },
+      { field: 'intake_date', header: 'Intake Date' }
+    ]
+
+    const timestamp = new Date().toISOString().split('T')[0]
+    exportService.exportToCSV(animals.value, `animals_${timestamp}.csv`, columns)
+
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Animals exported successfully',
+      life: 3000
+    })
+  } catch (error) {
+    console.error('Error exporting animals:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to export animals',
+      life: 3000
+    })
+  }
+}
+
 onMounted(() => {
   loadAnimals()
 })
@@ -336,6 +386,11 @@ onMounted(() => {
   font-weight: 700;
   color: #2c3e50;
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
 }
 
 .filters-card {

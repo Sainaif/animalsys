@@ -2,6 +2,7 @@
   <div class="adoption-list">
     <div class="page-header">
       <h1>{{ $t('adoption.title') }}</h1>
+      <Button :label="$t('common.export')" icon="pi pi-download" class="p-button-secondary" @click="exportAdoptions" />
     </div>
 
     <Card class="filters-card">
@@ -71,6 +72,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { adoptionService } from '@/services/adoptionService'
+import { exportService } from '@/services/exportService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
@@ -111,6 +113,32 @@ const formatCurrency = (amount) => amount ? `$${amount.toFixed(2)}` : 'N/A'
 const getStatusVariant = (status) => ({
   active: 'success', returned: 'warning', completed: 'info'
 }[status] || 'neutral')
+
+const exportAdoptions = () => {
+  try {
+    if (adoptions.value.length === 0) {
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'No adoptions to export', life: 3000 })
+      return
+    }
+
+    const columns = [
+      { field: 'animal.name', header: 'Animal' },
+      { field: 'adopter_first_name', header: 'First Name' },
+      { field: 'adopter_last_name', header: 'Last Name' },
+      { field: 'adopter_email', header: 'Email' },
+      { field: 'adoption_date', header: 'Adoption Date' },
+      { field: 'adoption_fee', header: 'Fee' },
+      { field: 'status', header: 'Status' }
+    ]
+
+    const timestamp = new Date().toISOString().split('T')[0]
+    exportService.exportToCSV(adoptions.value, `adoptions_${timestamp}.csv`, columns)
+
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Adoptions exported successfully', life: 3000 })
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to export adoptions', life: 3000 })
+  }
+}
 
 onMounted(loadAdoptions)
 </script>
