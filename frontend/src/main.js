@@ -3,6 +3,8 @@ import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
+import BadgeDirective from 'primevue/badgedirective'
+import Tooltip from 'primevue/tooltip'
 import { createI18n } from 'vue-i18n'
 
 import App from './App.vue'
@@ -40,5 +42,8 @@ app.use(PrimeVue, { ripple: true })
 app.use(ToastService)
 app.use(ConfirmationService)
 app.use(i18n)
+
+app.directive('badge', BadgeDirective)
+app.directive('tooltip', Tooltip)
 
 app.mount('#app')
