@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Partner, AnimalTransfer, PartnerAgreement } from '@/types/partner'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 export const partnerService = {
   // Partners
@@ -12,13 +12,13 @@ export const partnerService = {
   deletePartner: (id: number) => axios.delete(`${API_URL}/partners/${id}`),
 
   // Animal Transfers
-  getAnimalTransfers: (params?: any) => axios.get(`${API_URL}/animal-transfers`, { params }),
-  getAnimalTransfer: (id: number) => axios.get(`${API_URL}/animal-transfers/${id}`),
-  createAnimalTransfer: (data: AnimalTransfer) => axios.post(`${API_URL}/animal-transfers`, data),
-  updateAnimalTransfer: (id: number, data: AnimalTransfer) => axios.put(`${API_URL}/animal-transfers/${id}`, data),
-  deleteAnimalTransfer: (id: number) => axios.delete(`${API_URL}/animal-transfers/${id}`),
+  getAnimalTransfers: (params?: any) => axios.get(`${API_URL}/transfers`, { params }),
+  getAnimalTransfer: (id: number) => axios.get(`${API_URL}/transfers/${id}`),
+  createAnimalTransfer: (data: AnimalTransfer) => axios.post(`${API_URL}/transfers`, data),
+  updateAnimalTransfer: (id: number, data: AnimalTransfer) => axios.put(`${API_URL}/transfers/${id}`, data),
+  deleteAnimalTransfer: (id: number) => axios.delete(`${API_URL}/transfers/${id}`),
 
-  // Partner Agreements
+  // Partner Agreements (Note: May need backend implementation)
   getPartnerAgreements: (params?: any) => axios.get(`${API_URL}/partner-agreements`, { params }),
   getPartnerAgreement: (id: number) => axios.get(`${API_URL}/partner-agreements/${id}`),
   createPartnerAgreement: (data: PartnerAgreement) => axios.post(`${API_URL}/partner-agreements`, data),
