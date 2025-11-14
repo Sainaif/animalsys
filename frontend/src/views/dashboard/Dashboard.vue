@@ -30,41 +30,43 @@ const stats = computed(() => {
       value: overview.total_animals || 0,
       icon: 'pi-heart',
       color: '#3B82F6',
-      route: '/animals'
+      route: '/staff/animals'
     },
     {
       label: t('dashboard.availableAnimals'),
       value: overview.available_animals || 0,
       icon: 'pi-check-circle',
       color: '#10B981',
-      route: '/animals'
+      route: '/staff/animals'
     },
     {
       label: t('dashboard.adoptionsThisMonth'),
       value: overview.animals_adopted_this_month || 0,
       icon: 'pi-users',
       color: '#8B5CF6',
-      route: '/adoptions'
+      route: '/staff/adoptions'
     },
     {
       label: t('dashboard.animalsInTreatment'),
       value: overview.animals_in_treatment || 0,
       icon: 'pi-plus',
       color: '#F59E0B',
-      route: '/veterinary'
+      route: '/staff/veterinary'
     },
     {
       label: t('dashboard.donationsThisMonth'),
       value: formatCurrency(overview.total_donations_this_month || 0),
       icon: 'pi-dollar',
       color: '#E74C3C',
+      route: '/staff/finance',
       isCurrency: true
     },
     {
       label: t('dashboard.activeVolunteers'),
       value: overview.active_volunteers || 0,
       icon: 'pi-user-plus',
-      color: '#9B59B6'
+      color: '#9B59B6',
+      route: '/staff/volunteers'
     }
   ]
 })
@@ -159,7 +161,7 @@ onMounted(() => {
               <Button
                 :label="$t('common.viewMore')"
                 class="p-button-text p-button-sm"
-                @click="router.push('/animals')"
+                @click="router.push('/staff/animals')"
               />
             </div>
           </template>
@@ -174,7 +176,7 @@ onMounted(() => {
                     <Button
                       icon="pi pi-eye"
                       class="p-button-text p-button-sm"
-                      @click="router.push(`/animals/${slotProps.data.id}`)"
+                      @click="router.push(`/staff/animals/${slotProps.data.id}`)"
                     />
                   </template>
                 </Column>
@@ -217,33 +219,118 @@ onMounted(() => {
         </Card>
       </div>
 
-      <div class="quick-actions">
-        <h3>{{ $t('common.actions') }}</h3>
-        <div class="actions-grid">
-          <Button
-            :label="$t('animal.addAnimal')"
-            icon="pi pi-plus"
-            class="p-button-lg"
-            @click="router.push('/animals/new')"
-          />
-          <Button
-            :label="$t('nav.adoptions')"
-            icon="pi pi-users"
-            class="p-button-lg p-button-outlined"
-            @click="router.push('/adoptions')"
-          />
-          <Button
-            :label="$t('nav.veterinary')"
-            icon="pi pi-plus"
-            class="p-button-lg p-button-outlined"
-            @click="router.push('/veterinary')"
-          />
-          <Button
-            :label="$t('nav.contacts')"
-            icon="pi pi-phone"
-            class="p-button-lg p-button-outlined"
-            @click="router.push('/contacts')"
-          />
+      <div class="modules-section">
+        <h3>{{ $t('dashboard.modules') }}</h3>
+        <div class="modules-grid">
+          <!-- Priority 1: Animals -->
+          <Card class="module-card" @click="router.push('/staff/animals')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="pi pi-heart"></i>
+              </div>
+              <h4>{{ $t('nav.animals') }}</h4>
+              <p>{{ $t('dashboard.manageAnimals') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 2: Adoptions -->
+          <Card class="module-card" @click="router.push('/staff/adoptions')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="pi pi-users"></i>
+              </div>
+              <h4>{{ $t('nav.adoptions') }}</h4>
+              <p>{{ $t('dashboard.manageAdoptions') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 3: Veterinary -->
+          <Card class="module-card" @click="router.push('/staff/veterinary')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="pi pi-plus"></i>
+              </div>
+              <h4>{{ $t('nav.veterinary') }}</h4>
+              <p>{{ $t('dashboard.manageVeterinary') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 4: Finance -->
+          <Card class="module-card" @click="router.push('/staff/finance')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="pi pi-dollar"></i>
+              </div>
+              <h4>{{ $t('nav.finance') }}</h4>
+              <p>{{ $t('dashboard.manageFinance') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 5: Events & Volunteers -->
+          <Card class="module-card" @click="router.push('/staff/events')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="pi pi-calendar"></i>
+              </div>
+              <h4>{{ $t('nav.events') }}</h4>
+              <p>{{ $t('dashboard.manageEvents') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 6: Communications -->
+          <Card class="module-card" @click="router.push('/staff/communication')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                <i class="pi pi-envelope"></i>
+              </div>
+              <h4>{{ $t('nav.communication') }}</h4>
+              <p>{{ $t('dashboard.manageCommunication') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 7: Partners -->
+          <Card class="module-card" @click="router.push('/staff/partners')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <i class="pi pi-building"></i>
+              </div>
+              <h4>{{ $t('nav.partners') }}</h4>
+              <p>{{ $t('dashboard.managePartners') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 8: Inventory -->
+          <Card class="module-card" @click="router.push('/staff/inventory')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                <i class="pi pi-box"></i>
+              </div>
+              <h4>{{ $t('nav.inventory') }}</h4>
+              <p>{{ $t('dashboard.manageInventory') }}</p>
+            </template>
+          </Card>
+
+          <!-- Priority 9: Reports -->
+          <Card class="module-card" @click="router.push('/staff/reports')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                <i class="pi pi-chart-bar"></i>
+              </div>
+              <h4>{{ $t('nav.reports') }}</h4>
+              <p>{{ $t('dashboard.viewReports') }}</p>
+            </template>
+          </Card>
+
+          <!-- Contacts -->
+          <Card class="module-card" @click="router.push('/contacts')">
+            <template #content>
+              <div class="module-icon" style="background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%);">
+                <i class="pi pi-phone"></i>
+              </div>
+              <h4>{{ $t('nav.contacts') }}</h4>
+              <p>{{ $t('dashboard.manageContacts') }}</p>
+            </template>
+          </Card>
         </div>
       </div>
     </div>
@@ -397,22 +484,57 @@ onMounted(() => {
   color: #7f8c8d;
 }
 
-.quick-actions {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.modules-section {
+  margin-top: 2rem;
 }
 
-.quick-actions h3 {
+.modules-section h3 {
   margin-bottom: 1.5rem;
   color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
-.actions-grid {
+.modules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.module-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.module-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 1.75rem;
+}
+
+.module-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.module-card p {
+  margin: 0;
+  color: #7f8c8d;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
@@ -424,7 +546,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .actions-grid {
+  .modules-grid {
     grid-template-columns: 1fr;
   }
 }
