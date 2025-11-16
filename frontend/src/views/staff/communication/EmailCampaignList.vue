@@ -2,38 +2,77 @@
   <div class="email-campaign-list">
     <div class="page-header">
       <h1>{{ $t('communication.emailCampaigns') }}</h1>
-      <Button :label="$t('communication.addEmailCampaign')" icon="pi pi-plus" @click="router.push('/staff/communication/campaigns/new')" />
+      <Button
+        :label="$t('communication.addEmailCampaign')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/communication/campaigns/new')"
+      />
     </div>
 
     <Card v-if="!loading && campaigns.length > 0">
       <template #content>
-        <DataTable :value="campaigns" paginator :rows="20">
-          <Column field="name" :header="$t('communication.campaignName')" />
-          <Column field="recipient_type" :header="$t('communication.recipientType')">
+        <DataTable
+          :value="campaigns"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="name"
+            :header="$t('communication.campaignName')"
+          />
+          <Column
+            field="recipient_type"
+            :header="$t('communication.recipientType')"
+          >
             <template #body="slotProps">
               {{ $t(`communication.${slotProps.data.recipient_type}`) }}
             </template>
           </Column>
-          <Column field="scheduled_date" :header="$t('communication.scheduledDate')">
+          <Column
+            field="scheduled_date"
+            :header="$t('communication.scheduledDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.scheduled_date) }}
             </template>
           </Column>
-          <Column field="status" :header="$t('common.status')">
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ $t(`communication.${slotProps.data.status}`) }}
               </Badge>
             </template>
           </Column>
-          <Column field="sent_count" :header="$t('communication.sentCount')" />
-          <Column field="opened_count" :header="$t('communication.openedCount')" />
+          <Column
+            field="sent_count"
+            :header="$t('communication.sentCount')"
+          />
+          <Column
+            field="opened_count"
+            :header="$t('communication.openedCount')"
+          />
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button v-if="slotProps.data.status === 'draft'" icon="pi pi-send" class="p-button-rounded p-button-text p-button-success" @click="confirmSend(slotProps.data)" />
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/communication/campaigns/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  v-if="slotProps.data.status === 'draft'"
+                  icon="pi pi-send"
+                  class="p-button-rounded p-button-text p-button-success"
+                  @click="confirmSend(slotProps.data)"
+                />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/communication/campaigns/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -42,7 +81,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && campaigns.length === 0" :message="$t('communication.noEmailCampaignsFound')" />
+    <EmptyState
+      v-if="!loading && campaigns.length === 0"
+      :message="$t('communication.noEmailCampaignsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

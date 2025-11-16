@@ -2,34 +2,75 @@
   <div class="communication-log-list">
     <div class="page-header">
       <h1>{{ $t('communication.communicationLogs') }}</h1>
-      <Button :label="$t('communication.addCommunicationLog')" icon="pi pi-plus" @click="router.push('/staff/communication/logs/new')" />
+      <Button
+        :label="$t('communication.addCommunicationLog')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/communication/logs/new')"
+      />
     </div>
 
     <Card class="filters-card">
       <template #content>
         <div class="filters">
-          <Dropdown v-model="filters.communication_type" :options="typeOptions" :placeholder="$t('communication.communicationType')" option-label="label" option-value="value" show-clear @change="loadLogs" />
-          <Dropdown v-model="filters.status" :options="statusOptions" :placeholder="$t('common.status')" option-label="label" option-value="value" show-clear @change="loadLogs" />
+          <Dropdown
+            v-model="filters.communication_type"
+            :options="typeOptions"
+            :placeholder="$t('communication.communicationType')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadLogs"
+          />
+          <Dropdown
+            v-model="filters.status"
+            :options="statusOptions"
+            :placeholder="$t('common.status')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadLogs"
+          />
         </div>
       </template>
     </Card>
 
     <Card v-if="!loading && logs.length > 0">
       <template #content>
-        <DataTable :value="logs" paginator :rows="20">
-          <Column field="communication_type" :header="$t('communication.communicationType')">
+        <DataTable
+          :value="logs"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="communication_type"
+            :header="$t('communication.communicationType')"
+          >
             <template #body="slotProps">
-              <Badge variant="info">{{ $t(`communication.${slotProps.data.communication_type}`) }}</Badge>
+              <Badge variant="info">
+                {{ $t(`communication.${slotProps.data.communication_type}`) }}
+              </Badge>
             </template>
           </Column>
-          <Column field="subject" :header="$t('communication.subject')" />
-          <Column field="recipient_name" :header="$t('communication.recipient')" />
-          <Column field="communication_date" :header="$t('communication.communicationDate')">
+          <Column
+            field="subject"
+            :header="$t('communication.subject')"
+          />
+          <Column
+            field="recipient_name"
+            :header="$t('communication.recipient')"
+          />
+          <Column
+            field="communication_date"
+            :header="$t('communication.communicationDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.communication_date) }}
             </template>
           </Column>
-          <Column field="status" :header="$t('common.status')">
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ $t(`communication.${slotProps.data.status}`) }}
@@ -39,8 +80,16 @@
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/communication/logs/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/communication/logs/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -49,7 +98,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && logs.length === 0" :message="$t('communication.noCommunicationLogsFound')" />
+    <EmptyState
+      v-if="!loading && logs.length === 0"
+      :message="$t('communication.noCommunicationLogsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>
@@ -102,7 +154,7 @@ const loadLogs = async () => {
   try {
     loading.value = true
     const params = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, v]) => v != null)
+      Object.entries(filters.value).filter(([, value]) => value != null)
     )
     const response = await communicationService.getCommunicationLogs(params)
     logs.value = response.data

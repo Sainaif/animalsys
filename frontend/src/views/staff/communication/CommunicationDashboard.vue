@@ -3,37 +3,61 @@
     <h1>{{ $t('communication.title') }}</h1>
 
     <div class="dashboard-grid">
-      <Card class="stat-card" @click="router.push('/staff/communication/templates')">
+      <Card
+        class="stat-card"
+        @click="router.push('/staff/communication/templates')"
+      >
         <template #content>
           <div class="stat-content">
-            <i class="pi pi-envelope" style="font-size: 2.5rem; color: #3b82f6;"></i>
+            <i
+              class="pi pi-envelope"
+              style="font-size: 2.5rem; color: #3b82f6;"
+            />
             <div class="stat-info">
               <h3>{{ $t('communication.emailTemplates') }}</h3>
-              <p class="stat-number">{{ stats.emailTemplates || 0 }}</p>
+              <p class="stat-number">
+                {{ stats.emailTemplates || 0 }}
+              </p>
             </div>
           </div>
         </template>
       </Card>
 
-      <Card class="stat-card" @click="router.push('/staff/communication/campaigns')">
+      <Card
+        class="stat-card"
+        @click="router.push('/staff/communication/campaigns')"
+      >
         <template #content>
           <div class="stat-content">
-            <i class="pi pi-send" style="font-size: 2.5rem; color: #10b981;"></i>
+            <i
+              class="pi pi-send"
+              style="font-size: 2.5rem; color: #10b981;"
+            />
             <div class="stat-info">
               <h3>{{ $t('communication.emailCampaigns') }}</h3>
-              <p class="stat-number">{{ stats.emailCampaigns || 0 }}</p>
+              <p class="stat-number">
+                {{ stats.emailCampaigns || 0 }}
+              </p>
             </div>
           </div>
         </template>
       </Card>
 
-      <Card class="stat-card" @click="router.push('/staff/communication/logs')">
+      <Card
+        class="stat-card"
+        @click="router.push('/staff/communication/logs')"
+      >
         <template #content>
           <div class="stat-content">
-            <i class="pi pi-book" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+            <i
+              class="pi pi-book"
+              style="font-size: 2.5rem; color: #8b5cf6;"
+            />
             <div class="stat-info">
               <h3>{{ $t('communication.communicationLogs') }}</h3>
-              <p class="stat-number">{{ stats.communicationLogs || 0 }}</p>
+              <p class="stat-number">
+                {{ stats.communicationLogs || 0 }}
+              </p>
             </div>
           </div>
         </template>
@@ -42,10 +66,15 @@
       <Card class="stat-card">
         <template #content>
           <div class="stat-content">
-            <i class="pi pi-chart-line" style="font-size: 2.5rem; color: #f59e0b;"></i>
+            <i
+              class="pi pi-chart-line"
+              style="font-size: 2.5rem; color: #f59e0b;"
+            />
             <div class="stat-info">
               <h3>{{ $t('communication.sentCount') }}</h3>
-              <p class="stat-number">{{ stats.totalSent || 0 }}</p>
+              <p class="stat-number">
+                {{ stats.totalSent || 0 }}
+              </p>
             </div>
           </div>
         </template>
@@ -58,23 +87,42 @@
           <h2>{{ $t('communication.emailCampaigns') }}</h2>
         </template>
         <template #content>
-          <DataTable v-if="recentCampaigns.length > 0" :value="recentCampaigns" :rows="5">
-            <Column field="name" :header="$t('communication.campaignName')" />
-            <Column field="status" :header="$t('common.status')">
+          <DataTable
+            v-if="recentCampaigns.length > 0"
+            :value="recentCampaigns"
+            :rows="5"
+          >
+            <Column
+              field="name"
+              :header="$t('communication.campaignName')"
+            />
+            <Column
+              field="status"
+              :header="$t('common.status')"
+            >
               <template #body="slotProps">
                 <Badge :variant="getStatusVariant(slotProps.data.status)">
                   {{ $t(`communication.${slotProps.data.status}`) }}
                 </Badge>
               </template>
             </Column>
-            <Column field="sent_count" :header="$t('communication.sentCount')" />
-            <Column field="scheduled_date" :header="$t('communication.scheduledDate')">
+            <Column
+              field="sent_count"
+              :header="$t('communication.sentCount')"
+            />
+            <Column
+              field="scheduled_date"
+              :header="$t('communication.scheduledDate')"
+            >
               <template #body="slotProps">
                 {{ formatDate(slotProps.data.scheduled_date) }}
               </template>
             </Column>
           </DataTable>
-          <EmptyState v-else :message="$t('communication.noEmailCampaignsFound')" />
+          <EmptyState
+            v-else
+            :message="$t('communication.noEmailCampaignsFound')"
+          />
         </template>
       </Card>
     </div>
@@ -84,7 +132,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import { communicationService } from '@/services/communicationService'
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
@@ -93,7 +140,6 @@ import Badge from '@/components/shared/Badge.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
 
 const router = useRouter()
-const { t } = useI18n()
 
 const stats = ref({
   emailTemplates: 0,

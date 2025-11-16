@@ -1,7 +1,13 @@
 <template>
   <div class="empty-state">
-    <i v-if="icon" class="pi" :class="icon"></i>
-    <h3 v-if="title">{{ title }}</h3>
+    <i
+      v-if="icon"
+      class="pi"
+      :class="icon"
+    />
+    <h3 v-if="title">
+      {{ title }}
+    </h3>
     <p>{{ message }}</p>
     <Button
       v-if="actionText"
@@ -20,13 +26,22 @@ defineProps({
     type: String,
     default: 'pi-inbox'
   },
-  title: String,
+  title: {
+    type: String,
+    default: ''
+  },
   message: {
     type: String,
     required: true
   },
-  actionText: String,
-  actionIcon: String
+  actionText: {
+    type: String,
+    default: ''
+  },
+  actionIcon: {
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits(['action'])

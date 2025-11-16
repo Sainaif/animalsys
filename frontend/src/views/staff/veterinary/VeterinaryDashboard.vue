@@ -5,50 +5,65 @@
     </div>
 
     <div class="dashboard-grid">
-      <Card class="module-card" @click="router.push('/staff/veterinary/visits')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/veterinary/visits')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-calendar module-icon"></i>
+            <i class="pi pi-calendar module-icon" />
             <h2>{{ $t('veterinary.visits') }}</h2>
             <p>{{ $t('veterinary.manageVisits') }}</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/veterinary/vaccinations')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/veterinary/vaccinations')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-shield module-icon"></i>
+            <i class="pi pi-shield module-icon" />
             <h2>{{ $t('veterinary.vaccinations') }}</h2>
             <p>{{ $t('veterinary.trackVaccinations') }}</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/veterinary/medications')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/veterinary/medications')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-box module-icon"></i>
+            <i class="pi pi-box module-icon" />
             <h2>{{ $t('veterinary.medications') }}</h2>
             <p>{{ $t('veterinary.manageMedications') }}</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/veterinary/treatment-plans')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/veterinary/treatment-plans')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-list module-icon"></i>
+            <i class="pi pi-list module-icon" />
             <h2>{{ $t('veterinary.treatmentPlans') }}</h2>
             <p>{{ $t('veterinary.manageTreatmentPlans') }}</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/veterinary/medical-conditions')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/veterinary/medical-conditions')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-heart module-icon"></i>
+            <i class="pi pi-heart module-icon" />
             <h2>{{ $t('veterinary.medicalConditions') }}</h2>
             <p>{{ $t('veterinary.trackMedicalConditions') }}</p>
           </div>

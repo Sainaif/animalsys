@@ -2,13 +2,29 @@
   <div class="volunteer-detail">
     <LoadingSpinner v-if="loading" />
 
-    <div v-else-if="volunteer" class="detail-container">
+    <div
+      v-else-if="volunteer"
+      class="detail-container"
+    >
       <div class="detail-header">
-        <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+        <Button
+          icon="pi pi-arrow-left"
+          class="p-button-text"
+          @click="router.back()"
+        />
         <h1>{{ volunteer.first_name }} {{ volunteer.last_name }}</h1>
         <div class="header-actions">
-          <Button :label="$t('common.edit')" icon="pi pi-pencil" @click="router.push(`/staff/volunteers/${volunteer.id}/edit`)" />
-          <Button :label="$t('common.delete')" icon="pi pi-trash" class="p-button-danger" @click="confirmDelete" />
+          <Button
+            :label="$t('common.edit')"
+            icon="pi pi-pencil"
+            @click="router.push(`/staff/volunteers/${volunteer.id}/edit`)"
+          />
+          <Button
+            :label="$t('common.delete')"
+            icon="pi pi-trash"
+            class="p-button-danger"
+            @click="confirmDelete"
+          />
         </div>
       </div>
 
@@ -17,7 +33,9 @@
           <div class="status-info">
             <div class="status-item">
               <label>{{ $t('event.volunteerStatus') }}</label>
-              <Badge :variant="getStatusVariant(volunteer.volunteer_status)">{{ $t(`finance.${volunteer.volunteer_status}`) }}</Badge>
+              <Badge :variant="getStatusVariant(volunteer.volunteer_status)">
+                {{ $t(`finance.${volunteer.volunteer_status}`) }}
+              </Badge>
             </div>
             <div class="status-item">
               <label>{{ $t('event.totalHours') }}</label>
@@ -62,7 +80,10 @@
                   <label>Start Date</label>
                   <p>{{ formatDate(volunteer.start_date) }}</p>
                 </div>
-                <div class="info-item full-width" v-if="volunteer.address">
+                <div
+                  v-if="volunteer.address"
+                  class="info-item full-width"
+                >
                   <label>{{ $t('finance.address') }}</label>
                   <p>
                     {{ volunteer.address.street }}<br>
@@ -97,25 +118,64 @@
             <template #content>
               <div class="info-item">
                 <label>{{ $t('event.skills') }}</label>
-                <div class="skills-list" v-if="volunteer.skills && volunteer.skills.length">
-                  <Badge v-for="skill in volunteer.skills" :key="skill" variant="info">{{ skill }}</Badge>
+                <div
+                  v-if="volunteer.skills && volunteer.skills.length"
+                  class="skills-list"
+                >
+                  <Badge
+                    v-for="skill in volunteer.skills"
+                    :key="skill"
+                    variant="info"
+                  >
+                    {{ skill }}
+                  </Badge>
                 </div>
-                <p v-else>N/A</p>
+                <p v-else>
+                  N/A
+                </p>
               </div>
 
-              <div class="info-item" style="margin-top: 1.5rem;">
+              <div
+                class="info-item"
+                style="margin-top: 1.5rem;"
+              >
                 <label>{{ $t('event.preferredRoles') }}</label>
-                <div class="skills-list" v-if="volunteer.preferred_roles && volunteer.preferred_roles.length">
-                  <Badge v-for="role in volunteer.preferred_roles" :key="role" variant="success">{{ role }}</Badge>
+                <div
+                  v-if="volunteer.preferred_roles && volunteer.preferred_roles.length"
+                  class="skills-list"
+                >
+                  <Badge
+                    v-for="role in volunteer.preferred_roles"
+                    :key="role"
+                    variant="success"
+                  >
+                    {{ role }}
+                  </Badge>
                 </div>
-                <p v-else>N/A</p>
+                <p v-else>
+                  N/A
+                </p>
               </div>
 
-              <div class="info-item" style="margin-top: 1.5rem;">
+              <div
+                class="info-item"
+                style="margin-top: 1.5rem;"
+              >
                 <label>{{ $t('event.availability') }}</label>
-                <div class="availability-grid" v-if="volunteer.availability">
-                  <div v-for="(available, day) in volunteer.availability" :key="day" class="availability-item">
-                    <Checkbox :model-value="available" :binary="true" disabled />
+                <div
+                  v-if="volunteer.availability"
+                  class="availability-grid"
+                >
+                  <div
+                    v-for="(available, day) in volunteer.availability"
+                    :key="day"
+                    class="availability-item"
+                  >
+                    <Checkbox
+                      :model-value="available"
+                      :binary="true"
+                      disabled
+                    />
                     <label>{{ day }}</label>
                   </div>
                 </div>

@@ -21,6 +21,7 @@ func SetupRoutes(
 	campaignHandler *handlers.CampaignHandler,
 	eventHandler *handlers.EventHandler,
 	volunteerHandler *handlers.VolunteerHandler,
+	contactHandler *handlers.ContactHandler,
 	communicationHandler *handlers.CommunicationHandler,
 	notificationHandler *handlers.NotificationHandler,
 	reportHandler *handlers.ReportHandler,
@@ -914,6 +915,34 @@ func SetupRoutes(
 			volunteers.GET("/role/:role",
 				middleware.RequirePermission(middleware.PermissionViewVolunteers),
 				volunteerHandler.GetVolunteersByRole,
+			)
+		}
+
+		// Contact management routes
+		contacts := protected.Group("/contacts")
+		contacts.Use(middleware.RequirePermission(middleware.PermissionViewContacts))
+		{
+			contacts.GET("",
+				contactHandler.List,
+			)
+
+			contacts.GET("/:id",
+				contactHandler.Get,
+			)
+
+			contacts.POST("",
+				middleware.RequirePermission(middleware.PermissionCreateContacts),
+				contactHandler.Create,
+			)
+
+			contacts.PUT("/:id",
+				middleware.RequirePermission(middleware.PermissionUpdateContacts),
+				contactHandler.Update,
+			)
+
+			contacts.DELETE("/:id",
+				middleware.RequirePermission(middleware.PermissionDeleteContacts),
+				contactHandler.Delete,
 			)
 		}
 

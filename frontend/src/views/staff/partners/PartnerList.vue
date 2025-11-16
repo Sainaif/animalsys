@@ -2,31 +2,73 @@
   <div class="partner-list">
     <div class="page-header">
       <h1>{{ $t('partner.partners') }}</h1>
-      <Button :label="$t('partner.addPartner')" icon="pi pi-plus" @click="router.push('/staff/partners/new')" />
+      <Button
+        :label="$t('partner.addPartner')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/partners/new')"
+      />
     </div>
 
     <Card class="filters-card">
       <template #content>
         <div class="filters">
-          <Dropdown v-model="filters.partner_type" :options="partnerTypeOptions" :placeholder="$t('partner.partnerType')" option-label="label" option-value="value" show-clear @change="loadPartners" />
-          <Dropdown v-model="filters.status" :options="statusOptions" :placeholder="$t('common.status')" option-label="label" option-value="value" show-clear @change="loadPartners" />
+          <Dropdown
+            v-model="filters.partner_type"
+            :options="partnerTypeOptions"
+            :placeholder="$t('partner.partnerType')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadPartners"
+          />
+          <Dropdown
+            v-model="filters.status"
+            :options="statusOptions"
+            :placeholder="$t('common.status')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadPartners"
+          />
         </div>
       </template>
     </Card>
 
     <Card v-if="!loading && partners.length > 0">
       <template #content>
-        <DataTable :value="partners" paginator :rows="20">
-          <Column field="organization_name" :header="$t('partner.organizationName')" />
-          <Column field="partner_type" :header="$t('partner.partnerType')">
+        <DataTable
+          :value="partners"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="organization_name"
+            :header="$t('partner.organizationName')"
+          />
+          <Column
+            field="partner_type"
+            :header="$t('partner.partnerType')"
+          >
             <template #body="slotProps">
               {{ $t(`partner.${slotProps.data.partner_type}`) }}
             </template>
           </Column>
-          <Column field="contact_person" :header="$t('partner.contactPerson')" />
-          <Column field="email" header="Email" />
-          <Column field="phone" :header="$t('finance.phone')" />
-          <Column field="status" :header="$t('common.status')">
+          <Column
+            field="contact_person"
+            :header="$t('partner.contactPerson')"
+          />
+          <Column
+            field="email"
+            header="Email"
+          />
+          <Column
+            field="phone"
+            :header="$t('finance.phone')"
+          />
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ $t(`finance.${slotProps.data.status}`) }}
@@ -36,8 +78,16 @@
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/partners/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/partners/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -46,7 +96,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && partners.length === 0" :message="$t('partner.noPartnersFound')" />
+    <EmptyState
+      v-if="!loading && partners.length === 0"
+      :message="$t('partner.noPartnersFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>
@@ -98,7 +151,7 @@ const loadPartners = async () => {
   try {
     loading.value = true
     const params = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, v]) => v != null)
+      Object.entries(filters.value).filter(([, value]) => value != null)
     )
     const response = await partnerService.getPartners(params)
     partners.value = response.data

@@ -11,12 +11,20 @@
 
     <form @submit.prevent="handleSubmit">
       <Card>
-        <template #title>{{ $t('adoption.applicantInfo') }}</template>
+        <template #title>
+          {{ $t('adoption.applicantInfo') }}
+        </template>
         <template #content>
           <div class="form-grid">
-            <div class="form-field full-width" v-if="applicationId">
+            <div
+              v-if="applicationId"
+              class="form-field full-width"
+            >
               <label>{{ $t('adoption.applicationDetail') }}</label>
-              <InputText :value="`Application #${applicationId}`" disabled />
+              <InputText
+                :value="`Application #${applicationId}`"
+                disabled
+              />
             </div>
 
             <div class="form-field">
@@ -68,7 +76,9 @@
       </Card>
 
       <Card class="mt-3">
-        <template #title>{{ $t('adoption.adoptionInfo') }}</template>
+        <template #title>
+          {{ $t('adoption.adoptionInfo') }}
+        </template>
         <template #content>
           <div class="form-grid">
             <div class="form-field">
@@ -116,7 +126,10 @@
             </div>
 
             <div class="form-field">
-              <label for="contract_signed" class="checkbox-label">
+              <label
+                for="contract_signed"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="contract_signed"
                   v-model="formData.contract_signed"
@@ -127,7 +140,10 @@
             </div>
 
             <div class="form-field">
-              <label for="microchip_transferred" class="checkbox-label">
+              <label
+                for="microchip_transferred"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="microchip_transferred"
                   v-model="formData.microchip_transferred"
@@ -138,7 +154,10 @@
             </div>
 
             <div class="form-field">
-              <label for="return_policy_explained" class="checkbox-label">
+              <label
+                for="return_policy_explained"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="return_policy_explained"
                   v-model="formData.return_policy_explained"
@@ -149,7 +168,10 @@
             </div>
 
             <div class="form-field">
-              <label for="follow_up_required" class="checkbox-label">
+              <label
+                for="follow_up_required"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="follow_up_required"
                   v-model="formData.follow_up_required"
@@ -160,7 +182,10 @@
             </div>
           </div>
 
-          <div class="form-field full-width" v-if="formData.follow_up_required">
+          <div
+            v-if="formData.follow_up_required"
+            class="form-field full-width"
+          >
             <label for="follow_up_schedule">{{ $t('adoption.followUpSchedule') }}</label>
             <Textarea
               id="follow_up_schedule"

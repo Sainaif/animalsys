@@ -2,22 +2,48 @@
   <div class="inventory-list">
     <div class="page-header">
       <h1>{{ $t('inventory.title') }}</h1>
-      <Button :label="$t('inventory.addItem')" icon="pi pi-plus" @click="router.push('/staff/inventory/new')" />
+      <Button
+        :label="$t('inventory.addItem')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/inventory/new')"
+      />
     </div>
 
     <Card v-if="!loading && items.length > 0">
       <template #content>
-        <DataTable :value="items" paginator :rows="20">
-          <Column field="name" :header="$t('inventory.itemName')" />
-          <Column field="category" :header="$t('inventory.category')">
+        <DataTable
+          :value="items"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="name"
+            :header="$t('inventory.itemName')"
+          />
+          <Column
+            field="category"
+            :header="$t('inventory.category')"
+          >
             <template #body="slotProps">
               {{ $t(`inventory.${slotProps.data.category}`) }}
             </template>
           </Column>
-          <Column field="quantity_in_stock" :header="$t('inventory.quantityInStock')" />
-          <Column field="minimum_quantity" :header="$t('inventory.minimumQuantity')" />
-          <Column field="unit" :header="$t('inventory.unit')" />
-          <Column field="status" :header="$t('common.status')">
+          <Column
+            field="quantity_in_stock"
+            :header="$t('inventory.quantityInStock')"
+          />
+          <Column
+            field="minimum_quantity"
+            :header="$t('inventory.minimumQuantity')"
+          />
+          <Column
+            field="unit"
+            :header="$t('inventory.unit')"
+          />
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ $t(`inventory.${slotProps.data.status}`) }}
@@ -27,8 +53,16 @@
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/inventory/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/inventory/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -37,7 +71,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && items.length === 0" :message="$t('inventory.noItemsFound')" />
+    <EmptyState
+      v-if="!loading && items.length === 0"
+      :message="$t('inventory.noItemsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

@@ -6,52 +6,64 @@
       <Card class="report-card">
         <template #header>
           <div class="card-header">
-            <i class="pi pi-chart-bar"></i>
+            <i class="pi pi-chart-bar" />
             <h2>{{ $t('reports.animalReports') }}</h2>
           </div>
         </template>
         <template #content>
           <p>Animal intake, outcomes, and population statistics</p>
-          <Button :label="$t('reports.generateReport')" @click="generateReport('animals')" />
+          <Button
+            :label="$t('reports.generateReport')"
+            @click="generateReport('animals')"
+          />
         </template>
       </Card>
 
       <Card class="report-card">
         <template #header>
           <div class="card-header">
-            <i class="pi pi-heart"></i>
+            <i class="pi pi-heart" />
             <h2>{{ $t('reports.adoptionReports') }}</h2>
           </div>
         </template>
         <template #content>
           <p>Adoption applications, success rates, and trends</p>
-          <Button :label="$t('reports.generateReport')" @click="generateReport('adoptions')" />
+          <Button
+            :label="$t('reports.generateReport')"
+            @click="generateReport('adoptions')"
+          />
         </template>
       </Card>
 
       <Card class="report-card">
         <template #header>
           <div class="card-header">
-            <i class="pi pi-dollar"></i>
+            <i class="pi pi-dollar" />
             <h2>{{ $t('reports.financeReports') }}</h2>
           </div>
         </template>
         <template #content>
           <p>Donations, expenses, and financial summaries</p>
-          <Button :label="$t('reports.generateReport')" @click="generateReport('finance')" />
+          <Button
+            :label="$t('reports.generateReport')"
+            @click="generateReport('finance')"
+          />
         </template>
       </Card>
 
       <Card class="report-card">
         <template #header>
           <div class="card-header">
-            <i class="pi pi-box"></i>
+            <i class="pi pi-box" />
             <h2>{{ $t('reports.inventoryReports') }}</h2>
           </div>
         </template>
         <template #content>
           <p>Stock levels, usage patterns, and procurement needs</p>
-          <Button :label="$t('reports.generateReport')" @click="generateReport('inventory')" />
+          <Button
+            :label="$t('reports.generateReport')"
+            @click="generateReport('inventory')"
+          />
         </template>
       </Card>
     </div>
@@ -59,12 +71,10 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 
-const { t } = useI18n()
 const toast = useToast()
 
 const generateReport = (reportType) => {

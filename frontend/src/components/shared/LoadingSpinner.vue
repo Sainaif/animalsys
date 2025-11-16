@@ -1,8 +1,15 @@
 <template>
-  <div v-if="fullPage" class="loading-overlay">
+  <div
+    v-if="fullPage"
+    class="loading-overlay"
+  >
     <ProgressSpinner :style="{ width: spinnerSize, height: spinnerSize }" />
   </div>
-  <div v-else class="loading-inline" :class="{ 'loading-center': center }">
+  <div
+    v-else
+    class="loading-inline"
+    :class="{ 'loading-center': center }"
+  >
     <ProgressSpinner :style="{ width: spinnerSize, height: spinnerSize }" />
   </div>
 </template>

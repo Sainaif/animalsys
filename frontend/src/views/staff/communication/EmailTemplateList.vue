@@ -2,20 +2,40 @@
   <div class="email-template-list">
     <div class="page-header">
       <h1>{{ $t('communication.emailTemplates') }}</h1>
-      <Button :label="$t('communication.addEmailTemplate')" icon="pi pi-plus" @click="router.push('/staff/communication/templates/new')" />
+      <Button
+        :label="$t('communication.addEmailTemplate')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/communication/templates/new')"
+      />
     </div>
 
     <Card v-if="!loading && templates.length > 0">
       <template #content>
-        <DataTable :value="templates" paginator :rows="20">
-          <Column field="name" :header="$t('communication.templateName')" />
-          <Column field="subject" :header="$t('communication.subject')" />
-          <Column field="template_type" :header="$t('communication.templateType')">
+        <DataTable
+          :value="templates"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="name"
+            :header="$t('communication.templateName')"
+          />
+          <Column
+            field="subject"
+            :header="$t('communication.subject')"
+          />
+          <Column
+            field="template_type"
+            :header="$t('communication.templateType')"
+          >
             <template #body="slotProps">
               {{ $t(`communication.${slotProps.data.template_type}`) }}
             </template>
           </Column>
-          <Column field="is_active" :header="$t('communication.isActive')">
+          <Column
+            field="is_active"
+            :header="$t('communication.isActive')"
+          >
             <template #body="slotProps">
               <Badge :variant="slotProps.data.is_active ? 'success' : 'neutral'">
                 {{ slotProps.data.is_active ? $t('common.yes') : $t('common.no') }}
@@ -25,8 +45,16 @@
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/communication/templates/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/communication/templates/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -35,7 +63,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && templates.length === 0" :message="$t('communication.noEmailTemplatesFound')" />
+    <EmptyState
+      v-if="!loading && templates.length === 0"
+      :message="$t('communication.noEmailTemplatesFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

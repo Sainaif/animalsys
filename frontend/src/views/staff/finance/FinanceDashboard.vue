@@ -5,30 +5,39 @@
     </div>
 
     <div class="dashboard-grid">
-      <Card class="module-card" @click="router.push('/staff/finance/donors')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/finance/donors')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-users module-icon"></i>
+            <i class="pi pi-users module-icon" />
             <h2>{{ $t('finance.donors') }}</h2>
             <p>Manage donors and donor relationships</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/finance/donations')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/finance/donations')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-money-bill module-icon"></i>
+            <i class="pi pi-money-bill module-icon" />
             <h2>{{ $t('finance.donations') }}</h2>
             <p>Track donations and receipts</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/finance/campaigns')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/finance/campaigns')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-megaphone module-icon"></i>
+            <i class="pi pi-megaphone module-icon" />
             <h2>{{ $t('finance.campaigns') }}</h2>
             <p>Manage fundraising campaigns</p>
           </div>

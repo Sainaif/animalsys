@@ -202,12 +202,20 @@ onMounted(() => {
 <template>
   <div class="dashboard">
     <div class="welcome-section">
-      <h1>{{ $t('dashboard.welcome') }}, {{ authStore.user?.first_name || 'User' }}!</h1>
+      <h1>{{ $t('dashboard.welcome') }}, {{ authStore.user?.first_name || $t('dashboard.user') }}!</h1>
       <p>{{ $t('dashboard.overview') }}</p>
-      <p v-if="lastUpdated" class="last-updated">{{ $t('dashboard.lastUpdated', { time: lastUpdated }) }}</p>
+      <p
+        v-if="lastUpdated"
+        class="last-updated"
+      >
+        {{ $t('dashboard.lastUpdated', { time: lastUpdated }) }}
+      </p>
     </div>
 
-    <div v-if="loading" class="loading-container">
+    <div
+      v-if="loading"
+      class="loading-container"
+    >
       <ProgressSpinner />
     </div>
 
@@ -220,12 +228,22 @@ onMounted(() => {
           :class="{ clickable: stat.route }"
           @click="navigateToStat(stat.route)"
         >
-          <div class="stat-icon" :style="{ backgroundColor: stat.color }">
-            <i class="pi" :class="stat.icon"></i>
+          <div
+            class="stat-icon"
+            :style="{ backgroundColor: stat.color }"
+          >
+            <i
+              class="pi"
+              :class="stat.icon"
+            />
           </div>
           <div class="stat-content">
-            <div class="stat-label">{{ stat.label }}</div>
-            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">
+              {{ stat.label }}
+            </div>
+            <div class="stat-value">
+              {{ stat.value }}
+            </div>
           </div>
         </div>
       </div>
@@ -244,12 +262,20 @@ onMounted(() => {
           </template>
           <template #content>
             <div v-if="recentAnimals && recentAnimals.length > 0">
-              <DataTable :value="recentAnimals" :rows="5">
+              <DataTable
+                :value="recentAnimals"
+                :rows="5"
+              >
                 <Column :header="$t('animal.name')">
                   <template #body="slotProps">
                     <div class="animal-cell">
-                      <div class="animal-name">{{ getAnimalName(slotProps.data) }}</div>
-                      <small v-if="slotProps.data.breed" class="animal-breed">{{ slotProps.data.breed }}</small>
+                      <div class="animal-name">
+                        {{ getAnimalName(slotProps.data) }}
+                      </div>
+                      <small
+                        v-if="slotProps.data.breed"
+                        class="animal-breed"
+                      >{{ slotProps.data.breed }}</small>
                     </div>
                   </template>
                 </Column>
@@ -260,7 +286,10 @@ onMounted(() => {
                 </Column>
                 <Column :header="$t('animal.status')">
                   <template #body="slotProps">
-                    <span class="status-pill" :class="`status-${slotProps.data.status}`">
+                    <span
+                      class="status-pill"
+                      :class="`status-${slotProps.data.status}`"
+                    >
                       {{ getAnimalStatus(slotProps.data) }}
                     </span>
                   </template>
@@ -282,8 +311,11 @@ onMounted(() => {
                 </Column>
               </DataTable>
             </div>
-            <div v-else class="empty-state">
-              <i class="pi pi-inbox"></i>
+            <div
+              v-else
+              class="empty-state"
+            >
+              <i class="pi pi-inbox" />
               <p>{{ $t('dashboard.noRecentActivity') }}</p>
             </div>
           </template>
@@ -297,26 +329,41 @@ onMounted(() => {
           </template>
           <template #content>
             <div v-if="upcomingTasks && upcomingTasks.length > 0">
-              <div v-for="task in upcomingTasks" :key="task.id" class="task-item">
+              <div
+                v-for="task in upcomingTasks"
+                :key="task.id"
+                class="task-item"
+              >
                 <div class="task-info">
-                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-title">
+                    {{ task.title }}
+                  </div>
                   <div class="task-meta">
                     <span>{{ getTaskCategoryLabel(task) }}</span>
                     <span>{{ formatTaskDate(task.due_date) }}</span>
                   </div>
                 </div>
                 <div class="task-tags">
-                  <span class="priority-pill" :class="`priority-${task.priority}`">
+                  <span
+                    class="priority-pill"
+                    :class="`priority-${task.priority}`"
+                  >
                     {{ getTaskPriorityLabel(task) }}
                   </span>
-                  <span class="status-pill" :class="`status-${task.status}`">
+                  <span
+                    class="status-pill"
+                    :class="`status-${task.status}`"
+                  >
                     {{ getTaskStatusLabel(task) }}
                   </span>
                 </div>
               </div>
             </div>
-            <div v-else class="empty-state">
-              <i class="pi pi-check-circle"></i>
+            <div
+              v-else
+              class="empty-state"
+            >
+              <i class="pi pi-check-circle" />
               <p>{{ $t('tasks.noUpcoming') }}</p>
             </div>
           </template>
@@ -327,10 +374,16 @@ onMounted(() => {
         <h3>{{ $t('dashboard.modules') }}</h3>
         <div class="modules-grid">
           <!-- Priority 1: Animals -->
-          <Card class="module-card" @click="router.push('/staff/animals')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/animals')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <i class="pi pi-heart"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+              >
+                <i class="pi pi-heart" />
               </div>
               <h4>{{ $t('nav.animals') }}</h4>
               <p>{{ $t('dashboard.manageAnimals') }}</p>
@@ -338,10 +391,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 2: Adoptions -->
-          <Card class="module-card" @click="router.push('/staff/adoptions')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/adoptions')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <i class="pi pi-users"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"
+              >
+                <i class="pi pi-users" />
               </div>
               <h4>{{ $t('nav.adoptions') }}</h4>
               <p>{{ $t('dashboard.manageAdoptions') }}</p>
@@ -349,10 +408,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 3: Veterinary -->
-          <Card class="module-card" @click="router.push('/staff/veterinary')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/veterinary')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <i class="pi pi-plus"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"
+              >
+                <i class="pi pi-plus" />
               </div>
               <h4>{{ $t('nav.veterinary') }}</h4>
               <p>{{ $t('dashboard.manageVeterinary') }}</p>
@@ -360,10 +425,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 4: Finance -->
-          <Card class="module-card" @click="router.push('/staff/finance')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/finance')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                <i class="pi pi-dollar"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"
+              >
+                <i class="pi pi-dollar" />
               </div>
               <h4>{{ $t('nav.finance') }}</h4>
               <p>{{ $t('dashboard.manageFinance') }}</p>
@@ -371,10 +442,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 5: Events & Volunteers -->
-          <Card class="module-card" @click="router.push('/staff/events')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/events')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                <i class="pi pi-calendar"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"
+              >
+                <i class="pi pi-calendar" />
               </div>
               <h4>{{ $t('nav.events') }}</h4>
               <p>{{ $t('dashboard.manageEvents') }}</p>
@@ -382,10 +459,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 6: Communications -->
-          <Card class="module-card" @click="router.push('/staff/communication')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/communication')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
-                <i class="pi pi-envelope"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);"
+              >
+                <i class="pi pi-envelope" />
               </div>
               <h4>{{ $t('nav.communication') }}</h4>
               <p>{{ $t('dashboard.manageCommunication') }}</p>
@@ -393,10 +476,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 7: Partners -->
-          <Card class="module-card" @click="router.push('/staff/partners')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/partners')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                <i class="pi pi-building"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"
+              >
+                <i class="pi pi-building" />
               </div>
               <h4>{{ $t('nav.partners') }}</h4>
               <p>{{ $t('dashboard.managePartners') }}</p>
@@ -404,10 +493,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 8: Inventory -->
-          <Card class="module-card" @click="router.push('/staff/inventory')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/inventory')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
-                <i class="pi pi-box"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);"
+              >
+                <i class="pi pi-box" />
               </div>
               <h4>{{ $t('nav.inventory') }}</h4>
               <p>{{ $t('dashboard.manageInventory') }}</p>
@@ -415,10 +510,16 @@ onMounted(() => {
           </Card>
 
           <!-- Priority 9: Reports -->
-          <Card class="module-card" @click="router.push('/staff/reports')">
+          <Card
+            class="module-card"
+            @click="router.push('/staff/reports')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
-                <i class="pi pi-chart-bar"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);"
+              >
+                <i class="pi pi-chart-bar" />
               </div>
               <h4>{{ $t('nav.reports') }}</h4>
               <p>{{ $t('dashboard.viewReports') }}</p>
@@ -426,10 +527,16 @@ onMounted(() => {
           </Card>
 
           <!-- Contacts -->
-          <Card class="module-card" @click="router.push('/contacts')">
+          <Card
+            class="module-card"
+            @click="router.push('/contacts')"
+          >
             <template #content>
-              <div class="module-icon" style="background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%);">
-                <i class="pi pi-phone"></i>
+              <div
+                class="module-icon"
+                style="background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%);"
+              >
+                <i class="pi pi-phone" />
               </div>
               <h4>{{ $t('nav.contacts') }}</h4>
               <p>{{ $t('dashboard.manageContacts') }}</p>

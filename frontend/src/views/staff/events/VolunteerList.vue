@@ -2,26 +2,57 @@
   <div class="volunteer-list">
     <div class="page-header">
       <h1>{{ $t('event.volunteers') }}</h1>
-      <Button :label="$t('event.addVolunteer')" icon="pi pi-plus" @click="router.push('/staff/volunteers/new')" />
+      <Button
+        :label="$t('event.addVolunteer')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/volunteers/new')"
+      />
     </div>
 
     <Card v-if="!loading && volunteers.length > 0">
       <template #content>
-        <DataTable :value="volunteers" paginator :rows="20">
-          <Column field="first_name" :header="$t('event.firstName')">
-            <template #body="slotProps">{{ slotProps.data.first_name }} {{ slotProps.data.last_name }}</template>
-          </Column>
-          <Column field="email" :header="$t('finance.email')" />
-          <Column field="phone" :header="$t('finance.phone')" />
-          <Column field="total_hours" :header="$t('event.totalHours')" />
-          <Column field="volunteer_status" :header="$t('event.volunteerStatus')">
+        <DataTable
+          :value="volunteers"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="first_name"
+            :header="$t('event.firstName')"
+          >
             <template #body="slotProps">
-              <Badge :variant="getStatusVariant(slotProps.data.volunteer_status)">{{ $t(`finance.${slotProps.data.volunteer_status}`) }}</Badge>
+              {{ slotProps.data.first_name }} {{ slotProps.data.last_name }}
+            </template>
+          </Column>
+          <Column
+            field="email"
+            :header="$t('finance.email')"
+          />
+          <Column
+            field="phone"
+            :header="$t('finance.phone')"
+          />
+          <Column
+            field="total_hours"
+            :header="$t('event.totalHours')"
+          />
+          <Column
+            field="volunteer_status"
+            :header="$t('event.volunteerStatus')"
+          >
+            <template #body="slotProps">
+              <Badge :variant="getStatusVariant(slotProps.data.volunteer_status)">
+                {{ $t(`finance.${slotProps.data.volunteer_status}`) }}
+              </Badge>
             </template>
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -29,7 +60,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && volunteers.length === 0" :message="$t('event.noVolunteersFound')" />
+    <EmptyState
+      v-if="!loading && volunteers.length === 0"
+      :message="$t('event.noVolunteersFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

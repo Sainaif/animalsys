@@ -6,10 +6,12 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
+const { t } = useI18n()
 
 const email = ref('')
 const password = ref('')
@@ -19,13 +21,13 @@ const handleLogin = async () => {
   loading.value = true
   try {
     await authStore.login(email.value, password.value)
-    toast.add({ severity: 'success', summary: 'Success', detail: 'Login successful', life: 3000 })
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('auth.loginSuccess'), life: 3000 })
     router.push({ name: 'dashboard' })
   } catch (error) {
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: error.response?.data?.message || 'Login failed',
+      summary: t('common.error'),
+      detail: error.response?.data?.message || t('auth.loginFailed'),
       life: 5000
     })
   } finally {
@@ -38,31 +40,38 @@ const handleLogin = async () => {
   <div class="login-container">
     <div class="login-card card">
       <div class="login-header">
-        <h1 class="login-title">Animal Foundation CRM</h1>
-        <p class="login-subtitle">Sign in to continue</p>
+        <h1 class="login-title">
+          {{ $t('auth.loginTitle') }}
+        </h1>
+        <p class="login-subtitle">
+          {{ $t('auth.loginSubtitle') }}
+        </p>
       </div>
 
-      <form @submit.prevent="handleLogin" class="login-form">
+      <form
+        class="login-form"
+        @submit.prevent="handleLogin"
+      >
         <div class="field">
-          <label for="email">Email</label>
+          <label for="email">{{ $t('auth.email') }}</label>
           <InputText
             id="email"
             v-model="email"
             type="email"
-            placeholder="Enter your email"
+            :placeholder="$t('auth.emailPlaceholder')"
             required
             class="w-full"
           />
         </div>
 
         <div class="field">
-          <label for="password">Password</label>
+          <label for="password">{{ $t('auth.password') }}</label>
           <Password
             id="password"
             v-model="password"
-            placeholder="Enter your password"
+            :placeholder="$t('auth.passwordPlaceholder')"
             :feedback="false"
-            toggleMask
+            toggle-mask
             required
             class="w-full"
           />
@@ -70,7 +79,7 @@ const handleLogin = async () => {
 
         <Button
           type="submit"
-          label="Login"
+          :label="$t('auth.login')"
           icon="pi pi-sign-in"
           :loading="loading"
           class="w-full"

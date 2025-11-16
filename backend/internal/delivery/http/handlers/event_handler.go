@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
 	"github.com/sainaif/animalsys/backend/internal/domain/repositories"
 	"github.com/sainaif/animalsys/backend/internal/usecase/event"
@@ -197,6 +198,12 @@ func (h *EventHandler) ListEvents(c *gin.Context) {
 
 	events, total, err := h.eventUseCase.ListEvents(c.Request.Context(), filter)
 	if err != nil {
+		log.Error().
+			Err(err).
+			Str("path", c.FullPath()).
+			Str("type", c.Query("type")).
+			Str("status", c.Query("status")).
+			Msg("failed to list events")
 		HandleError(c, err)
 		return
 	}
@@ -455,7 +462,6 @@ func (h *EventHandler) GetEventStatistics(c *gin.Context) {
 	c.JSON(http.StatusOK, stats)
 }
 
-
 // GetPastEvents gets past events
 func (h *EventHandler) GetPastEvents(c *gin.Context) {
 	// Return mock past events list
@@ -464,7 +470,6 @@ func (h *EventHandler) GetPastEvents(c *gin.Context) {
 		"total":  0,
 	})
 }
-
 
 // RegisterForEvent registers a user for an event
 func (h *EventHandler) RegisterForEvent(c *gin.Context) {

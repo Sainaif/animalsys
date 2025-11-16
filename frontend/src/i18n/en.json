@@ -26,7 +26,11 @@
     "enableDarkMode": "Enable dark mode",
     "enableLightMode": "Enable light mode",
     "openMenu": "Open navigation menu",
-    "closeMenu": "Close navigation menu"
+    "closeMenu": "Close navigation menu",
+    "success": "Success",
+    "error": "Error",
+    "genericError": "Something went wrong. Please try again.",
+    "notAvailable": "Not available"
   },
   "auth": {
     "login": "Login",
@@ -38,7 +42,11 @@
     "loginTitle": "Welcome to Animal Foundation CRM",
     "loginSubtitle": "Please sign in to continue",
     "invalidCredentials": "Invalid email or password",
-    "staffLogin": "Staff Login"
+    "staffLogin": "Staff Login",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password"
   },
   "nav": {
     "home": "Home",
@@ -142,11 +150,15 @@
       "message": "Message (optional)",
       "submit": "Complete Donation",
       "thankYou": "Thank you for your support!",
+      "thankYouDetail": "Thank you for your {amount} USD donation!",
+      "failDetail": "Failed to process donation. Please try again.",
       "processing": "Processing your donation..."
     },
     "footer": {
       "about": "About",
       "contact": "Contact",
+      "address": "123 Animal Street<br>City, State 12345",
+      "phone": "+1 (234) 567-890",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "followUs": "Follow Us",
@@ -311,6 +323,7 @@
   "dashboard": {
     "title": "Staff Dashboard",
     "welcome": "Welcome back",
+    "user": "User",
     "overview": "Overview",
     "quickStats": "Quick Statistics",
     "recentActivity": "Recent Activity",
@@ -802,7 +815,8 @@
     "itemCreated": "Item created successfully",
     "itemUpdated": "Item updated successfully",
     "itemDeleted": "Item deleted successfully",
-    "transactionCreated": "Transaction created successfully"
+    "transactionCreated": "Transaction created successfully",
+    "itemCreateFailed": "Failed to create inventory item"
   },
   "system": {
     "title": "System Management",
@@ -830,6 +844,12 @@
     "noTasksFound": "No tasks found",
     "noDocumentsFound": "No documents found"
   },
+  "contact": {
+    "email": "hello@happypaws.org",
+    "phone": "+1 (234) 567-890",
+    "address": "123 Animal Street<br>City, State 12345",
+    "followUs": "Follow us"
+  },
   "reports": {
     "title": "Reports & Analytics",
     "animalReports": "Animal Reports",
@@ -841,5 +861,43 @@
     "dateRange": "Date Range",
     "from": "From",
     "to": "To"
+  },
+  "settings": {
+    "title": "Settings",
+    "saveSuccess": "Settings saved successfully!",
+    "general": {
+      "title": "General Settings",
+      "foundationName": "Foundation Name",
+      "legalName": "Legal Name",
+      "description": "Description",
+      "contactEmail": "Contact Email",
+      "contactPhone": "Contact Phone",
+      "website": "Website",
+      "address": "Address",
+      "neverUpdated": "No changes saved yet.",
+      "lastUpdated": "Last updated",
+      "validation": "Please review the highlighted fields.",
+      "foundationNameRequired": "Foundation name is required.",
+      "emailRequired": "Contact and sender email addresses are required.",
+      "loadError": "Unable to load settings.",
+      "saveError": "Unable to save settings.",
+      "noSettingsConfigured": "Settings not found.",
+      "noSettingsConfiguredDescription": "Provide the organization details to start using this section."
+    },
+    "localization": {
+      "title": "Localization",
+      "defaultLanguage": "Default Language"
+    },
+    "email": {
+      "title": "Email Configuration",
+      "fromName": "From name",
+      "fromEmail": "From email",
+      "smtpServer": "SMTP Server",
+      "smtpPort": "SMTP Port",
+      "smtpUsername": "SMTP Username",
+      "smtpPassword": "SMTP Password",
+      "smtpPasswordHint": "Leave blank to keep the existing password.",
+      "enableTls": "Use TLS/SSL"
+    }
   }
 }

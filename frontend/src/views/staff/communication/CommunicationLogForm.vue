@@ -1,61 +1,121 @@
 <template>
   <div class="communication-log-form">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? $t('common.edit') : $t('communication.addCommunicationLog') }}</h1>
     </div>
 
     <Card>
       <template #content>
-        <form @submit.prevent="handleSubmit" class="form-grid">
+        <form
+          class="form-grid"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-field">
             <label for="communication_type">{{ $t('communication.communicationType') }} *</label>
-            <Dropdown id="communication_type" v-model="formData.communication_type" :options="typeOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="communication_type"
+              v-model="formData.communication_type"
+              :options="typeOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="communication_date">{{ $t('communication.communicationDate') }} *</label>
-            <Calendar id="communication_date" v-model="formData.communication_date" date-format="yy-mm-dd" show-icon required />
+            <Calendar
+              id="communication_date"
+              v-model="formData.communication_date"
+              date-format="yy-mm-dd"
+              show-icon
+              required
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="subject">{{ $t('communication.subject') }} *</label>
-            <InputText id="subject" v-model="formData.subject" required />
+            <InputText
+              id="subject"
+              v-model="formData.subject"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="recipient_type">{{ $t('communication.recipientType') }} *</label>
-            <Dropdown id="recipient_type" v-model="formData.recipient_type" :options="recipientTypeOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="recipient_type"
+              v-model="formData.recipient_type"
+              :options="recipientTypeOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="recipient_name">{{ $t('communication.recipient') }}</label>
-            <InputText id="recipient_name" v-model="formData.recipient_name" />
+            <InputText
+              id="recipient_name"
+              v-model="formData.recipient_name"
+            />
           </div>
 
           <div class="form-field">
             <label for="sender_name">{{ $t('communication.sender') }}</label>
-            <InputText id="sender_name" v-model="formData.sender_name" />
+            <InputText
+              id="sender_name"
+              v-model="formData.sender_name"
+            />
           </div>
 
           <div class="form-field">
             <label for="status">{{ $t('common.status') }} *</label>
-            <Dropdown id="status" v-model="formData.status" :options="statusOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="status"
+              v-model="formData.status"
+              :options="statusOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="message">{{ $t('communication.message') }}</label>
-            <Textarea id="message" v-model="formData.message" rows="5" />
+            <Textarea
+              id="message"
+              v-model="formData.message"
+              rows="5"
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="notes">{{ $t('communication.notes') }}</label>
-            <Textarea id="notes" v-model="formData.notes" rows="3" />
+            <Textarea
+              id="notes"
+              v-model="formData.notes"
+              rows="3"
+            />
           </div>
 
           <div class="form-actions full-width">
-            <Button :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" type="button" />
-            <Button :label="$t('common.save')" type="submit" />
+            <Button
+              :label="$t('common.cancel')"
+              class="p-button-secondary"
+              type="button"
+              @click="router.back()"
+            />
+            <Button
+              :label="$t('common.save')"
+              type="submit"
+            />
           </div>
         </form>
       </template>

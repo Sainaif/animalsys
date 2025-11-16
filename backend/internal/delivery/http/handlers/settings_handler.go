@@ -168,25 +168,56 @@ func (h *SettingsHandler) GetOperatingHours(c *gin.Context) {
 
 // GetOrganizationSettings gets organization settings
 func (h *SettingsHandler) GetOrganizationSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"organization": map[string]interface{}{"name": "", "description": ""}})
+	org, err := h.settingsUseCase.GetOrganizationSettings(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, org)
 }
 
 // UpdateOrganizationSettings updates organization settings
 func (h *SettingsHandler) UpdateOrganizationSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Organization settings updated"})
+	var req settings.UpdateOrganizationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+	org, err := h.settingsUseCase.UpdateOrganizationSettings(c.Request.Context(), &req, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, org)
 }
 
 // GetEmailSettings gets email settings
 func (h *SettingsHandler) GetEmailSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"email": map[string]interface{}{"smtp_host": "", "smtp_port": 0}})
+	email, err := h.settingsUseCase.GetEmailSettings(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, email)
 }
 
 // GetNotificationSettings gets notification settings
 func (h *SettingsHandler) GetNotificationSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"notifications": map[string]interface{}{"enabled": false}})
+	notifications, err := h.settingsUseCase.GetNotificationSettings(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, notifications)
 }
 
 // GetIntegrationSettings gets integration settings
 func (h *SettingsHandler) GetIntegrationSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"integrations": map[string]interface{}{}})
+	integrations, err := h.settingsUseCase.GetIntegrationSettings(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, integrations)
 }

@@ -149,3 +149,91 @@ func (uc *SettingsUseCase) GetContactInfo(ctx context.Context) (*entities.Contac
 func (uc *SettingsUseCase) GetOperatingHours(ctx context.Context) (map[string]entities.OperatingHour, error) {
 	return uc.settingsRepo.GetOperatingHours(ctx)
 }
+
+// OrganizationSettings represents general org data
+type OrganizationSettings struct {
+	Name        string                  `json:"name"`
+	LegalName   string                  `json:"legal_name,omitempty"`
+	Description string                  `json:"description,omitempty"`
+	ContactInfo entities.ContactDetails `json:"contact_info"`
+	Address     entities.AddressInfo    `json:"address,omitempty"`
+}
+
+// UpdateOrganizationRequest payload
+type UpdateOrganizationRequest struct {
+	Name        string                  `json:"name" binding:"required"`
+	LegalName   string                  `json:"legal_name,omitempty"`
+	Description string                  `json:"description,omitempty"`
+	ContactInfo entities.ContactDetails `json:"contact_info"`
+	Address     *entities.AddressInfo   `json:"address,omitempty"`
+}
+
+// GetOrganizationSettings returns organization info
+func (uc *SettingsUseCase) GetOrganizationSettings(ctx context.Context) (*OrganizationSettings, error) {
+	settings, err := uc.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrganizationSettings{
+		Name:        settings.Name,
+		LegalName:   settings.LegalName,
+		Description: settings.Description,
+		ContactInfo: settings.ContactInfo,
+		Address:     settings.Address,
+	}, nil
+}
+
+// UpdateOrganizationSettings updates general settings
+func (uc *SettingsUseCase) UpdateOrganizationSettings(ctx context.Context, req *UpdateOrganizationRequest, userID primitive.ObjectID) (*OrganizationSettings, error) {
+	if req.ContactInfo.Email == "" {
+		return nil, errors.NewBadRequest("Contact email is required")
+	}
+
+	settings, err := uc.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	settings.Name = req.Name
+	settings.LegalName = req.LegalName
+	settings.Description = req.Description
+	settings.ContactInfo = req.ContactInfo
+	if req.Address != nil {
+		settings.Address = *req.Address
+	}
+	settings.UpdatedBy = userID
+
+	if err := uc.settingsRepo.Update(ctx, settings); err != nil {
+		return nil, err
+	}
+
+	return uc.GetOrganizationSettings(ctx)
+}
+
+// GetEmailSettings returns email configuration
+func (uc *SettingsUseCase) GetEmailSettings(ctx context.Context) (*entities.EmailSettings, error) {
+	settings, err := uc.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.EmailSettings, nil
+}
+
+// GetNotificationSettings returns notification preferences
+func (uc *SettingsUseCase) GetNotificationSettings(ctx context.Context) (*entities.NotificationSettings, error) {
+	settings, err := uc.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.NotificationSettings, nil
+}
+
+// GetIntegrationSettings returns feature flags
+func (uc *SettingsUseCase) GetIntegrationSettings(ctx context.Context) (*entities.FeatureFlags, error) {
+	settings, err := uc.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.Features, nil
+}

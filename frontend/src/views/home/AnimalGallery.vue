@@ -12,8 +12,8 @@
         <Dropdown
           v-model="filters.species"
           :options="speciesOptions"
-          optionLabel="label"
-          optionValue="value"
+          option-label="label"
+          option-value="value"
           class="filter-dropdown"
           @change="applyFilters"
         />
@@ -36,7 +36,10 @@
 
     <section class="gallery-grid">
       <div class="container">
-        <div v-if="featuredAnimal" class="featured-card">
+        <div
+          v-if="featuredAnimal"
+          class="featured-card"
+        >
           <div class="featured-header">
             <h3>{{ $t('home.adoptions.viewProfile') }}</h3>
             <Button
@@ -47,7 +50,10 @@
           </div>
           <div class="animal-card featured">
             <div class="animal-image">
-              <img :src="getAnimalImageSrc(featuredAnimal)" :alt="getAnimalName(featuredAnimal)" />
+              <img
+                :src="getAnimalImageSrc(featuredAnimal)"
+                :alt="getAnimalName(featuredAnimal)"
+              >
               <span class="animal-badge">{{ getStatusLabel(featuredAnimal) }}</span>
             </div>
             <div class="animal-info">
@@ -64,23 +70,35 @@
           </div>
         </div>
 
-        <div v-if="loading && animals.length === 0" class="loading-state">
+        <div
+          v-if="loading && animals.length === 0"
+          class="loading-state"
+        >
           <ProgressSpinner />
         </div>
 
-        <div v-else-if="animals.length === 0" class="empty-state">
+        <div
+          v-else-if="animals.length === 0"
+          class="empty-state"
+        >
           <i class="pi pi-paw" />
           <p>{{ $t('animal.noAnimalsFound') }}</p>
         </div>
 
-        <div v-else class="animals-grid">
+        <div
+          v-else
+          class="animals-grid"
+        >
           <div
             v-for="animal in animals"
             :key="animal.id"
             class="animal-card"
           >
             <div class="animal-image">
-              <img :src="getAnimalImageSrc(animal)" :alt="getAnimalName(animal)" />
+              <img
+                :src="getAnimalImageSrc(animal)"
+                :alt="getAnimalName(animal)"
+              >
               <span class="animal-badge">{{ getStatusLabel(animal) }}</span>
             </div>
             <div class="animal-info">
@@ -97,7 +115,10 @@
           </div>
         </div>
 
-        <div v-if="hasMore" class="load-more">
+        <div
+          v-if="hasMore"
+          class="load-more"
+        >
           <Button
             :label="$t('home.adoptions.loadMore')"
             icon="pi pi-arrow-down"

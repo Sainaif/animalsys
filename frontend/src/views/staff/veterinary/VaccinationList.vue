@@ -2,26 +2,59 @@
   <div class="vaccination-list">
     <div class="page-header">
       <h1>{{ $t('veterinary.vaccinations') }}</h1>
-      <Button :label="$t('veterinary.addVaccination')" icon="pi pi-plus" @click="router.push('/staff/veterinary/vaccinations/new')" />
+      <Button
+        :label="$t('veterinary.addVaccination')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/veterinary/vaccinations/new')"
+      />
     </div>
 
     <Card v-if="!loading && vaccinations.length > 0">
       <template #content>
-        <DataTable :value="vaccinations" paginator :rows="20">
-          <Column field="animal.name" header="Animal">
-            <template #body="slotProps">{{ formatAnimalName(slotProps.data.animal) }}</template>
+        <DataTable
+          :value="vaccinations"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            header="Animal"
+          >
+            <template #body="slotProps">
+              {{ formatAnimalName(slotProps.data.animal) }}
+            </template>
           </Column>
-          <Column field="vaccine_name" :header="$t('veterinary.vaccineName')" />
-          <Column field="vaccination_date" :header="$t('veterinary.vaccinationDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.vaccination_date) }}</template>
+          <Column
+            field="vaccine_name"
+            :header="$t('veterinary.vaccineName')"
+          />
+          <Column
+            field="vaccination_date"
+            :header="$t('veterinary.vaccinationDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.vaccination_date) }}
+            </template>
           </Column>
-          <Column field="next_due_date" :header="$t('veterinary.nextDueDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.next_due_date) }}</template>
+          <Column
+            field="next_due_date"
+            :header="$t('veterinary.nextDueDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.next_due_date) }}
+            </template>
           </Column>
-          <Column field="veterinarian_name" :header="$t('veterinary.veterinarianName')" />
+          <Column
+            field="veterinarian_name"
+            :header="$t('veterinary.veterinarianName')"
+          />
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -29,7 +62,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && vaccinations.length === 0" :message="$t('veterinary.noVaccinationsFound')" />
+    <EmptyState
+      v-if="!loading && vaccinations.length === 0"
+      :message="$t('veterinary.noVaccinationsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

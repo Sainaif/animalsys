@@ -27,29 +27,51 @@
 
     <Card v-if="!loading && visits.length > 0">
       <template #content>
-        <DataTable :value="visits" paginator :rows="20">
-          <Column field="animal.name" header="Animal">
+        <DataTable
+          :value="visits"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            header="Animal"
+          >
             <template #body="slotProps">
               {{ formatAnimalName(slotProps.data.animal) }}
             </template>
           </Column>
-          <Column field="visit_date" :header="$t('veterinary.visitDate')">
+          <Column
+            field="visit_date"
+            :header="$t('veterinary.visitDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.visit_date) }}
             </template>
           </Column>
-          <Column field="visit_type" :header="$t('veterinary.visitType')">
+          <Column
+            field="visit_type"
+            :header="$t('veterinary.visitType')"
+          >
             <template #body="slotProps">
               {{ formatVisitType(slotProps.data.visit_type) }}
             </template>
           </Column>
-          <Column field="veterinarian_name" :header="$t('veterinary.veterinarianName')" />
-          <Column field="reason" :header="$t('veterinary.reason')">
+          <Column
+            field="veterinarian_name"
+            :header="$t('veterinary.veterinarianName')"
+          />
+          <Column
+            field="reason"
+            :header="$t('veterinary.reason')"
+          >
             <template #body="slotProps">
               {{ truncate(slotProps.data.reason, 50) }}
             </template>
           </Column>
-          <Column field="follow_up_required" :header="$t('veterinary.followUpRequired')">
+          <Column
+            field="follow_up_required"
+            :header="$t('veterinary.followUpRequired')"
+          >
             <template #body="slotProps">
               <Badge :variant="slotProps.data.follow_up_required ? 'warning' : 'success'">
                 {{ slotProps.data.follow_up_required ? $t('common.yes') : $t('common.no') }}
@@ -77,7 +99,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && visits.length === 0" :message="$t('veterinary.noVisitsFound')" />
+    <EmptyState
+      v-if="!loading && visits.length === 0"
+      :message="$t('veterinary.noVisitsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

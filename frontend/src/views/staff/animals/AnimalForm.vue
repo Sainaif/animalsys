@@ -11,7 +11,9 @@
 
     <form @submit.prevent="handleSubmit">
       <Card>
-        <template #title>{{ $t('animal.basicInfo') }}</template>
+        <template #title>
+          {{ $t('animal.basicInfo') }}
+        </template>
         <template #content>
           <div class="form-grid">
             <div class="form-field">
@@ -177,11 +179,16 @@
       </Card>
 
       <Card class="mt-3">
-        <template #title>{{ $t('animal.medicalInfo') }}</template>
+        <template #title>
+          {{ $t('animal.medicalInfo') }}
+        </template>
         <template #content>
           <div class="form-grid">
             <div class="form-field">
-              <label for="spayed_neutered" class="checkbox-label">
+              <label
+                for="spayed_neutered"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="spayed_neutered"
                   v-model="formData.spayed_neutered"
@@ -192,7 +199,10 @@
             </div>
 
             <div class="form-field">
-              <label for="vaccinated" class="checkbox-label">
+              <label
+                for="vaccinated"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="vaccinated"
                   v-model="formData.vaccinated"
@@ -203,7 +213,10 @@
             </div>
 
             <div class="form-field">
-              <label for="house_trained" class="checkbox-label">
+              <label
+                for="house_trained"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="house_trained"
                   v-model="formData.house_trained"
@@ -214,7 +227,10 @@
             </div>
 
             <div class="form-field">
-              <label for="good_with_kids" class="checkbox-label">
+              <label
+                for="good_with_kids"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="good_with_kids"
                   v-model="formData.good_with_kids"
@@ -225,7 +241,10 @@
             </div>
 
             <div class="form-field">
-              <label for="good_with_dogs" class="checkbox-label">
+              <label
+                for="good_with_dogs"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="good_with_dogs"
                   v-model="formData.good_with_dogs"
@@ -236,7 +255,10 @@
             </div>
 
             <div class="form-field">
-              <label for="good_with_cats" class="checkbox-label">
+              <label
+                for="good_with_cats"
+                class="checkbox-label"
+              >
                 <Checkbox
                   id="good_with_cats"
                   v-model="formData.good_with_cats"
@@ -268,7 +290,9 @@
       </Card>
 
       <Card class="mt-3">
-        <template #title>{{ $t('animal.description') }}</template>
+        <template #title>
+          {{ $t('animal.description') }}
+        </template>
         <template #content>
           <div class="form-field">
             <label for="description">{{ $t('animal.description') }} (PL)</label>

@@ -1,88 +1,170 @@
 <template>
   <div class="visit-form-container">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? 'Edit Visit' : $t('veterinary.addVisit') }}</h1>
     </div>
 
     <form @submit.prevent="handleSubmit">
       <Card>
-        <template #title>{{ $t('veterinary.visit') }}</template>
+        <template #title>
+          {{ $t('veterinary.visit') }}
+        </template>
         <template #content>
           <div class="form-grid">
             <div class="form-field">
               <label for="animal_id">Animal ID *</label>
-              <InputText id="animal_id" v-model="formData.animal_id" required />
+              <InputText
+                id="animal_id"
+                v-model="formData.animal_id"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="visit_date">{{ $t('veterinary.visitDate') }} *</label>
-              <Calendar id="visit_date" v-model="formData.visit_date" date-format="yy-mm-dd" required />
+              <Calendar
+                id="visit_date"
+                v-model="formData.visit_date"
+                date-format="yy-mm-dd"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="visit_type">{{ $t('veterinary.visitType') }} *</label>
-              <Dropdown id="visit_type" v-model="formData.visit_type" :options="visitTypeOptions" option-label="label" option-value="value" required />
+              <Dropdown
+                id="visit_type"
+                v-model="formData.visit_type"
+                :options="visitTypeOptions"
+                option-label="label"
+                option-value="value"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="veterinarian_name">{{ $t('veterinary.veterinarianName') }} *</label>
-              <InputText id="veterinarian_name" v-model="formData.veterinarian_name" required />
+              <InputText
+                id="veterinarian_name"
+                v-model="formData.veterinarian_name"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="clinic_name">{{ $t('veterinary.clinicName') }}</label>
-              <InputText id="clinic_name" v-model="formData.clinic_name" />
+              <InputText
+                id="clinic_name"
+                v-model="formData.clinic_name"
+              />
             </div>
 
             <div class="form-field">
               <label for="weight">{{ $t('veterinary.weight') }} (kg)</label>
-              <InputNumber id="weight" v-model="formData.weight" :min="0" :max-fraction-digits="2" />
+              <InputNumber
+                id="weight"
+                v-model="formData.weight"
+                :min="0"
+                :max-fraction-digits="2"
+              />
             </div>
 
             <div class="form-field">
               <label for="temperature">{{ $t('veterinary.temperature') }} (°C)</label>
-              <InputNumber id="temperature" v-model="formData.temperature" :min="0" :max-fraction-digits="1" />
+              <InputNumber
+                id="temperature"
+                v-model="formData.temperature"
+                :min="0"
+                :max-fraction-digits="1"
+              />
             </div>
 
             <div class="form-field">
               <label for="cost">{{ $t('veterinary.cost') }}</label>
-              <InputNumber id="cost" v-model="formData.cost" mode="currency" currency="USD" :min="0" />
+              <InputNumber
+                id="cost"
+                v-model="formData.cost"
+                mode="currency"
+                currency="USD"
+                :min="0"
+              />
             </div>
 
             <div class="form-field full-width">
               <label for="reason">{{ $t('veterinary.reason') }} *</label>
-              <Textarea id="reason" v-model="formData.reason" rows="3" required />
+              <Textarea
+                id="reason"
+                v-model="formData.reason"
+                rows="3"
+                required
+              />
             </div>
 
             <div class="form-field full-width">
               <label for="diagnosis">{{ $t('veterinary.diagnosis') }}</label>
-              <Textarea id="diagnosis" v-model="formData.diagnosis" rows="3" />
+              <Textarea
+                id="diagnosis"
+                v-model="formData.diagnosis"
+                rows="3"
+              />
             </div>
 
             <div class="form-field full-width">
               <label for="treatment_provided">{{ $t('veterinary.treatmentProvided') }}</label>
-              <Textarea id="treatment_provided" v-model="formData.treatment_provided" rows="3" />
+              <Textarea
+                id="treatment_provided"
+                v-model="formData.treatment_provided"
+                rows="3"
+              />
             </div>
 
             <div class="form-field">
-              <label for="follow_up_required" class="checkbox-label">
-                <Checkbox id="follow_up_required" v-model="formData.follow_up_required" :binary="true" />
+              <label
+                for="follow_up_required"
+                class="checkbox-label"
+              >
+                <Checkbox
+                  id="follow_up_required"
+                  v-model="formData.follow_up_required"
+                  :binary="true"
+                />
                 {{ $t('veterinary.followUpRequired') }}
               </label>
             </div>
 
-            <div class="form-field" v-if="formData.follow_up_required">
+            <div
+              v-if="formData.follow_up_required"
+              class="form-field"
+            >
               <label for="follow_up_date">{{ $t('veterinary.followUpDate') }}</label>
-              <Calendar id="follow_up_date" v-model="formData.follow_up_date" date-format="yy-mm-dd" />
+              <Calendar
+                id="follow_up_date"
+                v-model="formData.follow_up_date"
+                date-format="yy-mm-dd"
+              />
             </div>
           </div>
         </template>
       </Card>
 
       <div class="form-actions">
-        <Button type="button" :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" />
-        <Button type="submit" :label="$t('common.save')" icon="pi pi-check" :loading="saving" />
+        <Button
+          type="button"
+          :label="$t('common.cancel')"
+          class="p-button-secondary"
+          @click="router.back()"
+        />
+        <Button
+          type="submit"
+          :label="$t('common.save')"
+          icon="pi pi-check"
+          :loading="saving"
+        />
       </div>
     </form>
   </div>

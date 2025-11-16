@@ -25,6 +25,7 @@ import (
 	authUC "github.com/sainaif/animalsys/backend/internal/usecase/auth"
 	campaignUC "github.com/sainaif/animalsys/backend/internal/usecase/campaign"
 	communicationUC "github.com/sainaif/animalsys/backend/internal/usecase/communication"
+	contactUC "github.com/sainaif/animalsys/backend/internal/usecase/contact"
 	dashboardUC "github.com/sainaif/animalsys/backend/internal/usecase/dashboard"
 	documentUC "github.com/sainaif/animalsys/backend/internal/usecase/document"
 	donationUC "github.com/sainaif/animalsys/backend/internal/usecase/donation"
@@ -89,6 +90,7 @@ func main() {
 	campaignRepo := repositories.NewCampaignRepository(db)
 	eventRepo := repositories.NewEventRepository(db)
 	volunteerRepo := repositories.NewVolunteerRepository(db)
+	contactRepo := repositories.NewContactRepository(db)
 	eventAttendanceRepo := repositories.NewEventAttendanceRepository(db)
 	volunteerAssignmentRepo := repositories.NewVolunteerAssignmentRepository(db)
 	communicationTemplateRepo := repositories.NewCommunicationTemplateRepository(db)
@@ -140,6 +142,9 @@ func main() {
 	}
 	if err := eventRepo.EnsureIndexes(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to create event indexes")
+	}
+	if err := contactRepo.EnsureIndexes(ctx); err != nil {
+		log.Error().Err(err).Msg("Failed to create contact indexes")
 	}
 	if err := volunteerRepo.EnsureIndexes(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to create volunteer indexes")
@@ -265,6 +270,7 @@ func main() {
 		volunteerAssignmentRepo,
 		auditLogRepo,
 	)
+	contactUseCase := contactUC.NewUseCase(contactRepo)
 	communicationUseCase := communicationUC.NewCommunicationUseCase(
 		communicationRepo,
 		communicationTemplateRepo,
@@ -348,6 +354,7 @@ func main() {
 	campaignHandler := handlers.NewCampaignHandler(campaignUseCase)
 	eventHandler := handlers.NewEventHandler(eventUseCase)
 	volunteerHandler := handlers.NewVolunteerHandler(volunteerUseCase)
+	contactHandler := handlers.NewContactHandler(contactUseCase)
 	communicationHandler := handlers.NewCommunicationHandler(communicationUseCase)
 	notificationHandler := handlers.NewNotificationHandler(notificationUseCase)
 	reportHandler := handlers.NewReportHandler(reportUseCase)
@@ -385,7 +392,7 @@ func main() {
 	router.GET("/health", healthCheckHandler(db))
 
 	// Setup API routes
-	routes.SetupRoutes(router, authHandler, userHandler, animalHandler, veterinaryHandler, adoptionHandler, donorHandler, donationHandler, campaignHandler, eventHandler, volunteerHandler, communicationHandler, notificationHandler, reportHandler, dashboardHandler, settingsHandler, taskHandler, documentHandler, partnerHandler, transferHandler, inventoryHandler, stockTransactionHandler, auditLogHandler, monitoringHandler, medicalHandler, batchHandler, jwtService, userRepo)
+	routes.SetupRoutes(router, authHandler, userHandler, animalHandler, veterinaryHandler, adoptionHandler, donorHandler, donationHandler, campaignHandler, eventHandler, volunteerHandler, contactHandler, communicationHandler, notificationHandler, reportHandler, dashboardHandler, settingsHandler, taskHandler, documentHandler, partnerHandler, transferHandler, inventoryHandler, stockTransactionHandler, auditLogHandler, monitoringHandler, medicalHandler, batchHandler, jwtService, userRepo)
 
 	// Create server
 	srv := &http.Server{

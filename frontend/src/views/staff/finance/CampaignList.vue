@@ -2,33 +2,73 @@
   <div class="campaign-list">
     <div class="page-header">
       <h1>{{ $t('finance.campaigns') }}</h1>
-      <Button :label="$t('finance.addCampaign')" icon="pi pi-plus" @click="router.push('/staff/finance/campaigns/new')" />
+      <Button
+        :label="$t('finance.addCampaign')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/finance/campaigns/new')"
+      />
     </div>
 
     <Card v-if="!loading && campaigns.length > 0">
       <template #content>
-        <DataTable :value="campaigns" paginator :rows="20">
-          <Column field="name" :header="$t('finance.campaignName')" />
-          <Column field="campaign_type" :header="$t('finance.campaignType')">
-            <template #body="slotProps">{{ $t(`finance.${slotProps.data.campaign_type}`) }}</template>
-          </Column>
-          <Column field="start_date" :header="$t('finance.startDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.start_date) }}</template>
-          </Column>
-          <Column field="goal_amount" :header="$t('finance.goalAmount')">
-            <template #body="slotProps">{{ formatCurrency(slotProps.data.goal_amount) }}</template>
-          </Column>
-          <Column field="raised_amount" :header="$t('finance.raisedAmount')">
-            <template #body="slotProps">{{ formatCurrency(slotProps.data.raised_amount) }}</template>
-          </Column>
-          <Column field="status" :header="$t('common.status')">
+        <DataTable
+          :value="campaigns"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="name"
+            :header="$t('finance.campaignName')"
+          />
+          <Column
+            field="campaign_type"
+            :header="$t('finance.campaignType')"
+          >
             <template #body="slotProps">
-              <Badge :variant="getStatusVariant(slotProps.data.status)">{{ $t(`finance.${slotProps.data.status}`) }}</Badge>
+              {{ $t(`finance.${slotProps.data.campaign_type}`) }}
+            </template>
+          </Column>
+          <Column
+            field="start_date"
+            :header="$t('finance.startDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.start_date) }}
+            </template>
+          </Column>
+          <Column
+            field="goal_amount"
+            :header="$t('finance.goalAmount')"
+          >
+            <template #body="slotProps">
+              {{ formatCurrency(slotProps.data.goal_amount) }}
+            </template>
+          </Column>
+          <Column
+            field="raised_amount"
+            :header="$t('finance.raisedAmount')"
+          >
+            <template #body="slotProps">
+              {{ formatCurrency(slotProps.data.raised_amount) }}
+            </template>
+          </Column>
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
+            <template #body="slotProps">
+              <Badge :variant="getStatusVariant(slotProps.data.status)">
+                {{ $t(`finance.${slotProps.data.status}`) }}
+              </Badge>
             </template>
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -36,7 +76,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && campaigns.length === 0" :message="$t('finance.noCampaignsFound')" />
+    <EmptyState
+      v-if="!loading && campaigns.length === 0"
+      :message="$t('finance.noCampaignsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

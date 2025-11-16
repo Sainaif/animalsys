@@ -6,7 +6,18 @@ export const eventService = {
   // Events
   async getEvents(params?: QueryParams): Promise<PaginatedResponse<Event>> {
     const response = await api.get('/events', { params })
-    return response.data
+    const payload = response.data
+
+    if (Array.isArray(payload?.events)) {
+      return {
+        data: payload.events,
+        total: payload.total ?? payload.events.length,
+        limit: payload.limit ?? params?.limit ?? payload.events.length,
+        offset: payload.offset ?? params?.offset ?? 0
+      }
+    }
+
+    return payload
   },
 
   async getEvent(id: string): Promise<Event> {

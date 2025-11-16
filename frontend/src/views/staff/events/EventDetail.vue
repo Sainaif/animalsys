@@ -2,13 +2,29 @@
   <div class="event-detail">
     <LoadingSpinner v-if="loading" />
 
-    <div v-else-if="event" class="detail-container">
+    <div
+      v-else-if="event"
+      class="detail-container"
+    >
       <div class="detail-header">
-        <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+        <Button
+          icon="pi pi-arrow-left"
+          class="p-button-text"
+          @click="router.back()"
+        />
         <h1>{{ event.name }}</h1>
         <div class="header-actions">
-          <Button :label="$t('common.edit')" icon="pi pi-pencil" @click="router.push(`/staff/events/${event.id}/edit`)" />
-          <Button :label="$t('common.delete')" icon="pi pi-trash" class="p-button-danger" @click="confirmDelete" />
+          <Button
+            :label="$t('common.edit')"
+            icon="pi pi-pencil"
+            @click="router.push(`/staff/events/${event.id}/edit`)"
+          />
+          <Button
+            :label="$t('common.delete')"
+            icon="pi pi-trash"
+            class="p-button-danger"
+            @click="confirmDelete"
+          />
         </div>
       </div>
 
@@ -17,7 +33,9 @@
           <div class="status-info">
             <div class="status-item">
               <label>{{ $t('common.status') }}</label>
-              <Badge :variant="getStatusVariant(event.status)">{{ $t(`event.${event.status}`) }}</Badge>
+              <Badge :variant="getStatusVariant(event.status)">
+                {{ $t(`event.${event.status}`) }}
+              </Badge>
             </div>
             <div class="status-item">
               <label>{{ $t('event.eventType') }}</label>
@@ -94,7 +112,10 @@
           </Card>
         </TabPanel>
 
-        <TabPanel header="Budget" v-if="event.budget || event.raised_amount">
+        <TabPanel
+          v-if="event.budget || event.raised_amount"
+          header="Budget"
+        >
           <Card>
             <template #content>
               <div class="info-grid">

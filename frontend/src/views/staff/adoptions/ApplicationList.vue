@@ -22,21 +22,43 @@
 
     <Card v-if="!loading && applications.length > 0">
       <template #content>
-        <DataTable :value="applications" paginator :rows="20">
-          <Column field="animal.name" header="Animal">
+        <DataTable
+          :value="applications"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            header="Animal"
+          >
             <template #body="slotProps">
               {{ formatAnimalName(slotProps.data) }}
             </template>
           </Column>
-          <Column field="applicant_first_name" :header="$t('adoption.firstName')" />
-          <Column field="applicant_last_name" :header="$t('adoption.lastName')" />
-          <Column field="email" :header="$t('adoption.email')" />
-          <Column field="application_date" :header="$t('adoption.applicationDate')">
+          <Column
+            field="applicant_first_name"
+            :header="$t('adoption.firstName')"
+          />
+          <Column
+            field="applicant_last_name"
+            :header="$t('adoption.lastName')"
+          />
+          <Column
+            field="email"
+            :header="$t('adoption.email')"
+          />
+          <Column
+            field="application_date"
+            :header="$t('adoption.applicationDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.application_date) }}
             </template>
           </Column>
-          <Column field="status" :header="$t('adoption.status')">
+          <Column
+            field="status"
+            :header="$t('adoption.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ formatStatusLabel(slotProps.data.status) }}
@@ -57,7 +79,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && applications.length === 0" :message="$t('adoption.noApplicationsFound')" />
+    <EmptyState
+      v-if="!loading && applications.length === 0"
+      :message="$t('adoption.noApplicationsFound')"
+    />
   </div>
 </template>
 

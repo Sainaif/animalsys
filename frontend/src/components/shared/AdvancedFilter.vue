@@ -3,30 +3,68 @@
     <template #content>
       <div class="filter-grid">
         <!-- Search -->
-        <div v-if="showSearch" class="filter-field">
+        <div
+          v-if="showSearch"
+          class="filter-field"
+        >
           <label>{{ $t('common.search') }}</label>
-          <InputText v-model="localFilters.search" :placeholder="searchPlaceholder" @input="emitFilters" />
+          <InputText
+            v-model="localFilters.search"
+            :placeholder="searchPlaceholder"
+            @input="emitFilters"
+          />
         </div>
 
         <!-- Date Range -->
-        <div v-if="showDateRange" class="filter-field">
+        <div
+          v-if="showDateRange"
+          class="filter-field"
+        >
           <label>{{ $t('reports.from') }}</label>
-          <Calendar v-model="localFilters.dateFrom" date-format="yy-mm-dd" show-icon @date-select="emitFilters" />
+          <Calendar
+            v-model="localFilters.dateFrom"
+            date-format="yy-mm-dd"
+            show-icon
+            @date-select="emitFilters"
+          />
         </div>
 
-        <div v-if="showDateRange" class="filter-field">
+        <div
+          v-if="showDateRange"
+          class="filter-field"
+        >
           <label>{{ $t('reports.to') }}</label>
-          <Calendar v-model="localFilters.dateTo" date-format="yy-mm-dd" show-icon @date-select="emitFilters" />
+          <Calendar
+            v-model="localFilters.dateTo"
+            date-format="yy-mm-dd"
+            show-icon
+            @date-select="emitFilters"
+          />
         </div>
 
         <!-- Custom filter slots -->
-        <slot></slot>
+        <slot />
 
         <!-- Action buttons -->
         <div class="filter-actions">
-          <Button :label="$t('common.filter')" icon="pi pi-filter" @click="emitFilters" />
-          <Button :label="$t('common.export')" icon="pi pi-download" class="p-button-secondary" @click="$emit('export')" v-if="showExport" />
-          <Button label="Clear" icon="pi pi-times" class="p-button-text" @click="clearFilters" />
+          <Button
+            :label="$t('common.filter')"
+            icon="pi pi-filter"
+            @click="emitFilters"
+          />
+          <Button
+            v-if="showExport"
+            :label="$t('common.export')"
+            icon="pi pi-download"
+            class="p-button-secondary"
+            @click="$emit('export')"
+          />
+          <Button
+            label="Clear"
+            icon="pi pi-times"
+            class="p-button-text"
+            @click="clearFilters"
+          />
         </div>
       </div>
     </template>

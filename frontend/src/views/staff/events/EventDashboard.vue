@@ -5,30 +5,39 @@
     </div>
 
     <div class="dashboard-grid">
-      <Card class="module-card" @click="router.push('/staff/events')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/events')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-calendar module-icon"></i>
+            <i class="pi pi-calendar module-icon" />
             <h2>{{ $t('event.title') }}</h2>
             <p>Manage events and activities</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/volunteers')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/volunteers')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-users module-icon"></i>
+            <i class="pi pi-users module-icon" />
             <h2>{{ $t('event.volunteers') }}</h2>
             <p>Manage volunteer database</p>
           </div>
         </template>
       </Card>
 
-      <Card class="module-card" @click="router.push('/staff/shifts')">
+      <Card
+        class="module-card"
+        @click="router.push('/staff/shifts')"
+      >
         <template #content>
           <div class="module-content">
-            <i class="pi pi-clock module-icon"></i>
+            <i class="pi pi-clock module-icon" />
             <h2>{{ $t('event.shifts') }}</h2>
             <p>Schedule and track volunteer shifts</p>
           </div>

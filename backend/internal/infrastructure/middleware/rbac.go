@@ -121,6 +121,12 @@ const (
 	PermissionUpdateTransfers Permission = "transfers:update"
 	PermissionDeleteTransfers Permission = "transfers:delete"
 
+	// Contact permissions
+	PermissionViewContacts   Permission = "contacts:view"
+	PermissionCreateContacts Permission = "contacts:create"
+	PermissionUpdateContacts Permission = "contacts:update"
+	PermissionDeleteContacts Permission = "contacts:delete"
+
 	// Inventory permissions
 	PermissionViewInventory   Permission = "inventory:view"
 	PermissionCreateInventory Permission = "inventory:create"
@@ -141,6 +147,7 @@ var PermissionMatrix = map[entities.UserRole][]Permission{
 		PermissionViewVeterinary, PermissionCreateVeterinary, PermissionUpdateVeterinary, PermissionDeleteVeterinary,
 		PermissionViewDonors, PermissionCreateDonors, PermissionUpdateDonors, PermissionDeleteDonors,
 		PermissionViewDonations, PermissionCreateDonations, PermissionUpdateDonations, PermissionDeleteDonations,
+		PermissionViewContacts, PermissionCreateContacts, PermissionUpdateContacts, PermissionDeleteContacts,
 		PermissionViewCampaigns, PermissionCreateCampaigns, PermissionUpdateCampaigns, PermissionDeleteCampaigns,
 		PermissionViewEvents, PermissionCreateEvents, PermissionUpdateEvents, PermissionDeleteEvents,
 		PermissionViewVolunteers, PermissionCreateVolunteers, PermissionUpdateVolunteers, PermissionDeleteVolunteers,
@@ -165,6 +172,7 @@ var PermissionMatrix = map[entities.UserRole][]Permission{
 		PermissionViewVeterinary, PermissionCreateVeterinary, PermissionUpdateVeterinary, PermissionDeleteVeterinary,
 		PermissionViewDonors, PermissionCreateDonors, PermissionUpdateDonors, PermissionDeleteDonors,
 		PermissionViewDonations, PermissionCreateDonations, PermissionUpdateDonations, PermissionDeleteDonations,
+		PermissionViewContacts, PermissionCreateContacts, PermissionUpdateContacts, PermissionDeleteContacts,
 		PermissionViewCampaigns, PermissionCreateCampaigns, PermissionUpdateCampaigns, PermissionDeleteCampaigns,
 		PermissionViewEvents, PermissionCreateEvents, PermissionUpdateEvents, PermissionDeleteEvents,
 		PermissionViewVolunteers, PermissionCreateVolunteers, PermissionUpdateVolunteers, PermissionDeleteVolunteers,
@@ -189,6 +197,7 @@ var PermissionMatrix = map[entities.UserRole][]Permission{
 		PermissionViewDonors, PermissionCreateDonors,
 		PermissionViewDonations, PermissionCreateDonations,
 		PermissionViewCampaigns,
+		PermissionViewContacts, PermissionCreateContacts, PermissionUpdateContacts,
 		PermissionViewEvents, PermissionCreateEvents, PermissionUpdateEvents,
 		PermissionViewVolunteers, PermissionCreateVolunteers, PermissionUpdateVolunteers,
 		PermissionViewCommunications, PermissionCreateCommunications,
@@ -211,6 +220,7 @@ var PermissionMatrix = map[entities.UserRole][]Permission{
 		PermissionViewDonors,
 		PermissionViewDonations,
 		PermissionViewCampaigns,
+		PermissionViewContacts,
 		PermissionViewEvents,
 		PermissionViewVolunteers,
 		PermissionViewNotifications,

@@ -2,16 +2,25 @@
   <div class="animal-detail">
     <LoadingSpinner v-if="loading" />
 
-    <div v-else-if="animal" class="detail-container">
-      <div class="hero-card" :class="{ 'no-photo': !animalPhoto }">
+    <div
+      v-else-if="animal"
+      class="detail-container"
+    >
+      <div
+        class="hero-card"
+        :class="{ 'no-photo': !animalPhoto }"
+      >
         <img
           v-if="animalPhoto"
           :src="animalPhoto"
           :alt="animalName"
           class="hero-image"
-        />
-        <div v-else class="hero-placeholder">
-          <i class="pi pi-heart"></i>
+        >
+        <div
+          v-else
+          class="hero-placeholder"
+        >
+          <i class="pi pi-heart" />
         </div>
         <div class="hero-overlay">
           <div class="hero-header">
@@ -46,7 +55,10 @@
             <div class="hero-tags">
               <span class="tag">{{ locationLabel }}</span>
               <span class="tag">{{ formatDate(animal.intake_date) }}</span>
-              <span class="tag" v-if="animal.breed">{{ animal.breed }}</span>
+              <span
+                v-if="animal.breed"
+                class="tag"
+              >{{ animal.breed }}</span>
             </div>
           </div>
         </div>
@@ -54,7 +66,9 @@
 
       <div class="summary-grid">
         <Card class="summary-card">
-          <template #title>{{ $t('animal.medicalInfo') }}</template>
+          <template #title>
+            {{ $t('animal.medicalInfo') }}
+          </template>
           <template #content>
             <div class="summary-content">
               <div class="summary-item">
@@ -82,7 +96,9 @@
         </Card>
 
         <Card class="summary-card">
-          <template #title>{{ $t('animal.behaviorInfo') }}</template>
+          <template #title>
+            {{ $t('animal.behaviorInfo') }}
+          </template>
           <template #content>
             <div class="summary-content">
               <div class="summary-item">
@@ -266,7 +282,6 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Badge from '@/components/shared/Badge.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import { getLocalizedValue, translateValue, getAnimalImage } from '@/utils/animalHelpers'
-import Avatar from 'primevue/avatar'
 
 const router = useRouter()
 const route = useRoute()

@@ -2,22 +2,50 @@
   <div class="public-layout">
     <nav class="navbar">
       <div class="navbar-container">
-        <router-link to="/" class="navbar-brand">
-          <i class="pi pi-heart"></i>
+        <router-link
+          to="/"
+          class="navbar-brand"
+        >
+          <i class="pi pi-heart" />
           <span>Animal Foundation</span>
         </router-link>
 
-        <div class="navbar-menu" :class="{ active: menuActive }">
+        <div
+          class="navbar-menu"
+          :class="{ active: menuActive }"
+        >
           <div class="nav-links">
-            <router-link to="/" class="nav-link">{{ $t('nav.home') }}</router-link>
-            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('about')">
+            <router-link
+              to="/"
+              class="nav-link"
+            >
+              {{ $t('nav.home') }}
+            </router-link>
+            <button
+              type="button"
+              class="nav-link nav-link-button"
+              @click="navigateToSection('about')"
+            >
               {{ $t('nav.aboutUs') }}
             </button>
-            <router-link to="/animals" class="nav-link">{{ $t('nav.adoptAnimal') }}</router-link>
-            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('help')">
+            <router-link
+              to="/animals"
+              class="nav-link"
+            >
+              {{ $t('nav.adoptAnimal') }}
+            </router-link>
+            <button
+              type="button"
+              class="nav-link nav-link-button"
+              @click="navigateToSection('help')"
+            >
               {{ $t('nav.howToHelp') }}
             </button>
-            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('contact')">
+            <button
+              type="button"
+              class="nav-link nav-link-button"
+              @click="navigateToSection('contact')"
+            >
               {{ $t('nav.contact') }}
             </button>
           </div>
@@ -29,7 +57,10 @@
               class="p-button-rounded p-button-danger"
               @click="scrollToDonation"
             />
-            <router-link to="/login" class="staff-login-btn">
+            <router-link
+              to="/login"
+              class="staff-login-btn"
+            >
               <Button
                 :label="$t('auth.staffLogin')"
                 icon="pi pi-sign-in"
@@ -45,10 +76,10 @@
             <Dropdown
               v-model="currentLocale"
               :options="locales"
-              optionLabel="label"
-              optionValue="value"
-              @change="changeLocale"
+              option-label="label"
+              option-value="value"
               class="locale-dropdown"
+              @change="changeLocale"
             >
               <template #value="slotProps">
                 <span class="locale-flag">{{ getLocaleFlag(slotProps.value) }}</span>
@@ -68,7 +99,10 @@
           :aria-label="menuActive ? $t('common.closeMenu') : $t('common.openMenu')"
           @click="menuActive = !menuActive"
         >
-          <i class="pi" :class="menuActive ? 'pi-times' : 'pi-bars'"></i>
+          <i
+            class="pi"
+            :class="menuActive ? 'pi-times' : 'pi-bars'"
+          />
         </button>
       </div>
     </nav>
@@ -80,13 +114,15 @@
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-section">
-          <h3><i class="pi pi-heart"></i> Animal Foundation</h3>
+          <h3><i class="pi pi-heart" /> Animal Foundation</h3>
           <p>{{ $t('home.hero.subtitle') }}</p>
         </div>
         <div class="footer-section">
           <h4>{{ $t('home.footer.about') }}</h4>
           <a href="#about">{{ $t('nav.aboutUs') }}</a>
-          <router-link to="/animals">{{ $t('nav.adoptAnimal') }}</router-link>
+          <router-link to="/animals">
+            {{ $t('nav.adoptAnimal') }}
+          </router-link>
           <a href="#help">{{ $t('nav.howToHelp') }}</a>
         </div>
         <div class="footer-section">
@@ -97,9 +133,18 @@
         <div class="footer-section">
           <h4>{{ $t('home.footer.followUs') }}</h4>
           <div class="social-links">
-            <a href="#" aria-label="Facebook"><i class="pi pi-facebook"></i></a>
-            <a href="#" aria-label="Twitter"><i class="pi pi-twitter"></i></a>
-            <a href="#" aria-label="Instagram"><i class="pi pi-instagram"></i></a>
+            <a
+              href="#"
+              aria-label="Facebook"
+            ><i class="pi pi-facebook" /></a>
+            <a
+              href="#"
+              aria-label="Twitter"
+            ><i class="pi pi-twitter" /></a>
+            <a
+              href="#"
+              aria-label="Instagram"
+            ><i class="pi pi-instagram" /></a>
           </div>
         </div>
       </div>

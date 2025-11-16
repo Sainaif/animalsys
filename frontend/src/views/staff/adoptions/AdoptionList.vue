@@ -2,7 +2,12 @@
   <div class="adoption-list">
     <div class="page-header">
       <h1>{{ $t('adoption.title') }}</h1>
-      <Button :label="$t('common.export')" icon="pi pi-download" class="p-button-secondary" @click="exportAdoptions" />
+      <Button
+        :label="$t('common.export')"
+        icon="pi pi-download"
+        class="p-button-secondary"
+        @click="exportAdoptions"
+      />
     </div>
 
     <Card class="filters-card">
@@ -23,25 +28,47 @@
 
     <Card v-if="!loading && adoptions.length > 0">
       <template #content>
-        <DataTable :value="adoptions" paginator :rows="20">
-          <Column field="animal.name" header="Animal">
+        <DataTable
+          :value="adoptions"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            header="Animal"
+          >
             <template #body="slotProps">
-                {{ formatAnimalName(slotProps.data) }}
+              {{ formatAnimalName(slotProps.data) }}
             </template>
           </Column>
-          <Column field="adopter_first_name" :header="$t('adoption.firstName')" />
-          <Column field="adopter_last_name" :header="$t('adoption.lastName')" />
-          <Column field="adoption_date" :header="$t('adoption.adoptionDate')">
+          <Column
+            field="adopter_first_name"
+            :header="$t('adoption.firstName')"
+          />
+          <Column
+            field="adopter_last_name"
+            :header="$t('adoption.lastName')"
+          />
+          <Column
+            field="adoption_date"
+            :header="$t('adoption.adoptionDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.adoption_date) }}
             </template>
           </Column>
-          <Column field="adoption_fee" :header="$t('adoption.adoptionFee')">
+          <Column
+            field="adoption_fee"
+            :header="$t('adoption.adoptionFee')"
+          >
             <template #body="slotProps">
               {{ formatCurrency(slotProps.data.adoption_fee) }}
             </template>
           </Column>
-          <Column field="status" :header="$t('adoption.status')">
+          <Column
+            field="status"
+            :header="$t('adoption.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ formatStatusLabel(slotProps.data.status) }}
@@ -62,7 +89,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && adoptions.length === 0" :message="$t('adoption.noAdoptionsFound')" />
+    <EmptyState
+      v-if="!loading && adoptions.length === 0"
+      :message="$t('adoption.noAdoptionsFound')"
+    />
   </div>
 </template>
 

@@ -3,8 +3,12 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
-        <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
+        <h1 class="hero-title">
+          {{ $t('home.hero.title') }}
+        </h1>
+        <p class="hero-subtitle">
+          {{ $t('home.hero.subtitle') }}
+        </p>
         <div class="hero-actions">
           <Button
             :label="$t('home.hero.cta')"
@@ -23,23 +27,28 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="about-section">
+    <section
+      id="about"
+      class="about-section"
+    >
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('home.about.title') }}</h2>
-          <p class="subtitle">{{ $t('home.about.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.about.subtitle') }}
+          </p>
         </div>
         <div class="about-content">
           <div class="about-card">
-            <i class="pi pi-heart"></i>
+            <i class="pi pi-heart" />
             <h3>{{ $t('home.about.mission') }}</h3>
           </div>
           <div class="about-card">
-            <i class="pi pi-eye"></i>
+            <i class="pi pi-eye" />
             <h3>{{ $t('home.about.vision') }}</h3>
           </div>
           <div class="about-card">
-            <i class="pi pi-star"></i>
+            <i class="pi pi-star" />
             <h3>{{ $t('home.about.values') }}</h3>
           </div>
         </div>
@@ -51,57 +60,97 @@
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('home.statistics.title') }}</h2>
-          <p class="subtitle">{{ $t('home.statistics.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.statistics.subtitle') }}
+          </p>
         </div>
         <div class="stats-grid">
-          <div v-for="stat in statistics" :key="stat.label" class="stat-card">
-            <div class="stat-icon" :style="{ backgroundColor: stat.color }">
-              <i class="pi" :class="stat.icon"></i>
+          <div
+            v-for="stat in statistics"
+            :key="stat.label"
+            class="stat-card"
+          >
+            <div
+              class="stat-icon"
+              :style="{ backgroundColor: stat.color }"
+            >
+              <i
+                class="pi"
+                :class="stat.icon"
+              />
             </div>
-            <div class="stat-value">{{ formatNumber(stat.value) }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
+            <div class="stat-value">
+              {{ formatNumber(stat.value) }}
+            </div>
+            <div class="stat-label">
+              {{ stat.label }}
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Animals Section -->
-    <section id="animals" class="animals-section">
+    <section
+      id="animals"
+      class="animals-section"
+    >
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('home.adoptions.title') }}</h2>
-          <p class="subtitle">{{ $t('home.adoptions.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.adoptions.subtitle') }}
+          </p>
         </div>
 
-        <div v-if="loading" class="loading-container">
+        <div
+          v-if="loading"
+          class="loading-container"
+        >
           <ProgressSpinner />
         </div>
 
-        <div v-else-if="animals.length > 0" class="animals-grid">
-          <div v-for="animal in animals" :key="animal.id" class="animal-card">
+        <div
+          v-else-if="animals.length > 0"
+          class="animals-grid"
+        >
+          <div
+            v-for="animal in animals"
+            :key="animal.id"
+            class="animal-card"
+          >
             <div class="animal-image">
               <img
                 v-if="getAnimalImageSrc(animal)"
                 :src="getAnimalImageSrc(animal)"
                 :alt="getAnimalName(animal)"
-              />
-              <div v-else class="animal-placeholder">
-                <i class="pi pi-image"></i>
+              >
+              <div
+                v-else
+                class="animal-placeholder"
+              >
+                <i class="pi pi-image" />
               </div>
               <span class="animal-badge">{{ getStatusLabel(animal) }}</span>
             </div>
             <div class="animal-info">
               <h3>{{ getAnimalName(animal) }}</h3>
               <div class="animal-details">
-                <span><i class="pi pi-calendar"></i> {{ formatAge(animal) }}</span>
-                <span><i class="pi pi-tag"></i> {{ getAnimalSpeciesLabel(animal) }}</span>
-                <span v-if="getAnimalColorLabel(animal)"><i class="pi pi-palette"></i> {{ getAnimalColorLabel(animal) }}</span>
+                <span><i class="pi pi-calendar" /> {{ formatAge(animal) }}</span>
+                <span><i class="pi pi-tag" /> {{ getAnimalSpeciesLabel(animal) }}</span>
+                <span v-if="getAnimalColorLabel(animal)"><i class="pi pi-palette" /> {{ getAnimalColorLabel(animal) }}</span>
                 <span>
-                  <i class="pi" :class="getGenderIcon(animal)"></i>
+                  <i
+                    class="pi"
+                    :class="getGenderIcon(animal)"
+                  />
                   {{ getGenderLabel(animal) }}
                 </span>
               </div>
-              <p v-if="getAnimalDescription(animal)" class="animal-description">
+              <p
+                v-if="getAnimalDescription(animal)"
+                class="animal-description"
+              >
                 {{ truncateText(getAnimalDescription(animal), 100) }}
               </p>
               <Button
@@ -125,16 +174,24 @@
     </section>
 
     <!-- How to Help Section -->
-    <section id="help" class="help-section">
+    <section
+      id="help"
+      class="help-section"
+    >
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('home.howToHelp.title') }}</h2>
-          <p class="subtitle">{{ $t('home.howToHelp.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.howToHelp.subtitle') }}
+          </p>
         </div>
         <div class="help-grid">
           <div class="help-card">
-            <div class="help-icon" style="background-color: #3498db;">
-              <i class="pi pi-dollar"></i>
+            <div
+              class="help-icon"
+              style="background-color: #3498db;"
+            >
+              <i class="pi pi-dollar" />
             </div>
             <h3>{{ $t('home.howToHelp.donate.title') }}</h3>
             <p>{{ $t('home.howToHelp.donate.description') }}</p>
@@ -145,8 +202,11 @@
             />
           </div>
           <div class="help-card">
-            <div class="help-icon" style="background-color: #2ecc71;">
-              <i class="pi pi-users"></i>
+            <div
+              class="help-icon"
+              style="background-color: #2ecc71;"
+            >
+              <i class="pi pi-users" />
             </div>
             <h3>{{ $t('home.howToHelp.volunteer.title') }}</h3>
             <p>{{ $t('home.howToHelp.volunteer.description') }}</p>
@@ -157,8 +217,11 @@
             />
           </div>
           <div class="help-card">
-            <div class="help-icon" style="background-color: #e74c3c;">
-              <i class="pi pi-heart"></i>
+            <div
+              class="help-icon"
+              style="background-color: #e74c3c;"
+            >
+              <i class="pi pi-heart" />
             </div>
             <h3>{{ $t('home.howToHelp.adopt.title') }}</h3>
             <p>{{ $t('home.howToHelp.adopt.description') }}</p>
@@ -169,8 +232,11 @@
             />
           </div>
           <div class="help-card">
-            <div class="help-icon" style="background-color: #9b59b6;">
-              <i class="pi pi-share-alt"></i>
+            <div
+              class="help-icon"
+              style="background-color: #9b59b6;"
+            >
+              <i class="pi pi-share-alt" />
             </div>
             <h3>{{ $t('home.howToHelp.spread.title') }}</h3>
             <p>{{ $t('home.howToHelp.spread.description') }}</p>
@@ -184,11 +250,16 @@
     </section>
 
     <!-- Donation Section -->
-    <section id="donation" class="donation-section">
+    <section
+      id="donation"
+      class="donation-section"
+    >
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('home.donation.title') }}</h2>
-          <p class="subtitle">{{ $t('home.donation.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.donation.subtitle') }}
+          </p>
         </div>
         <div class="donation-card">
           <div class="donation-form">
@@ -237,7 +308,10 @@
                 </div>
                 <div class="form-field">
                   <label>{{ $t('home.donation.email') }}</label>
-                  <InputText v-model="donorInfo.email" type="email" />
+                  <InputText
+                    v-model="donorInfo.email"
+                    type="email"
+                  />
                 </div>
                 <div class="form-field">
                   <label>{{ $t('home.donation.phone') }}</label>
@@ -246,7 +320,10 @@
               </div>
               <div class="form-field">
                 <label>{{ $t('home.donation.message') }}</label>
-                <Textarea v-model="donorInfo.message" rows="3" />
+                <Textarea
+                  v-model="donorInfo.message"
+                  rows="3"
+                />
               </div>
             </div>
 
@@ -263,27 +340,32 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="contact-section">
+    <section
+      id="contact"
+      class="contact-section"
+    >
       <div class="container">
         <div class="section-header">
           <h2>{{ $t('nav.contact') }}</h2>
-          <p class="subtitle">{{ $t('home.hero.subtitle') }}</p>
+          <p class="subtitle">
+            {{ $t('home.hero.subtitle') }}
+          </p>
         </div>
         <div class="contact-info">
           <div class="contact-card">
-            <i class="pi pi-envelope"></i>
+            <i class="pi pi-envelope" />
             <h3>{{ $t('home.footer.contact') }}</h3>
-            <a href="mailto:info@animalfoundation.org">info@animalfoundation.org</a>
+            <a :href="`mailto:${$t('contact.email')}`">{{ $t('contact.email') }}</a>
           </div>
           <div class="contact-card">
-            <i class="pi pi-phone"></i>
-            <h3>Phone</h3>
-            <a href="tel:+1234567890">+1 (234) 567-890</a>
+            <i class="pi pi-phone" />
+            <h3>{{ $t('contact.phone') }}</h3>
+            <a :href="`tel:${$t('contact.phone')}`">{{ $t('contact.phone') }}</a>
           </div>
           <div class="contact-card">
-            <i class="pi pi-map-marker"></i>
-            <h3>Address</h3>
-            <p>123 Animal Street<br>City, State 12345</p>
+            <i class="pi pi-map-marker" />
+            <h3>{{ $t('contact.address') }}</h3>
+            <p v-html="$t('contact.address')" />
           </div>
         </div>
       </div>
@@ -549,7 +631,7 @@ const submitDonation = async () => {
     toast.add({
       severity: 'success',
       summary: t('home.donation.thankYou'),
-      detail: `Thank you for your ${amount} USD donation!`,
+      detail: t('home.donation.thankYouDetail', { amount }),
       life: 5000
     })
 
@@ -567,8 +649,8 @@ const submitDonation = async () => {
     console.error('Error submitting donation:', error)
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to process donation. Please try again.',
+      summary: t('common.error'),
+      detail: t('home.donation.failDetail'),
       life: 5000
     })
   }
@@ -582,7 +664,7 @@ onMounted(() => {
 
 watch(
   () => route.hash,
-  (hash, prev) => {
+  (hash) => {
     if (route.path === '/') {
       scrollToHash(hash)
     }

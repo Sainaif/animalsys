@@ -1,47 +1,90 @@
 <template>
   <div class="email-template-form">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? $t('common.edit') : $t('communication.addEmailTemplate') }}</h1>
     </div>
 
     <Card>
       <template #content>
-        <form @submit.prevent="handleSubmit" class="form-grid">
+        <form
+          class="form-grid"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-field full-width">
             <label for="name">{{ $t('communication.templateName') }} *</label>
-            <InputText id="name" v-model="formData.name" required />
+            <InputText
+              id="name"
+              v-model="formData.name"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="template_type">{{ $t('communication.templateType') }} *</label>
-            <Dropdown id="template_type" v-model="formData.template_type" :options="templateTypeOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="template_type"
+              v-model="formData.template_type"
+              :options="templateTypeOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="is_active">{{ $t('communication.isActive') }}</label>
-            <Checkbox id="is_active" v-model="formData.is_active" :binary="true" />
+            <Checkbox
+              id="is_active"
+              v-model="formData.is_active"
+              :binary="true"
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="subject">{{ $t('communication.subject') }} *</label>
-            <InputText id="subject" v-model="formData.subject" required />
+            <InputText
+              id="subject"
+              v-model="formData.subject"
+              required
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="body">{{ $t('communication.body') }} *</label>
-            <Textarea id="body" v-model="formData.body" rows="10" required />
+            <Textarea
+              id="body"
+              v-model="formData.body"
+              rows="10"
+              required
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="variables">{{ $t('communication.variables') }}</label>
-            <Chips id="variables" v-model="formData.variables" separator="," />
+            <Chips
+              id="variables"
+              v-model="formData.variables"
+              separator=","
+            />
             <small>Available variables: {name}, {email}, {phone}, {date}</small>
           </div>
 
           <div class="form-actions full-width">
-            <Button :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" type="button" />
-            <Button :label="$t('common.save')" type="submit" />
+            <Button
+              :label="$t('common.cancel')"
+              class="p-button-secondary"
+              type="button"
+              @click="router.back()"
+            />
+            <Button
+              :label="$t('common.save')"
+              type="submit"
+            />
           </div>
         </form>
       </template>
@@ -50,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'

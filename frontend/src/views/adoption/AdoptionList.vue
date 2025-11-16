@@ -1,6 +1,7 @@
 <template>
-  <div class="page-container">
-    <h1 class="page-title">Adoptions</h1>
-    <p>Adoption module will be implemented in Phase 5</p>
-  </div>
+  <StaffAdoptionList />
 </template>
+
+<script setup>
+import StaffAdoptionList from '@/views/staff/adoptions/AdoptionList.vue'
+</script>

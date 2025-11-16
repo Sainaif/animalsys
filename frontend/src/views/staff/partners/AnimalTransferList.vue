@@ -2,47 +2,91 @@
   <div class="animal-transfer-list">
     <div class="page-header">
       <h1>{{ $t('partner.animalTransfers') }}</h1>
-      <Button :label="$t('partner.addTransfer')" icon="pi pi-plus" @click="router.push('/staff/partners/transfers/new')" />
+      <Button
+        :label="$t('partner.addTransfer')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/partners/transfers/new')"
+      />
     </div>
 
     <Card class="filters-card">
       <template #content>
         <div class="filters">
-          <Dropdown v-model="filters.transfer_type" :options="transferTypeOptions" :placeholder="$t('partner.transferType')" option-label="label" option-value="value" show-clear @change="loadTransfers" />
-          <Dropdown v-model="filters.status" :options="statusOptions" :placeholder="$t('common.status')" option-label="label" option-value="value" show-clear @change="loadTransfers" />
+          <Dropdown
+            v-model="filters.transfer_type"
+            :options="transferTypeOptions"
+            :placeholder="$t('partner.transferType')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadTransfers"
+          />
+          <Dropdown
+            v-model="filters.status"
+            :options="statusOptions"
+            :placeholder="$t('common.status')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadTransfers"
+          />
         </div>
       </template>
     </Card>
 
     <Card v-if="!loading && transfers.length > 0">
       <template #content>
-        <DataTable :value="transfers" paginator :rows="20">
-          <Column field="animal.name" :header="$t('animal.name')">
+        <DataTable
+          :value="transfers"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            :header="$t('animal.name')"
+          >
             <template #body="slotProps">
               {{ slotProps.data.animal?.name || 'N/A' }}
             </template>
           </Column>
-          <Column field="transfer_type" :header="$t('partner.transferType')">
+          <Column
+            field="transfer_type"
+            :header="$t('partner.transferType')"
+          >
             <template #body="slotProps">
-              <Badge variant="info">{{ $t(`partner.${slotProps.data.transfer_type}`) }}</Badge>
+              <Badge variant="info">
+                {{ $t(`partner.${slotProps.data.transfer_type}`) }}
+              </Badge>
             </template>
           </Column>
-          <Column field="transfer_date" :header="$t('partner.transferDate')">
+          <Column
+            field="transfer_date"
+            :header="$t('partner.transferDate')"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.transfer_date) }}
             </template>
           </Column>
-          <Column field="from_organization.organization_name" :header="$t('partner.fromOrganization')">
+          <Column
+            field="from_organization.organization_name"
+            :header="$t('partner.fromOrganization')"
+          >
             <template #body="slotProps">
               {{ slotProps.data.from_organization?.organization_name || 'N/A' }}
             </template>
           </Column>
-          <Column field="to_organization.organization_name" :header="$t('partner.toOrganization')">
+          <Column
+            field="to_organization.organization_name"
+            :header="$t('partner.toOrganization')"
+          >
             <template #body="slotProps">
               {{ slotProps.data.to_organization?.organization_name || 'N/A' }}
             </template>
           </Column>
-          <Column field="status" :header="$t('common.status')">
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
                 {{ $t(`partner.${slotProps.data.status}`) }}
@@ -52,8 +96,16 @@
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="router.push(`/staff/partners/transfers/${slotProps.data.id}/edit`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/partners/transfers/${slotProps.data.id}/edit`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -62,7 +114,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && transfers.length === 0" :message="$t('partner.noTransfersFound')" />
+    <EmptyState
+      v-if="!loading && transfers.length === 0"
+      :message="$t('partner.noTransfersFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>
@@ -113,7 +168,7 @@ const loadTransfers = async () => {
   try {
     loading.value = true
     const params = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, v]) => v != null)
+      Object.entries(filters.value).filter(([, value]) => value != null)
     )
     const response = await partnerService.getAnimalTransfers(params)
     transfers.value = response.data

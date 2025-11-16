@@ -1,5 +1,8 @@
 <template>
-  <span class="badge" :class="variantClass">
+  <span
+    class="badge"
+    :class="variantClass"
+  >
     <slot>{{ text }}</slot>
   </span>
 </template>
@@ -8,7 +11,10 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  text: String,
+  text: {
+    type: String,
+    default: ''
+  },
   variant: {
     type: String,
     default: 'neutral',

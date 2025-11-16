@@ -1,76 +1,142 @@
 <template>
   <div class="campaign-form-container">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? 'Edit Campaign' : $t('finance.addCampaign') }}</h1>
     </div>
 
     <form @submit.prevent="handleSubmit">
       <Card>
-        <template #title>{{ $t('finance.campaign') }}</template>
+        <template #title>
+          {{ $t('finance.campaign') }}
+        </template>
         <template #content>
           <div class="form-grid">
             <div class="form-field full-width">
               <label for="name">{{ $t('finance.campaignName') }} *</label>
-              <InputText id="name" v-model="formData.name" required />
+              <InputText
+                id="name"
+                v-model="formData.name"
+                required
+              />
             </div>
 
             <div class="form-field full-width">
               <label for="description">{{ $t('event.description') }}</label>
-              <Textarea id="description" v-model="formData.description" rows="3" />
+              <Textarea
+                id="description"
+                v-model="formData.description"
+                rows="3"
+              />
             </div>
 
             <div class="form-field">
               <label for="campaign_type">{{ $t('finance.campaignType') }} *</label>
-              <Dropdown id="campaign_type" v-model="formData.campaign_type" :options="campaignTypeOptions" option-label="label" option-value="value" required />
+              <Dropdown
+                id="campaign_type"
+                v-model="formData.campaign_type"
+                :options="campaignTypeOptions"
+                option-label="label"
+                option-value="value"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="status">Status</label>
-              <Dropdown id="status" v-model="formData.status" :options="statusOptions" option-label="label" option-value="value" />
+              <Dropdown
+                id="status"
+                v-model="formData.status"
+                :options="statusOptions"
+                option-label="label"
+                option-value="value"
+              />
             </div>
 
             <div class="form-field">
               <label for="start_date">{{ $t('finance.startDate') }} *</label>
-              <Calendar id="start_date" v-model="formData.start_date" date-format="yy-mm-dd" required />
+              <Calendar
+                id="start_date"
+                v-model="formData.start_date"
+                date-format="yy-mm-dd"
+                required
+              />
             </div>
 
             <div class="form-field">
               <label for="end_date">{{ $t('finance.endDate') }}</label>
-              <Calendar id="end_date" v-model="formData.end_date" date-format="yy-mm-dd" />
+              <Calendar
+                id="end_date"
+                v-model="formData.end_date"
+                date-format="yy-mm-dd"
+              />
             </div>
 
             <div class="form-field">
               <label for="goal_amount">{{ $t('finance.goalAmount') }}</label>
-              <InputNumber id="goal_amount" v-model="formData.goal_amount" mode="currency" currency="USD" :min="0" />
+              <InputNumber
+                id="goal_amount"
+                v-model="formData.goal_amount"
+                mode="currency"
+                currency="USD"
+                :min="0"
+              />
             </div>
 
             <div class="form-field">
               <label for="coordinator_name">{{ $t('finance.coordinator') }}</label>
-              <InputText id="coordinator_name" v-model="formData.coordinator_name" />
+              <InputText
+                id="coordinator_name"
+                v-model="formData.coordinator_name"
+              />
             </div>
 
             <div class="form-field">
               <label for="coordinator_email">Coordinator Email</label>
-              <InputText id="coordinator_email" v-model="formData.coordinator_email" type="email" />
+              <InputText
+                id="coordinator_email"
+                v-model="formData.coordinator_email"
+                type="email"
+              />
             </div>
 
             <div class="form-field">
               <label for="target_audience">{{ $t('finance.targetAudience') }}</label>
-              <InputText id="target_audience" v-model="formData.target_audience" />
+              <InputText
+                id="target_audience"
+                v-model="formData.target_audience"
+              />
             </div>
 
             <div class="form-field full-width">
               <label for="notes">Notes</label>
-              <Textarea id="notes" v-model="formData.notes" rows="3" />
+              <Textarea
+                id="notes"
+                v-model="formData.notes"
+                rows="3"
+              />
             </div>
           </div>
         </template>
       </Card>
 
       <div class="form-actions">
-        <Button type="button" :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" />
-        <Button type="submit" :label="$t('common.save')" icon="pi pi-check" :loading="saving" />
+        <Button
+          type="button"
+          :label="$t('common.cancel')"
+          class="p-button-secondary"
+          @click="router.back()"
+        />
+        <Button
+          type="submit"
+          :label="$t('common.save')"
+          icon="pi pi-check"
+          :loading="saving"
+        />
       </div>
     </form>
   </div>

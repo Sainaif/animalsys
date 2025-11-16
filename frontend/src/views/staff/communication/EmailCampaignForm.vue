@@ -1,41 +1,87 @@
 <template>
   <div class="email-campaign-form">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? $t('common.edit') : $t('communication.addEmailCampaign') }}</h1>
     </div>
 
     <Card>
       <template #content>
-        <form @submit.prevent="handleSubmit" class="form-grid">
+        <form
+          class="form-grid"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-field full-width">
             <label for="name">{{ $t('communication.campaignName') }} *</label>
-            <InputText id="name" v-model="formData.name" required />
+            <InputText
+              id="name"
+              v-model="formData.name"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="template_id">{{ $t('communication.template') }} *</label>
-            <Dropdown id="template_id" v-model="formData.template_id" :options="templates" option-label="name" option-value="id" :placeholder="$t('communication.template')" required />
+            <Dropdown
+              id="template_id"
+              v-model="formData.template_id"
+              :options="templates"
+              option-label="name"
+              option-value="id"
+              :placeholder="$t('communication.template')"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="recipient_type">{{ $t('communication.recipientType') }} *</label>
-            <Dropdown id="recipient_type" v-model="formData.recipient_type" :options="recipientTypeOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="recipient_type"
+              v-model="formData.recipient_type"
+              :options="recipientTypeOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="scheduled_date">{{ $t('communication.scheduledDate') }}</label>
-            <Calendar id="scheduled_date" v-model="formData.scheduled_date" date-format="yy-mm-dd" show-icon />
+            <Calendar
+              id="scheduled_date"
+              v-model="formData.scheduled_date"
+              date-format="yy-mm-dd"
+              show-icon
+            />
           </div>
 
           <div class="form-field">
             <label for="status">{{ $t('common.status') }} *</label>
-            <Dropdown id="status" v-model="formData.status" :options="statusOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="status"
+              v-model="formData.status"
+              :options="statusOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-actions full-width">
-            <Button :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" type="button" />
-            <Button :label="$t('common.save')" type="submit" />
+            <Button
+              :label="$t('common.cancel')"
+              class="p-button-secondary"
+              type="button"
+              @click="router.back()"
+            />
+            <Button
+              :label="$t('common.save')"
+              type="submit"
+            />
           </div>
         </form>
       </template>

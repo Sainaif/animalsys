@@ -2,34 +2,69 @@
   <div class="donation-list">
     <div class="page-header">
       <h1>{{ $t('finance.donations') }}</h1>
-      <Button :label="$t('finance.addDonation')" icon="pi pi-plus" @click="router.push('/staff/finance/donations/new')" />
+      <Button
+        :label="$t('finance.addDonation')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/finance/donations/new')"
+      />
     </div>
 
     <Card v-if="!loading && donations.length > 0">
       <template #content>
-        <DataTable :value="donations" paginator :rows="20">
-          <Column field="donor.first_name" header="Donor">
+        <DataTable
+          :value="donations"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="donor.first_name"
+            header="Donor"
+          >
             <template #body="slotProps">
               {{ slotProps.data.donor?.organization_name || `${slotProps.data.donor?.first_name || ''} ${slotProps.data.donor?.last_name || ''}` }}
             </template>
           </Column>
-          <Column field="amount" :header="$t('finance.amount')">
-            <template #body="slotProps">{{ formatCurrency(slotProps.data.amount) }}</template>
-          </Column>
-          <Column field="donation_date" :header="$t('finance.donationDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.donation_date) }}</template>
-          </Column>
-          <Column field="donation_type" :header="$t('finance.donationType')">
-            <template #body="slotProps">{{ $t(`finance.${slotProps.data.donation_type}`) }}</template>
-          </Column>
-          <Column field="payment_status" :header="$t('finance.paymentStatus')">
+          <Column
+            field="amount"
+            :header="$t('finance.amount')"
+          >
             <template #body="slotProps">
-              <Badge :variant="getStatusVariant(slotProps.data.payment_status)">{{ $t(`finance.${slotProps.data.payment_status}`) }}</Badge>
+              {{ formatCurrency(slotProps.data.amount) }}
+            </template>
+          </Column>
+          <Column
+            field="donation_date"
+            :header="$t('finance.donationDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.donation_date) }}
+            </template>
+          </Column>
+          <Column
+            field="donation_type"
+            :header="$t('finance.donationType')"
+          >
+            <template #body="slotProps">
+              {{ $t(`finance.${slotProps.data.donation_type}`) }}
+            </template>
+          </Column>
+          <Column
+            field="payment_status"
+            :header="$t('finance.paymentStatus')"
+          >
+            <template #body="slotProps">
+              <Badge :variant="getStatusVariant(slotProps.data.payment_status)">
+                {{ $t(`finance.${slotProps.data.payment_status}`) }}
+              </Badge>
             </template>
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -37,7 +72,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && donations.length === 0" :message="$t('finance.noDonationsFound')" />
+    <EmptyState
+      v-if="!loading && donations.length === 0"
+      :message="$t('finance.noDonationsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

@@ -2,31 +2,71 @@
   <div class="event-list">
     <div class="page-header">
       <h1>{{ $t('event.title') }}</h1>
-      <Button :label="$t('event.addEvent')" icon="pi pi-plus" @click="router.push('/staff/events/new')" />
+      <Button
+        :label="$t('event.addEvent')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/events/new')"
+      />
     </div>
 
     <Card v-if="!loading && events.length > 0">
       <template #content>
-        <DataTable :value="events" paginator :rows="20">
-          <Column field="name" :header="$t('event.eventName')" />
-          <Column field="event_type" :header="$t('event.eventType')">
-            <template #body="slotProps">{{ $t(`event.${slotProps.data.event_type}`) }}</template>
-          </Column>
-          <Column field="start_date" :header="$t('event.startDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.start_date) }}</template>
-          </Column>
-          <Column field="location" :header="$t('event.location')" />
-          <Column field="registered_participants" :header="$t('event.registeredParticipants')" />
-          <Column field="status" :header="$t('common.status')">
+        <DataTable
+          :value="events"
+          paginator
+          :rows="20"
+        >
+          <Column :header="$t('event.eventName')">
             <template #body="slotProps">
-              <Badge :variant="getStatusVariant(slotProps.data.status)">{{ $t(`event.${slotProps.data.status}`) }}</Badge>
+              {{ getEventName(slotProps.data) }}
+            </template>
+          </Column>
+          <Column :header="$t('event.eventType')">
+            <template #body="slotProps">
+              {{ getEventTypeLabel(slotProps.data.event_type || slotProps.data.type) }}
+            </template>
+          </Column>
+          <Column
+            field="start_date"
+            :header="$t('event.startDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.start_date) }}
+            </template>
+          </Column>
+          <Column :header="$t('event.location')">
+            <template #body="slotProps">
+              {{ formatLocation(slotProps.data.location) }}
+            </template>
+          </Column>
+          <Column :header="$t('event.registeredParticipants')">
+            <template #body="slotProps">
+              {{ getRegistrationCount(slotProps.data) }}
+            </template>
+          </Column>
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
+            <template #body="slotProps">
+              <Badge :variant="getStatusVariant(slotProps.data.status)">
+                {{ $t(`event.${slotProps.data.status}`) }}
+              </Badge>
             </template>
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
               <div class="action-buttons">
-                <Button icon="pi pi-eye" class="p-button-rounded p-button-text" @click="router.push(`/staff/events/${slotProps.data.id}`)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+                <Button
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text"
+                  @click="router.push(`/staff/events/${slotProps.data.id}`)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -35,7 +75,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && events.length === 0" :message="$t('event.noEventsFound')" />
+    <EmptyState
+      v-if="!loading && events.length === 0"
+      :message="$t('event.noEventsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>
@@ -47,6 +90,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { eventService } from '@/services/eventService'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -57,7 +101,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -78,6 +122,38 @@ const loadEvents = async () => {
 
 const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
 const getStatusVariant = (status) => ({ planned: 'neutral', active: 'success', completed: 'info', cancelled: 'danger' }[status] || 'neutral')
+const getEventName = (event) => {
+  return getLocalizedValue(event?.name, locale.value) || t('common.notAvailable')
+}
+const getEventTypeLabel = (type) => {
+  if (!type) {
+    return t('common.notAvailable')
+  }
+  const key = `event.${type}`
+  const translated = t(key)
+  return translated === key ? type.replace(/_/g, ' ') : translated
+}
+const formatLocation = (location) => {
+  if (!location) return t('common.notAvailable')
+  if (typeof location === 'string') {
+    return location
+  }
+  const parts = [
+    location.name,
+    [location.city, location.state].filter(Boolean).join(', '),
+    location.country
+  ].filter((segment) => segment && segment.trim().length > 0)
+  return parts.join(' • ') || t('common.notAvailable')
+}
+const getRegistrationCount = (event) => {
+  if (typeof event?.registered_participants === 'number') {
+    return event.registered_participants
+  }
+  if (typeof event?.registration?.current_count === 'number') {
+    return event.registration.current_count
+  }
+  return 0
+}
 
 const confirmDelete = (event) => {
   confirm.require({

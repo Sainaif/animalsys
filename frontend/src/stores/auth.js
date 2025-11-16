@@ -19,17 +19,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Actions
   async function login(email, password) {
-    try {
-      const response = await api.post('/auth/login', { email, password })
-      const { access_token, refresh_token, user: userData } = response.data
+    const response = await api.post('/auth/login', { email, password })
+    const { access_token, refresh_token, user: userData } = response.data
 
-      setTokens(access_token, refresh_token)
-      user.value = userData
+    setTokens(access_token, refresh_token)
+    user.value = userData
 
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    return response.data
   }
 
   async function logout() {
@@ -42,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function refreshTokenAction() {
+  async function refreshSession() {
     try {
       const response = await api.post('/auth/refresh', {
         refresh_token: refreshToken.value
@@ -71,24 +67,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function updateProfile(data) {
-    try {
-      const response = await api.put(`/users/${user.value.id}`, data)
-      user.value = response.data
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await api.put(`/users/${user.value.id}`, data)
+    user.value = response.data
+    return response.data
   }
 
   async function changePassword(oldPassword, newPassword) {
-    try {
-      await api.put('/auth/change-password', {
-        old_password: oldPassword,
-        new_password: newPassword
-      })
-    } catch (error) {
-      throw error
-    }
+    await api.put('/auth/change-password', {
+      old_password: oldPassword,
+      new_password: newPassword
+    })
   }
 
   function setTokens(access, refresh) {
@@ -124,7 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Actions
     login,
     logout,
-    refreshToken: refreshTokenAction,
+    refreshSession,
     getCurrentUser,
     updateProfile,
     changePassword

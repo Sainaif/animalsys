@@ -1,71 +1,134 @@
 <template>
   <div class="partner-form">
     <div class="form-header">
-      <Button icon="pi pi-arrow-left" class="p-button-text" @click="router.back()" />
+      <Button
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        @click="router.back()"
+      />
       <h1>{{ isEdit ? $t('common.edit') : $t('partner.addPartner') }}</h1>
     </div>
 
     <Card>
       <template #content>
-        <form @submit.prevent="handleSubmit" class="form-grid">
+        <form
+          class="form-grid"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-field full-width">
             <label for="organization_name">{{ $t('partner.organizationName') }} *</label>
-            <InputText id="organization_name" v-model="formData.organization_name" required />
+            <InputText
+              id="organization_name"
+              v-model="formData.organization_name"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="partner_type">{{ $t('partner.partnerType') }} *</label>
-            <Dropdown id="partner_type" v-model="formData.partner_type" :options="partnerTypeOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="partner_type"
+              v-model="formData.partner_type"
+              :options="partnerTypeOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="status">{{ $t('common.status') }} *</label>
-            <Dropdown id="status" v-model="formData.status" :options="statusOptions" option-label="label" option-value="value" required />
+            <Dropdown
+              id="status"
+              v-model="formData.status"
+              :options="statusOptions"
+              option-label="label"
+              option-value="value"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="contact_person">{{ $t('partner.contactPerson') }} *</label>
-            <InputText id="contact_person" v-model="formData.contact_person" required />
+            <InputText
+              id="contact_person"
+              v-model="formData.contact_person"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="email">Email *</label>
-            <InputText id="email" v-model="formData.email" type="email" required />
+            <InputText
+              id="email"
+              v-model="formData.email"
+              type="email"
+              required
+            />
           </div>
 
           <div class="form-field">
             <label for="phone">{{ $t('finance.phone') }}</label>
-            <InputText id="phone" v-model="formData.phone" />
+            <InputText
+              id="phone"
+              v-model="formData.phone"
+            />
           </div>
 
           <div class="form-field">
             <label for="website">{{ $t('partner.website') }}</label>
-            <InputText id="website" v-model="formData.website" />
+            <InputText
+              id="website"
+              v-model="formData.website"
+            />
           </div>
 
           <div class="form-field">
             <label for="license_number">{{ $t('partner.licenseNumber') }}</label>
-            <InputText id="license_number" v-model="formData.license_number" />
+            <InputText
+              id="license_number"
+              v-model="formData.license_number"
+            />
           </div>
 
           <div class="form-field">
             <label for="capacity">{{ $t('partner.capacity') }}</label>
-            <InputNumber id="capacity" v-model="formData.capacity" />
+            <InputNumber
+              id="capacity"
+              v-model="formData.capacity"
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="address">{{ $t('finance.address') }}</label>
-            <Textarea id="address" v-model="addressString" rows="3" placeholder="Street, City, State, Postal Code, Country" />
+            <Textarea
+              id="address"
+              v-model="addressString"
+              rows="3"
+              placeholder="Street, City, State, Postal Code, Country"
+            />
           </div>
 
           <div class="form-field full-width">
             <label for="notes">{{ $t('communication.notes') }}</label>
-            <Textarea id="notes" v-model="formData.notes" rows="3" />
+            <Textarea
+              id="notes"
+              v-model="formData.notes"
+              rows="3"
+            />
           </div>
 
           <div class="form-actions full-width">
-            <Button :label="$t('common.cancel')" class="p-button-secondary" @click="router.back()" type="button" />
-            <Button :label="$t('common.save')" type="submit" />
+            <Button
+              :label="$t('common.cancel')"
+              class="p-button-secondary"
+              type="button"
+              @click="router.back()"
+            />
+            <Button
+              :label="$t('common.save')"
+              type="submit"
+            />
           </div>
         </form>
       </template>

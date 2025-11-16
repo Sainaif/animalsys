@@ -64,7 +64,10 @@
     </Card>
 
     <!-- Animals Table/Grid -->
-    <Card v-if="!loading && animals.length > 0" class="animals-card">
+    <Card
+      v-if="!loading && animals.length > 0"
+      class="animals-card"
+    >
       <template #content>
         <DataTable
           :value="animals"
@@ -74,75 +77,109 @@
           paginator
           @page="onPage"
         >
-          <Column field="photo_url" header="" style="width: 80px">
+          <Column
+            field="photo_url"
+            header=""
+            style="width: 80px"
+          >
             <template #body="slotProps">
               <img
                 v-if="getAnimalPhoto(slotProps.data)"
                 :src="getAnimalPhoto(slotProps.data)"
                 :alt="resolveAnimalName(slotProps.data)"
                 class="animal-thumbnail"
-              />
-              <div v-else class="animal-placeholder">
-                <i class="pi pi-image"></i>
+              >
+              <div
+                v-else
+                class="animal-placeholder"
+              >
+                <i class="pi pi-image" />
               </div>
             </template>
           </Column>
 
-          <Column field="name" :header="$t('animal.name')" sortable>
+          <Column
+            field="name"
+            :header="$t('animal.name')"
+            sortable
+          >
             <template #body="slotProps">
-              <router-link :to="`/staff/animals/${slotProps.data.id}`" class="animal-link">
+              <router-link
+                :to="`/staff/animals/${slotProps.data.id}`"
+                class="animal-link"
+              >
                 {{ resolveAnimalName(slotProps.data) }}
               </router-link>
             </template>
           </Column>
 
-          <Column field="species" :header="$t('animal.species')" sortable>
+          <Column
+            field="species"
+            :header="$t('animal.species')"
+            sortable
+          >
             <template #body="slotProps">
               {{ getSpeciesLabel(slotProps.data.species || slotProps.data.Species) }}
             </template>
           </Column>
 
-          <Column field="breed" :header="$t('animal.breed')" sortable />
+          <Column
+            field="breed"
+            :header="$t('animal.breed')"
+            sortable
+          />
 
-          <Column field="age" :header="$t('animal.age')">
+          <Column
+            field="age"
+            :header="$t('animal.age')"
+          >
             <template #body="slotProps">
               {{ formatAge(slotProps.data) }}
             </template>
           </Column>
 
-          <Column field="sex" :header="$t('animal.gender')">
+          <Column
+            field="sex"
+            :header="$t('animal.gender')"
+          >
             <template #body="slotProps">
               {{ $t(`animal.${slotProps.data.sex ?? 'unknown'}`) }}
             </template>
           </Column>
 
-          <Column field="status" :header="$t('animal.status')">
+          <Column
+            field="status"
+            :header="$t('animal.status')"
+          >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
-                {{ formatStatusLabel(slotProps.data.status) }}
+                {{ formatAnimalStatusLabel(slotProps.data.status) }}
               </Badge>
             </template>
           </Column>
 
-          <Column :header="$t('common.actions')" style="width: 150px">
+          <Column
+            :header="$t('common.actions')"
+            style="width: 150px"
+          >
             <template #body="slotProps">
               <div class="action-buttons">
                 <Button
+                  v-tooltip.top="$t('common.viewMore')"
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-text"
-                  v-tooltip.top="$t('common.viewMore')"
                   @click="router.push(`/staff/animals/${slotProps.data.id}`)"
                 />
                 <Button
+                  v-tooltip.top="$t('common.edit')"
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-text"
-                  v-tooltip.top="$t('common.edit')"
                   @click="router.push(`/staff/animals/${slotProps.data.id}/edit`)"
                 />
                 <Button
+                  v-tooltip.top="$t('common.delete')"
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-text p-button-danger"
-                  v-tooltip.top="$t('common.delete')"
                   @click="confirmDelete(slotProps.data)"
                 />
               </div>
@@ -304,7 +341,7 @@ const getAnimalPhoto = (animal) => {
   return getAnimalImage(animal)
 }
 
-const formatStatusLabel = (status) => {
+const formatAnimalStatusLabel = (status) => {
   if (!status) return t('animal.status')
   const key = `animal.${status}`
   const translation = t(key)

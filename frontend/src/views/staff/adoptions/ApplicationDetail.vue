@@ -2,7 +2,10 @@
   <div class="application-detail">
     <LoadingSpinner v-if="loading" />
 
-    <div v-else-if="application" class="detail-container">
+    <div
+      v-else-if="application"
+      class="detail-container"
+    >
       <div class="detail-header">
         <Button
           icon="pi pi-arrow-left"
@@ -10,7 +13,10 @@
           @click="router.back()"
         />
         <h1>{{ $t('adoption.applicationDetail') }}</h1>
-        <div class="header-actions" v-if="canReview">
+        <div
+          v-if="canReview"
+          class="header-actions"
+        >
           <Button
             :label="$t('adoption.approve')"
             icon="pi pi-check"
@@ -39,9 +45,15 @@
               <label>{{ $t('adoption.applicationDate') }}</label>
               <p>{{ formatDate(application.application_date) }}</p>
             </div>
-            <div class="status-item" v-if="application.animal">
+            <div
+              v-if="application.animal"
+              class="status-item"
+            >
               <label>{{ $t('animal.name') }}</label>
-              <router-link :to="`/staff/animals/${application.animal.id}`" class="animal-link">
+              <router-link
+                :to="`/staff/animals/${application.animal.id}`"
+                class="animal-link"
+              >
                 {{ application.animal.name }}
               </router-link>
             </div>
@@ -79,7 +91,10 @@
                   <p>{{ application.occupation || 'N/A' }}</p>
                 </div>
               </div>
-              <div class="info-item full-width" v-if="application.address">
+              <div
+                v-if="application.address"
+                class="info-item full-width"
+              >
                 <label>{{ $t('adoption.address') }}</label>
                 <p>
                   {{ application.address.street }}<br>
@@ -117,10 +132,17 @@
                 </div>
               </div>
 
-              <div class="info-item full-width" v-if="application.other_pets && application.other_pets.length > 0">
+              <div
+                v-if="application.other_pets && application.other_pets.length > 0"
+                class="info-item full-width"
+              >
                 <label>{{ $t('adoption.otherPets') }}</label>
                 <div class="pets-list">
-                  <Card v-for="(pet, index) in application.other_pets" :key="index" class="pet-card">
+                  <Card
+                    v-for="(pet, index) in application.other_pets"
+                    :key="index"
+                    class="pet-card"
+                  >
                     <template #content>
                       <p><strong>{{ pet.type }}</strong> - {{ pet.breed || 'Mixed' }}</p>
                       <p>{{ $t('animal.age') }}: {{ pet.age }} {{ $t('home.adoptions.years') }}</p>
@@ -147,7 +169,10 @@
                 </div>
               </div>
 
-              <div class="info-item full-width" v-if="application.veterinarian_info">
+              <div
+                v-if="application.veterinarian_info"
+                class="info-item full-width"
+              >
                 <label>{{ $t('adoption.veterinarianInfo') }}</label>
                 <p>
                   <strong>{{ application.veterinarian_info.name }}</strong><br>
@@ -162,19 +187,29 @@
         <TabPanel :header="$t('adoption.references')">
           <Card>
             <template #content>
-              <div class="references-list" v-if="application.references && application.references.length > 0">
-                <Card v-for="(ref, index) in application.references" :key="index" class="reference-card">
+              <div
+                v-if="application.references && application.references.length > 0"
+                class="references-list"
+              >
+                <Card
+                  v-for="(reference, index) in application.references"
+                  :key="index"
+                  class="reference-card"
+                >
                   <template #content>
                     <div class="reference-info">
-                      <h3>{{ ref.name }}</h3>
-                      <p><strong>{{ $t('adoption.references') }}:</strong> {{ ref.relationship }}</p>
-                      <p><strong>{{ $t('adoption.phone') }}:</strong> {{ ref.phone }}</p>
-                      <p><strong>{{ $t('adoption.yearsOfExperience') }}:</strong> {{ ref.years_known }} {{ $t('home.adoptions.years') }}</p>
+                      <h3>{{ reference.name }}</h3>
+                      <p><strong>{{ $t('adoption.references') }}:</strong> {{ reference.relationship }}</p>
+                      <p><strong>{{ $t('adoption.phone') }}:</strong> {{ reference.phone }}</p>
+                      <p><strong>{{ $t('adoption.yearsOfExperience') }}:</strong> {{ reference.years_known }} {{ $t('home.adoptions.years') }}</p>
                     </div>
                   </template>
                 </Card>
               </div>
-              <EmptyState v-else :message="$t('adoption.noApplicationsFound')" />
+              <EmptyState
+                v-else
+                :message="$t('adoption.noApplicationsFound')"
+              />
             </template>
           </Card>
         </TabPanel>
@@ -210,20 +245,32 @@
           </Card>
         </TabPanel>
 
-        <TabPanel :header="$t('adoption.reviewNotes')" v-if="application.review_notes || application.reviewed_by">
+        <TabPanel
+          v-if="application.review_notes || application.reviewed_by"
+          :header="$t('adoption.reviewNotes')"
+        >
           <Card>
             <template #content>
               <div class="info-grid">
-                <div class="info-item" v-if="application.reviewed_by">
+                <div
+                  v-if="application.reviewed_by"
+                  class="info-item"
+                >
                   <label>Reviewed By</label>
                   <p>{{ application.reviewed_by }}</p>
                 </div>
-                <div class="info-item" v-if="application.reviewed_at">
+                <div
+                  v-if="application.reviewed_at"
+                  class="info-item"
+                >
                   <label>Reviewed At</label>
                   <p>{{ formatDate(application.reviewed_at) }}</p>
                 </div>
               </div>
-              <div class="info-item full-width" v-if="application.review_notes">
+              <div
+                v-if="application.review_notes"
+                class="info-item full-width"
+              >
                 <label>{{ $t('adoption.reviewNotes') }}</label>
                 <p>{{ application.review_notes }}</p>
               </div>
@@ -234,7 +281,12 @@
     </div>
 
     <!-- Approve Dialog -->
-    <Dialog v-model:visible="approveDialogVisible" :header="$t('adoption.approve')" :modal="true" style="width: 30rem">
+    <Dialog
+      v-model:visible="approveDialogVisible"
+      :header="$t('adoption.approve')"
+      :modal="true"
+      style="width: 30rem"
+    >
       <div class="dialog-content">
         <label for="approve-notes">{{ $t('adoption.reviewNotes') }}</label>
         <Textarea
@@ -245,13 +297,27 @@
         />
       </div>
       <template #footer>
-        <Button :label="$t('common.cancel')" class="p-button-secondary" @click="approveDialogVisible = false" />
-        <Button :label="$t('adoption.approve')" class="p-button-success" @click="handleApprove" :loading="submitting" />
+        <Button
+          :label="$t('common.cancel')"
+          class="p-button-secondary"
+          @click="approveDialogVisible = false"
+        />
+        <Button
+          :label="$t('adoption.approve')"
+          class="p-button-success"
+          :loading="submitting"
+          @click="handleApprove"
+        />
       </template>
     </Dialog>
 
     <!-- Reject Dialog -->
-    <Dialog v-model:visible="rejectDialogVisible" :header="$t('adoption.reject')" :modal="true" style="width: 30rem">
+    <Dialog
+      v-model:visible="rejectDialogVisible"
+      :header="$t('adoption.reject')"
+      :modal="true"
+      style="width: 30rem"
+    >
       <div class="dialog-content">
         <label for="reject-reason">Reason *</label>
         <Textarea
@@ -263,8 +329,18 @@
         />
       </div>
       <template #footer>
-        <Button :label="$t('common.cancel')" class="p-button-secondary" @click="rejectDialogVisible = false" />
-        <Button :label="$t('adoption.reject')" class="p-button-danger" @click="handleReject" :loading="submitting" :disabled="!rejectReason" />
+        <Button
+          :label="$t('common.cancel')"
+          class="p-button-secondary"
+          @click="rejectDialogVisible = false"
+        />
+        <Button
+          :label="$t('adoption.reject')"
+          class="p-button-danger"
+          :loading="submitting"
+          :disabled="!rejectReason"
+          @click="handleReject"
+        />
       </template>
     </Dialog>
   </div>

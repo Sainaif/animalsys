@@ -44,7 +44,7 @@ api.interceptors.response.use(
 
       try {
         // Try to refresh the token
-        await authStore.refreshToken()
+        await authStore.refreshSession()
 
         // Retry the original request with new token
         originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`

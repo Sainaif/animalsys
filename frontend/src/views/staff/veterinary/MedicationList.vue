@@ -2,37 +2,81 @@
   <div class="medication-list">
     <div class="page-header">
       <h1>{{ $t('veterinary.medications') }}</h1>
-      <Button :label="$t('veterinary.addMedication')" icon="pi pi-plus" @click="router.push('/staff/veterinary/medications/new')" />
+      <Button
+        :label="$t('veterinary.addMedication')"
+        icon="pi pi-plus"
+        @click="router.push('/staff/veterinary/medications/new')"
+      />
     </div>
 
     <Card class="filters-card">
       <template #content>
         <div class="filters">
-          <Dropdown v-model="filters.status" :options="statusOptions" :placeholder="$t('veterinary.status')" option-label="label" option-value="value" show-clear @change="loadMedications" />
+          <Dropdown
+            v-model="filters.status"
+            :options="statusOptions"
+            :placeholder="$t('veterinary.status')"
+            option-label="label"
+            option-value="value"
+            show-clear
+            @change="loadMedications"
+          />
         </div>
       </template>
     </Card>
 
     <Card v-if="!loading && medications.length > 0">
       <template #content>
-        <DataTable :value="medications" paginator :rows="20">
-          <Column field="animal.name" header="Animal">
-            <template #body="slotProps">{{ formatAnimalName(slotProps.data.animal) }}</template>
-          </Column>
-          <Column field="medication_name" :header="$t('veterinary.medicationName')" />
-          <Column field="dosage" :header="$t('veterinary.dosage')" />
-          <Column field="frequency" :header="$t('veterinary.frequency')" />
-          <Column field="start_date" :header="$t('veterinary.startDate')">
-            <template #body="slotProps">{{ formatDate(slotProps.data.start_date) }}</template>
-          </Column>
-          <Column field="status" :header="$t('common.status')">
+        <DataTable
+          :value="medications"
+          paginator
+          :rows="20"
+        >
+          <Column
+            field="animal.name"
+            header="Animal"
+          >
             <template #body="slotProps">
-              <Badge :variant="getStatusVariant(slotProps.data.status)">{{ $t(`veterinary.${slotProps.data.status}`) }}</Badge>
+              {{ formatAnimalName(slotProps.data.animal) }}
+            </template>
+          </Column>
+          <Column
+            field="medication_name"
+            :header="$t('veterinary.medicationName')"
+          />
+          <Column
+            field="dosage"
+            :header="$t('veterinary.dosage')"
+          />
+          <Column
+            field="frequency"
+            :header="$t('veterinary.frequency')"
+          />
+          <Column
+            field="start_date"
+            :header="$t('veterinary.startDate')"
+          >
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.start_date) }}
+            </template>
+          </Column>
+          <Column
+            field="status"
+            :header="$t('common.status')"
+          >
+            <template #body="slotProps">
+              <Badge :variant="getStatusVariant(slotProps.data.status)">
+                {{ $t(`veterinary.${slotProps.data.status}`) }}
+              </Badge>
             </template>
           </Column>
           <Column :header="$t('common.actions')">
             <template #body="slotProps">
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmDelete(slotProps.data)" />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -40,7 +84,10 @@
     </Card>
 
     <LoadingSpinner v-if="loading" />
-    <EmptyState v-if="!loading && medications.length === 0" :message="$t('veterinary.noMedicationsFound')" />
+    <EmptyState
+      v-if="!loading && medications.length === 0"
+      :message="$t('veterinary.noMedicationsFound')"
+    />
     <ConfirmDialog />
   </div>
 </template>

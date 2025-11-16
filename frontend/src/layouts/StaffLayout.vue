@@ -1,61 +1,105 @@
 <template>
   <div class="staff-layout">
-    <aside class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+    <aside
+      class="sidebar"
+      :class="{ collapsed: sidebarCollapsed }"
+    >
       <div class="sidebar-header">
-        <router-link to="/dashboard" class="brand">
-          <i class="pi pi-heart"></i>
+        <router-link
+          to="/dashboard"
+          class="brand"
+        >
+          <i class="pi pi-heart" />
           <span v-if="!sidebarCollapsed">Animal Foundation</span>
         </router-link>
-        <button class="collapse-btn" @click="toggleSidebar">
-          <i class="pi" :class="sidebarCollapsed ? 'pi-angle-right' : 'pi-angle-left'"></i>
+        <button
+          class="collapse-btn"
+          @click="toggleSidebar"
+        >
+          <i
+            class="pi"
+            :class="sidebarCollapsed ? 'pi-angle-right' : 'pi-angle-left'"
+          />
         </button>
       </div>
 
       <nav class="sidebar-nav">
-        <router-link to="/dashboard" class="nav-item">
-          <i class="pi pi-th-large"></i>
+        <router-link
+          to="/dashboard"
+          class="nav-item"
+        >
+          <i class="pi pi-th-large" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.dashboard') }}</span>
         </router-link>
-        <router-link to="/staff/animals" class="nav-item">
-          <i class="pi pi-heart"></i>
+        <router-link
+          to="/staff/animals"
+          class="nav-item"
+        >
+          <i class="pi pi-heart" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.animals') }}</span>
         </router-link>
-        <router-link to="/staff/veterinary" class="nav-item">
-          <i class="pi pi-plus"></i>
+        <router-link
+          to="/staff/veterinary"
+          class="nav-item"
+        >
+          <i class="pi pi-plus" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.veterinary') }}</span>
         </router-link>
-        <router-link to="/staff/adoptions/applications" class="nav-item">
-          <i class="pi pi-users"></i>
+        <router-link
+          to="/staff/adoptions/applications"
+          class="nav-item"
+        >
+          <i class="pi pi-users" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.adoptions') }}</span>
         </router-link>
-        <router-link to="/staff/finance" class="nav-item">
-          <i class="pi pi-money-bill"></i>
+        <router-link
+          to="/staff/finance"
+          class="nav-item"
+        >
+          <i class="pi pi-money-bill" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.finance') }}</span>
         </router-link>
-        <router-link to="/staff/events" class="nav-item">
-          <i class="pi pi-calendar"></i>
+        <router-link
+          to="/staff/events"
+          class="nav-item"
+        >
+          <i class="pi pi-calendar" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.events') }}</span>
         </router-link>
-        <router-link to="/contacts" class="nav-item">
-          <i class="pi pi-phone"></i>
+        <router-link
+          to="/contacts"
+          class="nav-item"
+        >
+          <i class="pi pi-phone" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.contacts') }}</span>
         </router-link>
 
         <Divider v-if="!sidebarCollapsed" />
 
-        <router-link v-if="isAdmin" to="/users" class="nav-item">
-          <i class="pi pi-user"></i>
+        <router-link
+          v-if="isAdmin"
+          to="/users"
+          class="nav-item"
+        >
+          <i class="pi pi-user" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.users') }}</span>
         </router-link>
-        <router-link v-if="isAdmin" to="/settings" class="nav-item">
-          <i class="pi pi-cog"></i>
+        <router-link
+          v-if="isAdmin"
+          to="/settings"
+          class="nav-item"
+        >
+          <i class="pi pi-cog" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.settings') }}</span>
         </router-link>
       </nav>
 
       <div class="sidebar-footer">
-        <router-link to="/profile" class="nav-item">
-          <i class="pi pi-user"></i>
+        <router-link
+          to="/profile"
+          class="nav-item"
+        >
+          <i class="pi pi-user" />
           <span v-if="!sidebarCollapsed">{{ $t('nav.profile') }}</span>
         </router-link>
       </div>
@@ -64,16 +108,18 @@
     <div class="main-wrapper">
       <header class="topbar">
         <div class="topbar-left">
-          <h2 class="page-title">{{ pageTitle }}</h2>
+          <h2 class="page-title">
+            {{ pageTitle }}
+          </h2>
         </div>
         <div class="topbar-right">
           <Dropdown
             v-model="currentLocale"
             :options="locales"
-            optionLabel="label"
-            optionValue="value"
-            @change="changeLocale"
+            option-label="label"
+            option-value="value"
             class="locale-dropdown"
+            @change="changeLocale"
           >
             <template #value="slotProps">
               <span class="locale-flag">{{ getLocaleFlag(slotProps.value) }}</span>
@@ -92,19 +138,19 @@
           />
 
           <Button
+            v-tooltip.bottom="$t('nav.home')"
             icon="pi pi-home"
             class="p-button-text p-button-rounded"
             :aria-label="$t('nav.home')"
-            v-tooltip.bottom="$t('nav.home')"
             @click="goToHome"
           />
 
           <Button
+            v-tooltip.bottom="$t('nav.notifications')"
+            v-badge="3"
             icon="pi pi-bell"
             class="p-button-text p-button-rounded"
             :aria-label="$t('nav.notifications')"
-            v-tooltip.bottom="$t('nav.notifications')"
-            v-badge="3"
           />
 
           <div class="user-menu">
@@ -114,7 +160,11 @@
               class="p-button-text"
               @click="toggleUserMenu"
             />
-            <Menu ref="userMenuRef" :model="userMenuItems" :popup="true" />
+            <Menu
+              ref="userMenuRef"
+              :model="userMenuItems"
+              :popup="true"
+            />
           </div>
         </div>
       </header>
@@ -129,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
@@ -146,6 +196,19 @@ const route = useRoute()
 const { locale, t } = useI18n()
 const authStore = useAuthStore()
 const { theme, toggleTheme } = useTheme()
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuthenticated) => {
+    if (!isAuthenticated && route.meta?.requiresAuth) {
+      router.push({
+        name: 'login',
+        query: { redirect: route.fullPath }
+      })
+    }
+  },
+  { immediate: true }
+)
 
 const sidebarCollapsed = ref(false)
 const userMenuRef = ref()
