@@ -2,11 +2,35 @@ import api from './api'
 import type { Animal, AnimalStatistics, VeterinaryVisit, Vaccination } from '@/types/animal'
 import type { PaginatedResponse, QueryParams } from '@/types/common'
 
+const normalizeListResponse = (
+  payload: any,
+  params?: QueryParams
+): PaginatedResponse<Animal> => {
+  const animals = Array.isArray(payload?.animals)
+    ? payload.animals
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : Array.isArray(payload)
+        ? payload
+        : []
+
+  return {
+    data: animals,
+    total: typeof payload?.total === 'number' ? payload.total : animals.length,
+    limit: typeof payload?.limit === 'number'
+      ? payload.limit
+      : (typeof params?.limit === 'number' ? params.limit : animals.length),
+    offset: typeof payload?.offset === 'number'
+      ? payload.offset
+      : (typeof params?.offset === 'number' ? params.offset : 0)
+  }
+}
+
 export const animalService = {
   // List animals
   async getAnimals(params?: QueryParams): Promise<PaginatedResponse<Animal>> {
     const response = await api.get('/animals', { params })
-    return response.data
+    return normalizeListResponse(response.data, params)
   },
 
   // Get animal by ID

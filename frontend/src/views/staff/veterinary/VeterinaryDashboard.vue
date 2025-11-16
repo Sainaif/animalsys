@@ -10,7 +10,7 @@
           <div class="module-content">
             <i class="pi pi-calendar module-icon"></i>
             <h2>{{ $t('veterinary.visits') }}</h2>
-            <p>Manage veterinary visits and checkups</p>
+            <p>{{ $t('veterinary.manageVisits') }}</p>
           </div>
         </template>
       </Card>
@@ -20,7 +20,7 @@
           <div class="module-content">
             <i class="pi pi-shield module-icon"></i>
             <h2>{{ $t('veterinary.vaccinations') }}</h2>
-            <p>Track vaccination records and schedules</p>
+            <p>{{ $t('veterinary.trackVaccinations') }}</p>
           </div>
         </template>
       </Card>
@@ -30,7 +30,7 @@
           <div class="module-content">
             <i class="pi pi-box module-icon"></i>
             <h2>{{ $t('veterinary.medications') }}</h2>
-            <p>Manage medications and prescriptions</p>
+            <p>{{ $t('veterinary.manageMedications') }}</p>
           </div>
         </template>
       </Card>
@@ -40,7 +40,7 @@
           <div class="module-content">
             <i class="pi pi-list module-icon"></i>
             <h2>{{ $t('veterinary.treatmentPlans') }}</h2>
-            <p>Manage treatment plans and progress</p>
+            <p>{{ $t('veterinary.manageTreatmentPlans') }}</p>
           </div>
         </template>
       </Card>
@@ -50,7 +50,7 @@
           <div class="module-content">
             <i class="pi pi-heart module-icon"></i>
             <h2>{{ $t('veterinary.medicalConditions') }}</h2>
-            <p>Track medical conditions and diagnoses</p>
+            <p>{{ $t('veterinary.trackMedicalConditions') }}</p>
           </div>
         </template>
       </Card>

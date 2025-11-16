@@ -22,10 +22,14 @@ import './assets/styles/main.css'
 import en from './i18n/en.json'
 import pl from './i18n/pl.json'
 
+const savedLocale = localStorage.getItem('locale') || 'pl'
+const savedTheme = localStorage.getItem('theme') || 'light'
+document.documentElement.setAttribute('data-theme', savedTheme)
+
 // Create i18n instance
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
+  locale: savedLocale,
   fallbackLocale: 'en',
   messages: {
     en,

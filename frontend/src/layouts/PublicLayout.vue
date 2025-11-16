@@ -8,11 +8,19 @@
         </router-link>
 
         <div class="navbar-menu" :class="{ active: menuActive }">
-          <router-link to="/" class="nav-link">{{ $t('nav.home') }}</router-link>
-          <a href="#about" class="nav-link">{{ $t('nav.aboutUs') }}</a>
-          <a href="#animals" class="nav-link">{{ $t('nav.adoptAnimal') }}</a>
-          <a href="#help" class="nav-link">{{ $t('nav.howToHelp') }}</a>
-          <a href="#contact" class="nav-link">{{ $t('nav.contact') }}</a>
+          <div class="nav-links">
+            <router-link to="/" class="nav-link">{{ $t('nav.home') }}</router-link>
+            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('about')">
+              {{ $t('nav.aboutUs') }}
+            </button>
+            <router-link to="/animals" class="nav-link">{{ $t('nav.adoptAnimal') }}</router-link>
+            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('help')">
+              {{ $t('nav.howToHelp') }}
+            </button>
+            <button type="button" class="nav-link nav-link-button" @click="navigateToSection('contact')">
+              {{ $t('nav.contact') }}
+            </button>
+          </div>
 
           <div class="nav-actions">
             <Button
@@ -28,6 +36,12 @@
                 class="p-button-rounded p-button-outlined"
               />
             </router-link>
+            <Button
+              :icon="theme === 'light' ? 'pi pi-moon' : 'pi pi-sun'"
+              class="p-button-rounded p-button-text theme-toggle"
+              :aria-label="theme === 'light' ? $t('common.enableDarkMode') : $t('common.enableLightMode')"
+              @click="toggleTheme"
+            />
             <Dropdown
               v-model="currentLocale"
               :options="locales"
@@ -47,7 +61,13 @@
           </div>
         </div>
 
-        <button class="mobile-menu-toggle" @click="menuActive = !menuActive">
+        <button
+          class="mobile-menu-toggle"
+          type="button"
+          :aria-expanded="menuActive"
+          :aria-label="menuActive ? $t('common.closeMenu') : $t('common.openMenu')"
+          @click="menuActive = !menuActive"
+        >
           <i class="pi" :class="menuActive ? 'pi-times' : 'pi-bars'"></i>
         </button>
       </div>
@@ -66,7 +86,7 @@
         <div class="footer-section">
           <h4>{{ $t('home.footer.about') }}</h4>
           <a href="#about">{{ $t('nav.aboutUs') }}</a>
-          <a href="#animals">{{ $t('nav.adoptAnimal') }}</a>
+          <router-link to="/animals">{{ $t('nav.adoptAnimal') }}</router-link>
           <a href="#help">{{ $t('nav.howToHelp') }}</a>
         </div>
         <div class="footer-section">
@@ -91,13 +111,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
+import useTheme from '@/composables/useTheme'
 
 const { locale } = useI18n()
 const menuActive = ref(false)
+const router = useRouter()
+const route = useRoute()
+const { theme, toggleTheme } = useTheme()
 
 const locales = [
   { label: 'English', value: 'en' },
@@ -117,12 +142,51 @@ const getLocaleFlag = (loc) => {
   return loc === 'en' ? '🇬🇧' : '🇵🇱'
 }
 
-const scrollToDonation = () => {
-  const element = document.getElementById('donation')
+const closeMenu = () => {
+  menuActive.value = false
+}
+
+watch(
+  () => route.fullPath,
+  () => closeMenu()
+)
+
+const scrollToSection = (sectionId) => {
+  if (!sectionId) return
+  const element = document.getElementById(sectionId)
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
+    const headerHeight = document.querySelector('.navbar')?.offsetHeight || 80
+    const offset = element.getBoundingClientRect().top + window.scrollY - (headerHeight + 16)
+    window.scrollTo({ top: Math.max(offset, 0), behavior: 'smooth' })
   }
 }
+
+const navigateToSection = async (sectionId) => {
+  if (!sectionId) return
+  closeMenu()
+  const hash = `#${sectionId}`
+  if (route.path !== '/') {
+    await router.push({ path: '/', hash })
+  } else if (route.hash !== hash) {
+    router.replace({ hash })
+  }
+  nextTick(() => scrollToSection(sectionId))
+}
+
+const scrollToDonation = () => {
+  navigateToSection('donation')
+}
+
+watch(
+  () => route.hash,
+  (hash) => {
+    if (route.path === '/' && hash) {
+      const target = hash.replace('#', '')
+      nextTick(() => scrollToSection(target))
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -130,15 +194,19 @@ const scrollToDonation = () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--surface-ground);
+  color: var(--text-color);
 }
 
 .navbar {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--nav-bg);
+  box-shadow: 0 6px 30px rgba(15, 23, 42, 0.08);
   position: sticky;
   top: 0;
   z-index: 1000;
   padding: 1rem 0;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--nav-border);
 }
 
 .navbar-container {
@@ -148,6 +216,7 @@ const scrollToDonation = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .navbar-brand {
@@ -172,32 +241,85 @@ const scrollToDonation = () => {
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  flex-wrap: nowrap;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-link {
-  color: #333;
+  color: var(--nav-text, var(--text-color));
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.3s, transform 0.3s;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0.35rem 0;
+  letter-spacing: 0.01em;
 }
 
-.nav-link:hover {
-  color: #e74c3c;
+.nav-link:hover,
+.nav-link-button:focus-visible {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.nav-link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
+  flex-shrink: 0;
 }
 
 .staff-login-btn {
   text-decoration: none;
 }
 
+.theme-toggle {
+  color: var(--nav-text);
+}
+
 .locale-dropdown {
   width: 120px;
+  background: var(--card-bg);
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.locale-dropdown :deep(.p-dropdown-label),
+.locale-dropdown :deep(.p-dropdown-trigger-icon) {
+  color: var(--text-color);
+}
+
+.locale-dropdown :deep(.p-dropdown-label) {
+  padding-left: 0.75rem;
+}
+
+.locale-dropdown :deep(.p-dropdown-panel) {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
 }
 
 .locale-flag {
@@ -211,7 +333,7 @@ const scrollToDonation = () => {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #333;
+  color: var(--nav-text, #333);
 }
 
 .main-content {
@@ -219,8 +341,8 @@ const scrollToDonation = () => {
 }
 
 .footer {
-  background: #2c3e50;
-  color: white;
+  background: #121a2c;
+  color: #f8fafc;
   padding: 3rem 0 1rem;
   margin-top: 4rem;
 }
@@ -249,14 +371,14 @@ const scrollToDonation = () => {
 
 .footer-section a {
   display: block;
-  color: #ecf0f1;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   margin-bottom: 0.5rem;
   transition: color 0.3s;
 }
 
 .footer-section a:hover {
-  color: #e74c3c;
+  color: #f87171;
 }
 
 .social-links {
@@ -296,28 +418,43 @@ const scrollToDonation = () => {
 
   .navbar-menu {
     position: fixed;
-    top: 80px;
-    left: 0;
-    right: 0;
-    background: white;
-    flex-direction: column;
-    padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-150%);
-    transition: transform 0.3s;
-    gap: 1rem;
+  top: 80px;
+  left: 0;
+  right: 0;
+  background: var(--nav-bg);
+  flex-direction: column;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-150%);
+  transition: transform 0.3s;
+  gap: 1.5rem;
+  align-items: flex-start;
   }
 
   .navbar-menu.active {
     transform: translateY(0);
   }
 
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .nav-link {
+    width: 100%;
+    justify-content: flex-start;
+    white-space: normal;
+  }
+
   .nav-actions {
     flex-direction: column;
     width: 100%;
+    gap: 0.75rem;
   }
 
-  .nav-actions button {
+  .nav-actions button,
+  .nav-actions .p-button {
     width: 100%;
   }
 }

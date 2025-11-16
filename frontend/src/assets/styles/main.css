@@ -8,8 +8,46 @@
 :root {
   /* Override PrimeVue variables if needed */
   --primary-color: #3B82F6;
-  --surface-ground: #f8f9fa;
-  --text-color: #495057;
+  --surface-ground: #f5f7fb;
+  --text-color: #0f172a;
+  --nav-text: #0f172a;
+  --card-bg: #ffffff;
+  --card-muted-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-muted: #64748b;
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: rgba(15, 23, 42, 0.05);
+  --brand-accent: #fb7185;
+  --sidebar-bg: #13213b;
+  --sidebar-text: #f8fafc;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-active-bg: rgba(59, 130, 246, 0.25);
+  --topbar-bg: rgba(255, 255, 255, 0.9);
+  --topbar-text: #0f172a;
+  --surface-overlay: #ffffff;
+  --input-bg: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  --surface-ground: #0b1120;
+  --text-color: #e2e8f0;
+  --nav-text: #e2e8f0;
+  --card-bg: #17203a;
+  --card-muted-bg: #11182b;
+  --border-color: rgba(148, 163, 184, 0.35);
+  --text-muted: #94a3b8;
+  --nav-bg: rgba(15, 23, 42, 0.95);
+  --nav-border: rgba(15, 23, 42, 0.8);
+  --primary-color: #8b5cf6;
+  --brand-accent: #fbbf24;
+  --sidebar-bg: #050b1e;
+  --sidebar-text: #e2e8f0;
+  --sidebar-border: rgba(148, 163, 184, 0.25);
+  --sidebar-active-bg: rgba(129, 140, 248, 0.25);
+  --topbar-bg: rgba(15, 23, 42, 0.9);
+  --topbar-text: #f8fafc;
+  --surface-overlay: #101935;
+  --input-bg: #11182b;
 }
 
 body {
@@ -18,6 +56,81 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-color);
   background-color: var(--surface-ground);
+}
+
+.p-component {
+  color: var(--text-color);
+}
+
+.p-card,
+.p-panel,
+.p-dialog,
+.p-sidebar,
+.p-datatable,
+.p-toast-message,
+.p-tieredmenu,
+.p-menu,
+.p-menubar {
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.p-card,
+.p-panel,
+.p-dialog,
+.p-datatable,
+.p-dropdown,
+.p-inputtext,
+.p-inputnumber-input,
+.p-password-input,
+.p-calendar .p-inputtext,
+.p-multiselect,
+.p-sidebar,
+.p-table,
+.p-toast-message,
+.p-menubar,
+.p-menu {
+  border-color: var(--border-color);
+}
+
+.p-dropdown,
+.p-multiselect,
+.p-inputtext,
+.p-inputnumber-input,
+.p-password-input {
+  background: var(--input-bg);
+  color: var(--text-color);
+}
+
+.p-dropdown-panel,
+.p-multiselect-panel,
+.p-menu,
+.p-tieredmenu,
+.p-menubar-root-list {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.p-datatable {
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--card-muted-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--card-muted-bg);
 }
 
 /* Utility Classes */
@@ -71,10 +184,11 @@ body {
 
 /* Card */
 .card {
-  background: #ffffff;
+  background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 /* Page Container */

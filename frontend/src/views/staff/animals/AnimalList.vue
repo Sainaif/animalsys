@@ -77,9 +77,9 @@
           <Column field="photo_url" header="" style="width: 80px">
             <template #body="slotProps">
               <img
-                v-if="slotProps.data.photo_url"
-                :src="slotProps.data.photo_url"
-                :alt="slotProps.data.name"
+                v-if="getAnimalPhoto(slotProps.data)"
+                :src="getAnimalPhoto(slotProps.data)"
+                :alt="resolveAnimalName(slotProps.data)"
                 class="animal-thumbnail"
               />
               <div v-else class="animal-placeholder">
@@ -91,12 +91,16 @@
           <Column field="name" :header="$t('animal.name')" sortable>
             <template #body="slotProps">
               <router-link :to="`/staff/animals/${slotProps.data.id}`" class="animal-link">
-                {{ slotProps.data.name }}
+                {{ resolveAnimalName(slotProps.data) }}
               </router-link>
             </template>
           </Column>
 
-          <Column field="species" :header="$t('animal.species')" sortable />
+          <Column field="species" :header="$t('animal.species')" sortable>
+            <template #body="slotProps">
+              {{ getSpeciesLabel(slotProps.data.species || slotProps.data.Species) }}
+            </template>
+          </Column>
 
           <Column field="breed" :header="$t('animal.breed')" sortable />
 
@@ -108,14 +112,14 @@
 
           <Column field="sex" :header="$t('animal.gender')">
             <template #body="slotProps">
-              {{ $t(`animal.${slotProps.data.sex}`) }}
+              {{ $t(`animal.${slotProps.data.sex ?? 'unknown'}`) }}
             </template>
           </Column>
 
           <Column field="status" :header="$t('animal.status')">
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
-                {{ $t(`animal.${slotProps.data.status}`) }}
+                {{ formatStatusLabel(slotProps.data.status) }}
               </Badge>
             </template>
           </Column>
@@ -126,19 +130,19 @@
                 <Button
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-text"
-                  v-tooltip.top="'View'"
+                  v-tooltip.top="$t('common.viewMore')"
                   @click="router.push(`/staff/animals/${slotProps.data.id}`)"
                 />
                 <Button
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-text"
-                  v-tooltip.top="'Edit'"
+                  v-tooltip.top="$t('common.edit')"
                   @click="router.push(`/staff/animals/${slotProps.data.id}/edit`)"
                 />
                 <Button
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-text p-button-danger"
-                  v-tooltip.top="'Delete'"
+                  v-tooltip.top="$t('common.delete')"
                   @click="confirmDelete(slotProps.data)"
                 />
               </div>
@@ -164,7 +168,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
@@ -181,9 +185,10 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Badge from '@/components/shared/Badge.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
+import { getLocalizedValue, translateValue, getAnimalImage } from '@/utils/animalHelpers'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -202,15 +207,15 @@ const filters = reactive({
   size: null
 })
 
-const speciesOptions = [
-  { label: 'Dog', value: 'dog' },
-  { label: 'Cat', value: 'cat' },
-  { label: 'Rabbit', value: 'rabbit' },
-  { label: 'Bird', value: 'bird' },
-  { label: 'Other', value: 'other' }
-]
+const speciesOptions = computed(() => [
+  { label: translateValue('dog', t, 'animal.speciesNames'), value: 'dog' },
+  { label: translateValue('cat', t, 'animal.speciesNames'), value: 'cat' },
+  { label: translateValue('rabbit', t, 'animal.speciesNames'), value: 'rabbit' },
+  { label: translateValue('bird', t, 'animal.speciesNames'), value: 'bird' },
+  { label: t('animal.otherSpecies', 'Other'), value: 'other' }
+])
 
-const statusOptions = ref([
+const statusOptions = computed(() => [
   { label: t('animal.available'), value: 'available' },
   { label: t('animal.adopted'), value: 'adopted' },
   { label: t('animal.underTreatment'), value: 'under_treatment' },
@@ -218,7 +223,7 @@ const statusOptions = ref([
   { label: t('animal.transferred'), value: 'transferred' }
 ])
 
-const sizeOptions = ref([
+const sizeOptions = computed(() => [
   { label: t('animal.small'), value: 'small' },
   { label: t('animal.medium'), value: 'medium' },
   { label: t('animal.large'), value: 'large' },
@@ -279,7 +284,31 @@ const formatAge = (animal) => {
   if (animal.age_months) {
     return `${animal.age_months} ${t('animal.ageMonths')}`
   }
-  return 'N/A'
+  return '—'
+}
+
+const resolveAnimalName = (animal) => {
+  const source = animal?.name ?? animal?.Name ?? animal
+  if (!source) return t('animal.unknown')
+  if (typeof source === 'string') return source
+  return getLocalizedValue(source, locale.value) || source.en || source.pl || t('animal.unknown')
+}
+
+const getSpeciesLabel = (species) => {
+  if (!species) return '—'
+  const translated = translateValue(species, t, 'animal.speciesNames')
+  return translated || species
+}
+
+const getAnimalPhoto = (animal) => {
+  return getAnimalImage(animal)
+}
+
+const formatStatusLabel = (status) => {
+  if (!status) return t('animal.status')
+  const key = `animal.${status}`
+  const translation = t(key)
+  return translation !== key ? translation : status
 }
 
 const getStatusVariant = (status) => {

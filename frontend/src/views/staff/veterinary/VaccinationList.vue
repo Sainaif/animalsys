@@ -9,7 +9,7 @@
       <template #content>
         <DataTable :value="vaccinations" paginator :rows="20">
           <Column field="animal.name" header="Animal">
-            <template #body="slotProps">{{ slotProps.data.animal?.name || 'N/A' }}</template>
+            <template #body="slotProps">{{ formatAnimalName(slotProps.data.animal) }}</template>
           </Column>
           <Column field="vaccine_name" :header="$t('veterinary.vaccineName')" />
           <Column field="vaccination_date" :header="$t('veterinary.vaccinationDate')">
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
@@ -48,9 +48,10 @@ import Column from 'primevue/column'
 import ConfirmDialog from 'primevue/confirmdialog'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -69,7 +70,21 @@ const loadVaccinations = async () => {
   }
 }
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
+const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value === 'pl' ? 'pl-PL' : 'en-US'))
+
+const formatDate = (date) => {
+  if (!date) return '—'
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return '—'
+  return dateFormatter.value.format(parsed)
+}
+
+const formatAnimalName = (animal) => {
+  if (!animal) return t('animal.unknown')
+  if (typeof animal === 'string') return animal
+  const localized = getLocalizedValue(animal.name || animal, locale.value)
+  return localized || animal.name?.en || animal.name?.pl || t('animal.unknown')
+}
 
 const confirmDelete = (vaccination) => {
   confirm.require({

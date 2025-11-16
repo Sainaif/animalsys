@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -278,7 +279,7 @@ func main() {
 		reportExecutionRepo,
 		auditLogRepo,
 	)
-	_ = dashboardUC.NewDashboardUseCase(
+	dashboardUseCase := dashboardUC.NewDashboardUseCase(
 		animalRepo,
 		adoptionRepo,
 		donationRepo,
@@ -350,7 +351,11 @@ func main() {
 	communicationHandler := handlers.NewCommunicationHandler(communicationUseCase)
 	notificationHandler := handlers.NewNotificationHandler(notificationUseCase)
 	reportHandler := handlers.NewReportHandler(reportUseCase)
-	dashboardHandler := handlers.NewDashboardHandler()
+	dashboardHandler := handlers.NewDashboardHandler(
+		dashboardUseCase,
+		animalUseCase,
+		taskUseCase,
+	)
 	settingsHandler := handlers.NewSettingsHandler(settingsUseCase)
 	taskHandler := handlers.NewTaskHandler(taskUseCase)
 	documentHandler := handlers.NewDocumentHandler(documentUseCase)
@@ -422,8 +427,19 @@ func main() {
 
 // corsMiddleware handles CORS
 func corsMiddleware(cfg *config.Config) gin.HandlerFunc {
+	allowedOrigins := parseAllowedOrigins(cfg.CORS.AllowedOrigins)
+	allowAll := len(allowedOrigins) == 0 || (len(allowedOrigins) == 1 && allowedOrigins[0] == "*")
+
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", cfg.CORS.AllowedOrigins)
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			if allowAll || containsOrigin(allowedOrigins, origin) {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+			}
+		} else if allowAll {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		}
+
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
@@ -435,6 +451,31 @@ func corsMiddleware(cfg *config.Config) gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func parseAllowedOrigins(origins string) []string {
+	if origins == "" {
+		return nil
+	}
+
+	items := strings.Split(origins, ",")
+	result := make([]string, 0, len(items))
+	for _, item := range items {
+		if trimmed := strings.TrimSpace(item); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+
+	return result
+}
+
+func containsOrigin(origins []string, origin string) bool {
+	for _, allowed := range origins {
+		if allowed == origin {
+			return true
+		}
+	}
+	return false
 }
 
 // loggerMiddleware logs HTTP requests using zerolog

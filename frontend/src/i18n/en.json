@@ -22,7 +22,11 @@
     "donate": "Donate",
     "adoptNow": "Adopt Now",
     "readMore": "Read More",
-    "day": "day"
+    "day": "day",
+    "enableDarkMode": "Enable dark mode",
+    "enableLightMode": "Enable light mode",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu"
   },
   "auth": {
     "login": "Login",
@@ -61,7 +65,8 @@
     "aboutUs": "About Us",
     "adoptAnimal": "Adopt an Animal",
     "howToHelp": "How to Help",
-    "contact": "Contact"
+    "contact": "Contact",
+    "notifications": "Notifications"
   },
   "home": {
     "hero": {
@@ -88,11 +93,14 @@
     "adoptions": {
       "title": "Meet Our Animals",
       "subtitle": "Find your new best friend",
-      "available": "Available for Adoption",
-      "viewProfile": "View Profile",
-      "allAnimals": "See All Animals",
-      "age": "Age",
-      "gender": "Gender",
+    "available": "Available for Adoption",
+    "viewProfile": "View Profile",
+    "allAnimals": "See All Animals",
+    "searchPlaceholder": "Search by name or description",
+    "allSpecies": "All species",
+    "loadMore": "Load more animals",
+    "age": "Age",
+    "gender": "Gender",
       "breed": "Breed",
       "years": "years",
       "months": "months",
@@ -213,7 +221,30 @@
     "filterBySpecies": "Filter by Species",
     "filterByStatus": "Filter by Status",
     "filterBySize": "Filter by Size",
-    "noAnimalsFound": "No animals found"
+    "noAnimalsFound": "No animals found",
+    "otherSpecies": "Other",
+    "speciesNames": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "rabbit": "Rabbit",
+      "bird": "Bird"
+    },
+    "colorNames": {
+      "black": "Black",
+      "brown": "Brown",
+      "golden": "Golden",
+      "white": "White",
+      "brindle": "Brindle",
+      "orange": "Orange",
+      "gray": "Gray",
+      "grey": "Gray",
+      "calico": "Calico",
+      "tabby": "Tabby",
+      "spotted": "Spotted",
+      "green": "Green",
+      "blue": "Blue",
+      "yellow": "Yellow"
+    }
   },
   "adoption": {
     "title": "Adoptions",
@@ -284,6 +315,8 @@
     "quickStats": "Quick Statistics",
     "recentActivity": "Recent Activity",
     "upcomingTasks": "Upcoming Tasks",
+    "noRecentActivity": "No recent activity yet",
+    "lastUpdated": "Last updated: {time}",
     "totalAnimals": "Total Animals",
     "availableAnimals": "Available for Adoption",
     "adoptionsThisMonth": "Adoptions This Month",
@@ -304,6 +337,34 @@
     "viewReports": "Generate and view analytics reports",
     "manageContacts": "Manage contact information"
   },
+  "tasks": {
+    "noUpcoming": "No upcoming tasks",
+    "noDueDate": "No due date",
+    "statuses": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "on_hold": "On hold"
+    },
+    "priorities": {
+      "low": "Low priority",
+      "medium": "Medium priority",
+      "high": "High priority",
+      "urgent": "Urgent"
+    },
+    "categories": {
+      "animal_care": "Animal care",
+      "medical": "Medical",
+      "adoption": "Adoption",
+      "maintenance": "Maintenance",
+      "administrative": "Administrative",
+      "event": "Event",
+      "fundraising": "Fundraising",
+      "volunteer": "Volunteer",
+      "other": "Other"
+    }
+  },
   "veterinary": {
     "title": "Veterinary",
     "visits": "Visits",
@@ -321,6 +382,11 @@
     "addMedication": "Add Medication",
     "addTreatmentPlan": "Add Treatment Plan",
     "addMedicalCondition": "Add Medical Condition",
+    "manageVisits": "Manage veterinary visits and checkups",
+    "trackVaccinations": "Track vaccination records and schedules",
+    "manageMedications": "Manage medications and prescriptions",
+    "manageTreatmentPlans": "Manage treatment plans and progress",
+    "trackMedicalConditions": "Track medical conditions and diagnoses",
     "visitDate": "Visit Date",
     "visitType": "Visit Type",
     "checkup": "Checkup",

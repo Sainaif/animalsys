@@ -30,11 +30,11 @@
         </router-link>
         <router-link to="/staff/finance" class="nav-item">
           <i class="pi pi-money-bill"></i>
-          <span v-if="!sidebarCollapsed">Finance</span>
+          <span v-if="!sidebarCollapsed">{{ $t('nav.finance') }}</span>
         </router-link>
         <router-link to="/staff/events" class="nav-item">
           <i class="pi pi-calendar"></i>
-          <span v-if="!sidebarCollapsed">Events</span>
+          <span v-if="!sidebarCollapsed">{{ $t('nav.events') }}</span>
         </router-link>
         <router-link to="/contacts" class="nav-item">
           <i class="pi pi-phone"></i>
@@ -85,16 +85,25 @@
           </Dropdown>
 
           <Button
+            :icon="theme === 'light' ? 'pi pi-moon' : 'pi pi-sun'"
+            class="p-button-text p-button-rounded theme-toggle"
+            :aria-label="theme === 'light' ? $t('common.enableDarkMode') : $t('common.enableLightMode')"
+            @click="toggleTheme"
+          />
+
+          <Button
             icon="pi pi-home"
             class="p-button-text p-button-rounded"
-            v-tooltip.bottom="'Home'"
+            :aria-label="$t('nav.home')"
+            v-tooltip.bottom="$t('nav.home')"
             @click="goToHome"
           />
 
           <Button
             icon="pi pi-bell"
             class="p-button-text p-button-rounded"
-            v-tooltip.bottom="'Notifications'"
+            :aria-label="$t('nav.notifications')"
+            v-tooltip.bottom="$t('nav.notifications')"
             v-badge="3"
           />
 
@@ -120,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
@@ -130,14 +139,44 @@ import Menu from 'primevue/menu'
 import Divider from 'primevue/divider'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import useTheme from '@/composables/useTheme'
 
 const router = useRouter()
 const route = useRoute()
 const { locale, t } = useI18n()
 const authStore = useAuthStore()
+const { theme, toggleTheme } = useTheme()
 
 const sidebarCollapsed = ref(false)
 const userMenuRef = ref()
+
+const routeTitleMap = {
+  dashboard: 'nav.dashboard',
+  animals: 'nav.animals',
+  'animal-create': 'nav.animals',
+  'animal-detail': 'nav.animals',
+  'animal-edit': 'nav.animals',
+  'adoption-applications': 'adoption.applications',
+  'adoption-application-detail': 'adoption.applicationDetail',
+  adoptions: 'adoption.title',
+  'adoption-create': 'adoption.createAdoption',
+  'adoption-detail': 'adoption.applicationDetail',
+  veterinary: 'nav.veterinary',
+  'veterinary-visits': 'veterinary.visits',
+  'veterinary-visit-create': 'veterinary.addVisit',
+  'veterinary-visit-edit': 'veterinary.visit',
+  'veterinary-vaccinations': 'veterinary.vaccinations',
+  'veterinary-medications': 'veterinary.medications',
+  finance: 'nav.finance',
+  events: 'nav.events',
+  'finance-donations': 'nav.finance',
+  'finance-donors': 'nav.donors',
+  volunteers: 'nav.volunteers',
+  partners: 'nav.partners',
+  inventory: 'nav.inventory',
+  reports: 'nav.reports',
+  contacts: 'nav.contacts'
+}
 
 const locales = [
   { label: 'English', value: 'en' },
@@ -159,13 +198,15 @@ const userDisplayName = computed(() => {
 })
 
 const pageTitle = computed(() => {
-  const name = route.name
-  if (name) {
-    const key = `nav.${name}`
+  const routeName = route.name ? String(route.name) : ''
+  const key = routeTitleMap[routeName] || route.meta?.titleKey || (routeName ? `nav.${routeName}` : '')
+  if (key) {
     const translation = t(key)
-    return translation !== key ? translation : name
+    if (translation !== key) {
+      return translation
+    }
   }
-  return ''
+  return routeName ? routeName.replace(/-/g, ' ') : ''
 })
 
 const userMenuItems = computed(() => [
@@ -222,12 +263,13 @@ if (savedState !== null) {
   display: flex;
   min-height: 100vh;
   background: var(--surface-ground);
+  color: var(--text-color);
 }
 
 .sidebar {
   width: 280px;
-  background: #2c3e50;
-  color: white;
+  background: var(--sidebar-bg, #1f2937);
+  color: var(--sidebar-text, #f8fafc);
   display: flex;
   flex-direction: column;
   transition: width 0.3s;
@@ -236,6 +278,8 @@ if (savedState !== null) {
   top: 0;
   bottom: 0;
   z-index: 1000;
+  border-right: 1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08));
+  box-shadow: 8px 0 40px rgba(15, 23, 42, 0.45);
 }
 
 .sidebar.collapsed {
@@ -247,14 +291,14 @@ if (savedState !== null) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--sidebar-border, rgba(255, 255, 255, 0.1));
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: white;
+  color: var(--sidebar-text, #fff);
   text-decoration: none;
   font-size: 1.25rem;
   font-weight: 700;
@@ -264,14 +308,14 @@ if (savedState !== null) {
 
 .brand i {
   font-size: 1.75rem;
-  color: #e74c3c;
+  color: var(--brand-accent, #f97316);
   flex-shrink: 0;
 }
 
 .collapse-btn {
   background: none;
   border: none;
-  color: white;
+  color: inherit;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 4px;
@@ -294,7 +338,7 @@ if (savedState !== null) {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(248, 250, 252, 0.8);
   text-decoration: none;
   transition: all 0.3s;
   white-space: nowrap;
@@ -309,18 +353,18 @@ if (savedState !== null) {
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-text, #fff);
 }
 
 .nav-item.router-link-active {
-  background: rgba(231, 76, 60, 0.2);
-  color: white;
-  border-left: 3px solid #e74c3c;
+  background: var(--sidebar-active-bg, rgba(59, 130, 246, 0.25));
+  color: var(--sidebar-text, #fff);
+  border-left: 3px solid var(--primary-color, #3b82f6);
 }
 
 .sidebar-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--sidebar-border, rgba(255, 255, 255, 0.1));
   padding: 1rem 0;
 }
 
@@ -337,21 +381,23 @@ if (savedState !== null) {
 }
 
 .topbar {
-  background: white;
+  background: var(--topbar-bg, rgba(255, 255, 255, 0.9));
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
   position: sticky;
   top: 0;
   z-index: 999;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--topbar-text, #0f172a);
   margin: 0;
 }
 
@@ -377,6 +423,12 @@ if (savedState !== null) {
 .content {
   flex: 1;
   padding: 2rem;
+  background: var(--surface-ground);
+  min-height: 100%;
+}
+
+.theme-toggle {
+  color: var(--topbar-text, var(--text-color));
 }
 
 @media (max-width: 968px) {

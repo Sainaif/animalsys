@@ -17,7 +17,7 @@
       <template #content>
         <DataTable :value="medications" paginator :rows="20">
           <Column field="animal.name" header="Animal">
-            <template #body="slotProps">{{ slotProps.data.animal?.name || 'N/A' }}</template>
+            <template #body="slotProps">{{ formatAnimalName(slotProps.data.animal) }}</template>
           </Column>
           <Column field="medication_name" :header="$t('veterinary.medicationName')" />
           <Column field="dosage" :header="$t('veterinary.dosage')" />
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
@@ -61,9 +61,10 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Badge from '@/components/shared/Badge.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -71,11 +72,11 @@ const medications = ref([])
 const loading = ref(true)
 const filters = reactive({ status: null })
 
-const statusOptions = [
+const statusOptions = computed(() => ([
   { label: t('veterinary.active'), value: 'active' },
   { label: t('veterinary.completed'), value: 'completed' },
   { label: t('veterinary.discontinued'), value: 'discontinued' }
-]
+]))
 
 const loadMedications = async () => {
   try {
@@ -89,8 +90,27 @@ const loadMedications = async () => {
   }
 }
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
-const getStatusVariant = (status) => ({ active: 'success', completed: 'info', discontinued: 'neutral' }[status] || 'neutral')
+const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value === 'pl' ? 'pl-PL' : 'en-US'))
+
+const formatDate = (date) => {
+  if (!date) return '—'
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return '—'
+  return dateFormatter.value.format(parsed)
+}
+
+const formatAnimalName = (animal) => {
+  if (!animal) return t('animal.unknown')
+  if (typeof animal === 'string') return animal
+  const localized = getLocalizedValue(animal.name || animal, locale.value)
+  return localized || animal.name?.en || animal.name?.pl || t('animal.unknown')
+}
+
+const getStatusVariant = (status) => ({
+  active: 'success',
+  completed: 'info',
+  discontinued: 'neutral'
+}[status?.toLowerCase?.()] || 'neutral')
 
 const confirmDelete = (medication) => {
   confirm.require({

@@ -7,7 +7,7 @@ import StaffLayout from '@/layouts/StaffLayout.vue'
 const route = useRoute()
 
 const layout = computed(() => {
-  return route.meta.layout || 'staff'
+  return route.meta.layout || 'public'
 })
 </script>
 

@@ -2,11 +2,29 @@ import api from './api'
 import type { AdoptionApplication, Adoption, AdoptionStatistics } from '@/types/adoption'
 import type { PaginatedResponse, QueryParams } from '@/types/common'
 
+const toPaginatedResponse = <T>(
+  payload: any,
+  key: string,
+  params?: QueryParams
+): PaginatedResponse<T> => {
+  const items = Array.isArray(payload?.[key]) ? payload[key] : []
+  return {
+    data: items,
+    total: typeof payload?.total === 'number' ? payload.total : items.length,
+    limit: typeof payload?.limit === 'number'
+      ? payload.limit
+      : (typeof params?.limit === 'number' ? params.limit : items.length),
+    offset: typeof payload?.offset === 'number'
+      ? payload.offset
+      : (typeof params?.offset === 'number' ? params.offset : 0)
+  }
+}
+
 export const adoptionService = {
   // Applications
   async getApplications(params?: QueryParams): Promise<PaginatedResponse<AdoptionApplication>> {
     const response = await api.get('/adoptions/applications', { params })
-    return response.data
+    return toPaginatedResponse<AdoptionApplication>(response.data, 'applications', params)
   },
 
   async getApplication(id: string): Promise<AdoptionApplication> {
@@ -46,7 +64,7 @@ export const adoptionService = {
   // Adoptions
   async getAdoptions(params?: QueryParams): Promise<PaginatedResponse<Adoption>> {
     const response = await api.get('/adoptions', { params })
-    return response.data
+    return toPaginatedResponse<Adoption>(response.data, 'adoptions', params)
   },
 
   async getAdoption(id: string): Promise<Adoption> {

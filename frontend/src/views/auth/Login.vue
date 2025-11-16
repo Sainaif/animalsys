@@ -86,13 +86,17 @@ const handleLogin = async () => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
   padding: 1rem;
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  background: var(--card-bg, #ffffff);
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
 }
 
 .login-header {
@@ -101,14 +105,14 @@ const handleLogin = async () => {
 }
 
 .login-title {
-  font-size: 1.75rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  color: #212529;
+  color: var(--text-color, #0f172a);
   margin-bottom: 0.5rem;
 }
 
 .login-subtitle {
-  color: #6c757d;
+  color: var(--text-muted, #6c757d);
   font-size: 0.95rem;
 }
 
@@ -125,7 +129,16 @@ const handleLogin = async () => {
 }
 
 .field label {
-  font-weight: 500;
-  color: #495057;
+  font-weight: 600;
+  color: var(--text-muted, #495057);
+  font-size: 0.95rem;
+}
+
+:global([data-theme='dark'] .login-container) {
+  background: radial-gradient(circle at top, rgba(8, 18, 43, 0.95) 0%, rgba(5, 8, 22, 0.98) 100%);
+}
+
+:global([data-theme='dark'] .login-card) {
+  box-shadow: 0 30px 80px rgba(3, 7, 18, 0.8);
 }
 </style>

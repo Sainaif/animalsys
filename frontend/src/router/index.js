@@ -12,6 +12,12 @@ const router = createRouter({
       meta: { requiresAuth: false, layout: 'public' }
     },
     {
+      path: '/animals',
+      name: 'public-animals',
+      component: () => import('@/views/home/AnimalGallery.vue'),
+      meta: { requiresAuth: false, layout: 'public' }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('@/views/auth/Login.vue'),
@@ -294,6 +300,12 @@ const router = createRouter({
       path: '/staff/inventory',
       name: 'inventory',
       component: () => import('@/views/staff/inventory/InventoryList.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/inventory/new',
+      name: 'inventory-create',
+      component: () => import('@/views/staff/inventory/CreateInventoryItem.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     // Reports routes

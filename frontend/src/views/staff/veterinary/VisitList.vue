@@ -30,7 +30,7 @@
         <DataTable :value="visits" paginator :rows="20">
           <Column field="animal.name" header="Animal">
             <template #body="slotProps">
-              {{ slotProps.data.animal?.name || 'N/A' }}
+              {{ formatAnimalName(slotProps.data.animal) }}
             </template>
           </Column>
           <Column field="visit_date" :header="$t('veterinary.visitDate')">
@@ -40,7 +40,7 @@
           </Column>
           <Column field="visit_type" :header="$t('veterinary.visitType')">
             <template #body="slotProps">
-              {{ $t(`veterinary.${slotProps.data.visit_type}`) }}
+              {{ formatVisitType(slotProps.data.visit_type) }}
             </template>
           </Column>
           <Column field="veterinarian_name" :header="$t('veterinary.veterinarianName')" />
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
@@ -98,9 +98,10 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Badge from '@/components/shared/Badge.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -108,14 +109,14 @@ const visits = ref([])
 const loading = ref(true)
 const filters = reactive({ visit_type: null })
 
-const visitTypeOptions = ref([
+const visitTypeOptions = computed(() => ([
   { label: t('veterinary.checkup'), value: 'checkup' },
   { label: t('veterinary.emergency'), value: 'emergency' },
   { label: t('veterinary.surgery'), value: 'surgery' },
-  { label: t('animal.vaccinated'), value: 'vaccination' },
+  { label: t('veterinary.vaccination'), value: 'vaccination' },
   { label: t('veterinary.followUp'), value: 'follow_up' },
   { label: t('veterinary.other'), value: 'other' }
-])
+]))
 
 const loadVisits = async () => {
   try {
@@ -129,8 +130,33 @@ const loadVisits = async () => {
   }
 }
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
-const truncate = (text, length) => text && text.length > length ? text.substring(0, length) + '...' : text || 'N/A'
+const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value === 'pl' ? 'pl-PL' : 'en-US'))
+
+const formatDate = (date) => {
+  if (!date) return '—'
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return '—'
+  return dateFormatter.value.format(parsed)
+}
+
+const formatAnimalName = (animal) => {
+  if (!animal) return t('animal.unknown')
+  if (typeof animal === 'string') return animal
+  const localized = getLocalizedValue(animal.name || animal, locale.value)
+  return localized || animal.name?.en || animal.name?.pl || t('animal.unknown')
+}
+
+const formatVisitType = (type) => {
+  if (!type) return '—'
+  const key = `veterinary.${type}`
+  const translation = t(key)
+  return translation !== key ? translation : type
+}
+
+const truncate = (text, length) => {
+  if (!text) return '—'
+  return text.length > length ? `${text.substring(0, length)}…` : text
+}
 
 const confirmDelete = (visit) => {
   confirm.require({

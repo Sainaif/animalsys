@@ -9,16 +9,51 @@ import type {
   VeterinaryStatistics
 } from '@/types/veterinary'
 
+const toPaginatedResponse = <T>(
+  payload: any,
+  key: string,
+  params?: QueryParams
+): PaginatedResponse<T> => {
+  const items = Array.isArray(payload?.[key]) ? payload[key] : []
+  return {
+    data: items,
+    total: typeof payload?.total === 'number' ? payload.total : items.length,
+    limit: typeof payload?.limit === 'number'
+      ? payload.limit
+      : (typeof params?.limit === 'number' ? params.limit : items.length),
+    offset: typeof payload?.offset === 'number'
+      ? payload.offset
+      : (typeof params?.offset === 'number' ? params.offset : 0)
+  }
+}
+
+const toList = <T>(payload: any, key: string): T[] => {
+  if (Array.isArray(payload?.[key])) {
+    return payload[key]
+  }
+  if (Array.isArray(payload)) {
+    return payload
+  }
+  return []
+}
+
+const extractItem = <T>(payload: any, key: string): T => {
+  if (payload && typeof payload === 'object' && key in payload) {
+    return payload[key]
+  }
+  return payload as T
+}
+
 export const veterinaryService = {
   // Veterinary Visits
   async getVisits(params?: QueryParams): Promise<PaginatedResponse<VeterinaryVisit>> {
     const response = await api.get('/veterinary/visits', { params })
-    return response.data
+    return toPaginatedResponse<VeterinaryVisit>(response.data, 'visits', params)
   },
 
   async getVisit(id: string): Promise<VeterinaryVisit> {
     const response = await api.get(`/veterinary/visits/${id}`)
-    return response.data
+    return extractItem<VeterinaryVisit>(response.data, 'visit')
   },
 
   async createVisit(data: Partial<VeterinaryVisit>): Promise<VeterinaryVisit> {
@@ -37,18 +72,18 @@ export const veterinaryService = {
 
   async getAnimalVisits(animalId: string): Promise<VeterinaryVisit[]> {
     const response = await api.get(`/animals/${animalId}/veterinary-visits`)
-    return response.data
+    return toList<VeterinaryVisit>(response.data, 'visits')
   },
 
   // Vaccinations
   async getVaccinations(params?: QueryParams): Promise<PaginatedResponse<Vaccination>> {
     const response = await api.get('/veterinary/vaccinations', { params })
-    return response.data
+    return toPaginatedResponse<Vaccination>(response.data, 'vaccinations', params)
   },
 
   async getVaccination(id: string): Promise<Vaccination> {
     const response = await api.get(`/veterinary/vaccinations/${id}`)
-    return response.data
+    return extractItem<Vaccination>(response.data, 'vaccination')
   },
 
   async createVaccination(data: Partial<Vaccination>): Promise<Vaccination> {
@@ -67,18 +102,18 @@ export const veterinaryService = {
 
   async getAnimalVaccinations(animalId: string): Promise<Vaccination[]> {
     const response = await api.get(`/animals/${animalId}/vaccinations`)
-    return response.data
+    return toList<Vaccination>(response.data, 'vaccinations')
   },
 
   // Medications
   async getMedications(params?: QueryParams): Promise<PaginatedResponse<Medication>> {
     const response = await api.get('/veterinary/medications', { params })
-    return response.data
+    return toPaginatedResponse<Medication>(response.data, 'medications', params)
   },
 
   async getMedication(id: string): Promise<Medication> {
     const response = await api.get(`/veterinary/medications/${id}`)
-    return response.data
+    return extractItem<Medication>(response.data, 'medication')
   },
 
   async createMedication(data: Partial<Medication>): Promise<Medication> {
@@ -97,7 +132,7 @@ export const veterinaryService = {
 
   async getAnimalMedications(animalId: string): Promise<Medication[]> {
     const response = await api.get(`/animals/${animalId}/medications`)
-    return response.data
+    return toList<Medication>(response.data, 'medications')
   },
 
   async discontinueMedication(id: string, reason: string): Promise<Medication> {
@@ -108,12 +143,12 @@ export const veterinaryService = {
   // Treatment Plans
   async getTreatmentPlans(params?: QueryParams): Promise<PaginatedResponse<TreatmentPlan>> {
     const response = await api.get('/veterinary/treatment-plans', { params })
-    return response.data
+    return toPaginatedResponse<TreatmentPlan>(response.data, 'treatment_plans', params)
   },
 
   async getTreatmentPlan(id: string): Promise<TreatmentPlan> {
     const response = await api.get(`/veterinary/treatment-plans/${id}`)
-    return response.data
+    return extractItem<TreatmentPlan>(response.data, 'treatment_plan')
   },
 
   async createTreatmentPlan(data: Partial<TreatmentPlan>): Promise<TreatmentPlan> {
@@ -132,7 +167,7 @@ export const veterinaryService = {
 
   async getAnimalTreatmentPlans(animalId: string): Promise<TreatmentPlan[]> {
     const response = await api.get(`/animals/${animalId}/treatment-plans`)
-    return response.data
+    return toList<TreatmentPlan>(response.data, 'treatment_plans')
   },
 
   async addProgressNote(
@@ -146,12 +181,12 @@ export const veterinaryService = {
   // Medical Conditions
   async getMedicalConditions(params?: QueryParams): Promise<PaginatedResponse<MedicalCondition>> {
     const response = await api.get('/veterinary/medical-conditions', { params })
-    return response.data
+    return toPaginatedResponse<MedicalCondition>(response.data, 'conditions', params)
   },
 
   async getMedicalCondition(id: string): Promise<MedicalCondition> {
     const response = await api.get(`/veterinary/medical-conditions/${id}`)
-    return response.data
+    return extractItem<MedicalCondition>(response.data, 'condition')
   },
 
   async createMedicalCondition(data: Partial<MedicalCondition>): Promise<MedicalCondition> {
@@ -173,7 +208,7 @@ export const veterinaryService = {
 
   async getAnimalMedicalConditions(animalId: string): Promise<MedicalCondition[]> {
     const response = await api.get(`/animals/${animalId}/medical-conditions`)
-    return response.data
+    return toList<MedicalCondition>(response.data, 'conditions')
   },
 
   // Statistics

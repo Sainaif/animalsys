@@ -9,91 +9,175 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
+import { getLocalizedValue, translateValue } from '@/utils/animalHelpers'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const router = useRouter()
 
 const loading = ref(true)
 const dashboardData = ref(null)
 
-const stats = computed(() => {
-  if (!dashboardData.value) {
-    return []
-  }
+const localeCode = computed(() => (locale.value === 'pl' ? 'pl-PL' : 'en-US'))
+const currencyCode = computed(() => (locale.value === 'pl' ? 'PLN' : 'USD'))
 
-  const overview = dashboardData.value.overview || {}
+const formatNumber = (value) => {
+  return new Intl.NumberFormat(localeCode.value).format(value || 0)
+}
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat(localeCode.value, {
+    style: 'currency',
+    currency: currencyCode.value,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value || 0)
+}
+
+const formatDate = (value) => {
+  if (!value) {
+    return ''
+  }
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return new Intl.DateTimeFormat(localeCode.value, { dateStyle: 'medium' }).format(date)
+}
+
+const formatTaskDate = (value) => {
+  const formatted = formatDate(value)
+  return formatted || t('tasks.noDueDate')
+}
+
+const stats = computed(() => {
+  const overview = dashboardData.value?.overview || {}
 
   return [
     {
       label: t('dashboard.totalAnimals'),
-      value: overview.total_animals || 0,
+      value: formatNumber(overview.total_animals),
       icon: 'pi-heart',
-      color: '#3B82F6',
+      color: '#6366f1',
       route: '/staff/animals'
     },
     {
       label: t('dashboard.availableAnimals'),
-      value: overview.available_animals || 0,
+      value: formatNumber(overview.animals_in_shelter || overview.available_animals),
       icon: 'pi-check-circle',
-      color: '#10B981',
+      color: '#10b981',
       route: '/staff/animals'
     },
     {
       label: t('dashboard.adoptionsThisMonth'),
-      value: overview.animals_adopted_this_month || 0,
+      value: formatNumber(overview.adoptions_this_month || overview.animals_adopted_this_month),
       icon: 'pi-users',
-      color: '#8B5CF6',
+      color: '#8b5cf6',
       route: '/staff/adoptions'
     },
     {
       label: t('dashboard.animalsInTreatment'),
-      value: overview.animals_in_treatment || 0,
+      value: formatNumber(overview.animals_in_treatment),
       icon: 'pi-plus',
-      color: '#F59E0B',
+      color: '#f59e0b',
       route: '/staff/veterinary'
     },
     {
       label: t('dashboard.donationsThisMonth'),
-      value: formatCurrency(overview.total_donations_this_month || 0),
+      value: formatCurrency(overview.donations_this_month || overview.total_donations_this_month),
       icon: 'pi-dollar',
-      color: '#E74C3C',
-      route: '/staff/finance',
-      isCurrency: true
+      color: '#ec4899',
+      route: '/staff/finance'
     },
     {
       label: t('dashboard.activeVolunteers'),
-      value: overview.active_volunteers || 0,
+      value: formatNumber(overview.active_volunteers),
       icon: 'pi-user-plus',
-      color: '#9B59B6',
+      color: '#14b8a6',
       route: '/staff/volunteers'
     }
   ]
 })
 
-const recentAnimals = computed(() => {
-  return dashboardData.value?.recent_animals || []
-})
+const toArray = (value) => {
+  if (Array.isArray(value)) {
+    return value
+  }
+  if (!value) {
+    return []
+  }
+  return Object.values(value)
+}
 
-const upcomingTasks = computed(() => {
-  return dashboardData.value?.upcoming_tasks || []
-})
+const recentAnimals = computed(() => toArray(dashboardData.value?.recent_animals))
+const upcomingTasks = computed(() => toArray(dashboardData.value?.upcoming_tasks))
+const lastUpdated = computed(() => formatDate(dashboardData.value?.generated_at))
+
+const getAnimalName = (animal) => {
+  return getLocalizedValue(animal?.name, locale.value) || t('animal.unknown')
+}
+
+const getAnimalSpecies = (animal) => {
+  if (!animal) return ''
+  const translated = translateValue(animal.species || '', t, 'animal.speciesNames')
+  return translated || animal.species || ''
+}
+
+const getAnimalStatus = (animal) => {
+  const status = (animal?.status || '').toLowerCase()
+  switch (status) {
+    case 'available':
+      return t('animal.available')
+    case 'adopted':
+      return t('animal.adopted')
+    case 'fostered':
+      return t('animal.fostered')
+    case 'under_treatment':
+      return t('animal.underTreatment')
+    default:
+      return t('animal.status')
+  }
+}
+
+const getTaskStatusLabel = (task) => {
+  const status = (task?.status || '').toLowerCase()
+  const key = `tasks.statuses.${status}`
+  const translated = t(key)
+  return translated === key ? status : translated
+}
+
+const getTaskCategoryLabel = (task) => {
+  if (!task?.category) return ''
+  const key = `tasks.categories.${task.category}`
+  const translated = t(key)
+  return translated === key ? task.category : translated
+}
+
+const getTaskPriorityLabel = (task) => {
+  if (!task?.priority) return ''
+  const key = `tasks.priorities.${task.priority}`
+  const translated = t(key)
+  return translated === key ? task.priority : translated
+}
 
 const loadDashboard = async () => {
   try {
     loading.value = true
     const response = await api.get('/dashboard')
-    dashboardData.value = response.data
+    dashboardData.value = {
+      ...response.data,
+      recent_animals: toArray(response.data?.recent_animals),
+      upcoming_tasks: toArray(response.data?.upcoming_tasks)
+    }
   } catch (error) {
     console.error('Error loading dashboard:', error)
-    // Use mock data if API fails
     dashboardData.value = {
       overview: {
         total_animals: 150,
-        available_animals: 45,
-        animals_adopted_this_month: 12,
+        animals_in_shelter: 45,
+        adoptions_this_month: 12,
         animals_in_treatment: 15,
-        total_donations_this_month: 5000,
+        donations_this_month: 5000,
         active_volunteers: 35
       },
       recent_animals: [],
@@ -102,14 +186,6 @@ const loadDashboard = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const formatCurrency = (value) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0
-  }).format(value)
 }
 
 const navigateToStat = (route) => {
@@ -128,6 +204,7 @@ onMounted(() => {
     <div class="welcome-section">
       <h1>{{ $t('dashboard.welcome') }}, {{ authStore.user?.first_name || 'User' }}!</h1>
       <p>{{ $t('dashboard.overview') }}</p>
+      <p v-if="lastUpdated" class="last-updated">{{ $t('dashboard.lastUpdated', { time: lastUpdated }) }}</p>
     </div>
 
     <div v-if="loading" class="loading-container">
@@ -166,16 +243,39 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <div v-if="recentAnimals.length > 0">
+            <div v-if="recentAnimals && recentAnimals.length > 0">
               <DataTable :value="recentAnimals" :rows="5">
-                <Column field="name" :header="$t('animal.name')"></Column>
-                <Column field="species" :header="$t('animal.species')"></Column>
-                <Column field="status" :header="$t('animal.status')"></Column>
+                <Column :header="$t('animal.name')">
+                  <template #body="slotProps">
+                    <div class="animal-cell">
+                      <div class="animal-name">{{ getAnimalName(slotProps.data) }}</div>
+                      <small v-if="slotProps.data.breed" class="animal-breed">{{ slotProps.data.breed }}</small>
+                    </div>
+                  </template>
+                </Column>
+                <Column :header="$t('animal.species')">
+                  <template #body="slotProps">
+                    {{ getAnimalSpecies(slotProps.data) }}
+                  </template>
+                </Column>
+                <Column :header="$t('animal.status')">
+                  <template #body="slotProps">
+                    <span class="status-pill" :class="`status-${slotProps.data.status}`">
+                      {{ getAnimalStatus(slotProps.data) }}
+                    </span>
+                  </template>
+                </Column>
+                <Column :header="$t('common.createdAt')">
+                  <template #body="slotProps">
+                    {{ formatDate(slotProps.data.created_at) }}
+                  </template>
+                </Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       icon="pi pi-eye"
                       class="p-button-text p-button-sm"
+                      :aria-label="$t('common.viewMore')"
                       @click="router.push(`/staff/animals/${slotProps.data.id}`)"
                     />
                   </template>
@@ -184,7 +284,7 @@ onMounted(() => {
             </div>
             <div v-else class="empty-state">
               <i class="pi pi-inbox"></i>
-              <p>No recent activity</p>
+              <p>{{ $t('dashboard.noRecentActivity') }}</p>
             </div>
           </template>
         </Card>
@@ -196,24 +296,28 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <div v-if="upcomingTasks.length > 0">
+            <div v-if="upcomingTasks && upcomingTasks.length > 0">
               <div v-for="task in upcomingTasks" :key="task.id" class="task-item">
                 <div class="task-info">
-                  <i class="pi pi-calendar"></i>
-                  <div>
-                    <div class="task-title">{{ task.title }}</div>
-                    <div class="task-date">{{ task.due_date }}</div>
+                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-meta">
+                    <span>{{ getTaskCategoryLabel(task) }}</span>
+                    <span>{{ formatTaskDate(task.due_date) }}</span>
                   </div>
                 </div>
-                <Button
-                  icon="pi pi-check"
-                  class="p-button-text p-button-sm p-button-success"
-                />
+                <div class="task-tags">
+                  <span class="priority-pill" :class="`priority-${task.priority}`">
+                    {{ getTaskPriorityLabel(task) }}
+                  </span>
+                  <span class="status-pill" :class="`status-${task.status}`">
+                    {{ getTaskStatusLabel(task) }}
+                  </span>
+                </div>
               </div>
             </div>
             <div v-else class="empty-state">
               <i class="pi pi-check-circle"></i>
-              <p>No upcoming tasks</p>
+              <p>{{ $t('tasks.noUpcoming') }}</p>
             </div>
           </template>
         </Card>
@@ -339,8 +443,10 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: 2rem;
+  color: var(--text-color);
 }
 
 .welcome-section {
@@ -348,38 +454,44 @@ onMounted(() => {
 }
 
 .welcome-section h1 {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  margin-bottom: 0.35rem;
 }
 
 .welcome-section p {
-  color: #7f8c8d;
-  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.last-updated {
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 .loading-container {
   text-align: center;
-  padding: 4rem;
+  padding: 4rem 0;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   padding: 1.5rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
+  background: var(--card-bg);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stat-card.clickable {
@@ -387,20 +499,19 @@ onMounted(() => {
 }
 
 .stat-card.clickable:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
 }
 
 .stat-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 1.75rem;
-  flex-shrink: 0;
+  color: #fff;
+  font-size: 1.35rem;
 }
 
 .stat-content {
@@ -408,22 +519,32 @@ onMounted(() => {
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: #7f8c8d;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 0.25rem;
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+.recent-animals-card :deep(.p-card),
+.tasks-card :deep(.p-card) {
+  background: var(--card-bg);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
 }
 
 .card-header {
@@ -432,30 +553,68 @@ onMounted(() => {
   align-items: center;
 }
 
-.card-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #2c3e50;
-}
-
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: #7f8c8d;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .empty-state i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
+  font-size: 2rem;
+  color: var(--border-color);
+}
+
+.animal-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.animal-name {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.animal-breed {
+  color: var(--text-muted);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+.status-pill.status-available {
+  background: #22c55e;
+}
+
+.status-pill.status-adopted {
+  background: #6366f1;
+}
+
+.status-pill.status-fostered {
+  background: #ec4899;
+}
+
+.status-pill.status-under_treatment {
+  background: #f59e0b;
 }
 
 .task-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #ecf0f1;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
 }
 
 .task-item:last-child {
@@ -463,91 +622,119 @@ onMounted(() => {
 }
 
 .task-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.task-info i {
-  font-size: 1.5rem;
-  color: #3498db;
+  flex: 1;
 }
 
 .task-title {
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.25rem;
+  color: var(--text-color);
 }
 
-.task-date {
-  font-size: 0.875rem;
-  color: #7f8c8d;
+.task-meta {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.task-tags {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.priority-pill {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.priority-pill.priority-low {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.priority-pill.priority-medium {
+  background: rgba(251, 191, 36, 0.2);
+  color: #b45309;
+}
+
+.priority-pill.priority-high {
+  background: rgba(249, 115, 22, 0.2);
+  color: #c2410c;
+}
+
+.priority-pill.priority-urgent {
+  background: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
 }
 
 .modules-section {
   margin-top: 2rem;
 }
 
-.modules-section h3 {
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
 .modules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
 }
 
 .module-card {
   cursor: pointer;
-  transition: all 0.3s ease;
-  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid transparent;
+  padding: 1.25rem;
 }
 
 .module-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(15, 23, 42, 0.15);
 }
 
 .module-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
   color: white;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .module-card h4 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.125rem;
-  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-color);
 }
 
 .module-card p {
-  margin: 0;
-  color: #7f8c8d;
-  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboard {
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .stats-grid,
+  .dashboard-grid,
   .modules-grid {
     grid-template-columns: 1fr;
+  }
+
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

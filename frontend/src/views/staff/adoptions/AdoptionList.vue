@@ -26,7 +26,7 @@
         <DataTable :value="adoptions" paginator :rows="20">
           <Column field="animal.name" header="Animal">
             <template #body="slotProps">
-              {{ slotProps.data.animal?.name || 'N/A' }}
+                {{ formatAnimalName(slotProps.data) }}
             </template>
           </Column>
           <Column field="adopter_first_name" :header="$t('adoption.firstName')" />
@@ -44,7 +44,7 @@
           <Column field="status" :header="$t('adoption.status')">
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
-                {{ $t(`adoption.${slotProps.data.status}`) }}
+                {{ formatStatusLabel(slotProps.data.status) }}
               </Badge>
             </template>
           </Column>
@@ -67,12 +67,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { adoptionService } from '@/services/adoptionService'
 import { exportService } from '@/services/exportService'
+import { animalService } from '@/services/animalService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
@@ -81,26 +82,29 @@ import Column from 'primevue/column'
 import Badge from '@/components/shared/Badge.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 const adoptions = ref([])
 const loading = ref(true)
 const filters = reactive({ status: null })
+const animalsCache = reactive({})
 
-const statusOptions = ref([
+const statusOptions = computed(() => ([
   { label: t('adoption.active'), value: 'active' },
   { label: t('adoption.returned'), value: 'returned' },
   { label: t('adoption.completed'), value: 'completed' }
-])
+]))
 
 const loadAdoptions = async () => {
   try {
     loading.value = true
     const response = await adoptionService.getAdoptions(filters)
     adoptions.value = response.data
+    await preloadAnimals(response.data)
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load adoptions', life: 3000 })
   } finally {
@@ -108,11 +112,88 @@ const loadAdoptions = async () => {
   }
 }
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
-const formatCurrency = (amount) => amount ? `$${amount.toFixed(2)}` : 'N/A'
+const currencyFormatter = computed(() => new Intl.NumberFormat(
+  locale.value === 'pl' ? 'pl-PL' : 'en-US',
+  {
+    style: 'currency',
+    currency: locale.value === 'pl' ? 'PLN' : 'USD',
+    minimumFractionDigits: 0
+  }
+))
+
+const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value === 'pl' ? 'pl-PL' : 'en-US'))
+
+const formatDate = (date) => {
+  if (!date) return '—'
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return '—'
+  return dateFormatter.value.format(parsed)
+}
+
+const formatCurrency = (amount) => {
+  if (typeof amount !== 'number') return '—'
+  return currencyFormatter.value.format(amount)
+}
+
+const preloadAnimals = async (records) => {
+  const missingIds = Array.from(new Set(
+    records
+      .map((item) => item.animal_id || item.animal?.id || item.animal)
+      .filter((id) => typeof id === 'string' && id && !animalsCache[id])
+  ))
+
+  if (missingIds.length === 0) {
+    return
+  }
+
+  await Promise.allSettled(
+    missingIds.map(async (id) => {
+      try {
+        const animal = await animalService.getAnimal(id)
+        animalsCache[id] = animal
+      } catch (error) {
+        console.warn('Failed to load animal', id, error)
+      }
+    })
+  )
+}
+
+const resolveAnimal = (record) => {
+  if (!record) {
+    return null
+  }
+  if (record.animal && typeof record.animal === 'object') {
+    return record.animal
+  }
+  const id = record.animal_id || (typeof record.animal === 'string' ? record.animal : null)
+  if (id && animalsCache[id]) {
+    return animalsCache[id]
+  }
+  return null
+}
+
+const formatAnimalName = (record) => {
+  const animal = resolveAnimal(record)
+  if (!animal) {
+    return t('animal.unknown')
+  }
+  const localized = getLocalizedValue(animal.name || animal.Name || animal, locale.value)
+  return localized || animal.name?.en || animal.name?.pl || animal.Name?.en || t('animal.unknown')
+}
+
+const formatStatusLabel = (status) => {
+  if (!status) return t('common.status')
+  const normalized = status.toLowerCase()
+  const key = `adoption.${normalized}`
+  const translation = t(key)
+  return translation !== key ? translation : status
+}
+
 const getStatusVariant = (status) => ({
-  active: 'success', returned: 'warning', completed: 'info'
-}[status] || 'neutral')
+  active: 'success',
+  returned: 'warning',
+  completed: 'info'
+}[status?.toLowerCase?.()] || 'neutral')
 
 const exportAdoptions = () => {
   try {

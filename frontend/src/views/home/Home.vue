@@ -81,27 +81,28 @@
           <div v-for="animal in animals" :key="animal.id" class="animal-card">
             <div class="animal-image">
               <img
-                v-if="animal.photo_url"
-                :src="animal.photo_url"
-                :alt="animal.name"
+                v-if="getAnimalImageSrc(animal)"
+                :src="getAnimalImageSrc(animal)"
+                :alt="getAnimalName(animal)"
               />
               <div v-else class="animal-placeholder">
                 <i class="pi pi-image"></i>
               </div>
-              <span class="animal-badge">{{ $t('home.adoptions.available') }}</span>
+              <span class="animal-badge">{{ getStatusLabel(animal) }}</span>
             </div>
             <div class="animal-info">
-              <h3>{{ animal.name }}</h3>
+              <h3>{{ getAnimalName(animal) }}</h3>
               <div class="animal-details">
                 <span><i class="pi pi-calendar"></i> {{ formatAge(animal) }}</span>
-                <span><i class="pi pi-tag"></i> {{ animal.breed || animal.species }}</span>
+                <span><i class="pi pi-tag"></i> {{ getAnimalSpeciesLabel(animal) }}</span>
+                <span v-if="getAnimalColorLabel(animal)"><i class="pi pi-palette"></i> {{ getAnimalColorLabel(animal) }}</span>
                 <span>
-                  <i class="pi" :class="animal.gender === 'male' ? 'pi-mars' : 'pi-venus'"></i>
-                  {{ $t(`home.adoptions.${animal.gender}`) }}
+                  <i class="pi" :class="getGenderIcon(animal)"></i>
+                  {{ getGenderLabel(animal) }}
                 </span>
               </div>
-              <p v-if="animal.description" class="animal-description">
-                {{ truncateText(animal.description, 100) }}
+              <p v-if="getAnimalDescription(animal)" class="animal-description">
+                {{ truncateText(getAnimalDescription(animal), 100) }}
               </p>
               <Button
                 :label="$t('home.adoptions.viewProfile')"
@@ -291,9 +292,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
+import { useAuthStore } from '@/stores/auth'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -301,9 +304,13 @@ import Textarea from 'primevue/textarea'
 import Divider from 'primevue/divider'
 import ProgressSpinner from 'primevue/progressspinner'
 import api from '@/services/api'
+import { getLocalizedValue, getAnimalImage, getAnimalGender, translateValue } from '@/utils/animalHelpers'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const router = useRouter()
+const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 
 // Animals
 const animals = ref([])
@@ -360,9 +367,10 @@ const loadAnimals = async () => {
   try {
     loading.value = true
     const response = await api.get('/public/animals', {
-      params: { limit: 6 }
+      params: { limit: 6, available_only: true, sort_by: 'created_at', sort_order: 'desc' }
     })
-    animals.value = response.data.data || response.data
+    const list = response.data?.animals || response.data?.data || []
+    animals.value = Array.isArray(list) ? list : []
   } catch (error) {
     console.error('Error loading animals:', error)
     // Use mock data if API fails
@@ -373,6 +381,14 @@ const loadAnimals = async () => {
 }
 
 const loadStatistics = async () => {
+  if (!authStore.isAuthenticated) {
+    statistics.value[0].value = 150
+    statistics.value[1].value = 89
+    statistics.value[2].value = 42
+    statistics.value[3].value = 50000
+    return
+  }
+
   try {
     // Try to load real statistics (this endpoint might require auth)
     const [animalStats] = await Promise.allSettled([
@@ -407,15 +423,84 @@ const formatNumber = (num) => {
   return num.toString()
 }
 
-const formatAge = (animal) => {
-  if (!animal.age_years && !animal.age_months) return 'Unknown'
-  const years = animal.age_years || 0
-  const months = animal.age_months || 0
+const getAnimalName = (animal) => {
+  const name = getLocalizedValue(animal?.name, locale.value)
+  return name || t('animal.unknown')
+}
 
-  if (years > 0) {
-    return `${years} ${t('home.adoptions.years')}`
+const getAnimalDescription = (animal) => getLocalizedValue(animal?.description, locale.value)
+
+const getAnimalImageSrc = (animal) => getAnimalImage(animal)
+
+const getAnimalSpeciesLabel = (animal) => {
+  if (!animal) return ''
+  if (animal.breed) {
+    return animal.breed
   }
-  return `${months} ${t('home.adoptions.months')}`
+  const translated = translateValue(animal.species || '', t, 'animal.speciesNames')
+  return translated || animal.species || ''
+}
+
+const getAnimalColorLabel = (animal) => {
+  if (!animal?.color) return ''
+  return translateValue(animal.color, t, 'animal.colorNames')
+}
+
+const getGenderLabel = (animal) => {
+  const gender = getAnimalGender(animal)
+  if (gender === 'male' || gender === 'female') {
+    return t(`home.adoptions.${gender}`)
+  }
+  return t('animal.unknown')
+}
+
+const getGenderIcon = (animal) => getAnimalGender(animal) === 'male' ? 'pi-mars' : 'pi-venus'
+
+const getStatusLabel = (animal) => {
+  const status = (animal?.status || '').toLowerCase()
+  switch (status) {
+    case 'available':
+      return t('animal.available')
+    case 'adopted':
+      return t('animal.adopted')
+    case 'fostered':
+      return t('animal.fostered')
+    case 'under_treatment':
+      return t('animal.underTreatment')
+    default:
+      return t('animal.status')
+  }
+}
+
+const formatAge = (animal) => {
+  if (!animal) return t('animal.unknown')
+
+  if (animal.age_years || animal.age_months) {
+    const years = animal.age_years || 0
+    if (years > 0) {
+      return `${years} ${t('home.adoptions.years')}`
+    }
+    return `${animal.age_months || 0} ${t('home.adoptions.months')}`
+  }
+
+  if (typeof animal.age === 'number') {
+    return `${animal.age} ${t('home.adoptions.years')}`
+  }
+
+  if (animal.date_of_birth) {
+    const dob = new Date(animal.date_of_birth)
+    if (!Number.isNaN(dob.getTime())) {
+      const diff = Date.now() - dob.getTime()
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365))
+      if (years > 0) {
+        return `${years} ${t('home.adoptions.years')}`
+      }
+      const months = Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24 * 30)))
+      return `${months} ${t('home.adoptions.months')}`
+    }
+  }
+
+  return t('animal.unknown')
 }
 
 const truncateText = (text, length) => {
@@ -436,13 +521,23 @@ const scrollToContact = () => {
   document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
 }
 
+const scrollToHash = (hash) => {
+  if (!hash) return
+  const target = hash.replace('#', '')
+  requestAnimationFrame(() => {
+    document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' })
+  })
+}
+
 const viewAnimal = (id) => {
-  // In future, navigate to animal detail page
-  console.log('View animal:', id)
+  router.push({
+    name: 'public-animals',
+    query: id ? { animal: id } : undefined
+  })
 }
 
 const viewAllAnimals = () => {
-  scrollToAnimals()
+  router.push({ name: 'public-animals' })
 }
 
 const submitDonation = async () => {
@@ -482,33 +577,66 @@ const submitDonation = async () => {
 onMounted(() => {
   loadAnimals()
   loadStatistics()
+  scrollToHash(route.hash)
 })
+
+watch(
+  () => route.hash,
+  (hash, prev) => {
+    if (route.path === '/') {
+      scrollToHash(hash)
+    }
+  }
+)
 </script>
 
 <style scoped>
+:global(body) {
+  background-color: var(--surface-ground);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text-color);
+}
+
+.home-page {
+  background: var(--surface-ground);
+  color: var(--text-color);
+}
+
 .hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #ffe5ec 0%, #ffd6e0 40%, #f5f7fb 100%);
+  color: #2a1f4f;
   padding: 6rem 2rem;
   text-align: center;
 }
 
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-opacity='0.2'%3E%3Cpath d='M0 200C120 120 280 280 400 200V400H0z' fill='%23ffcbd7'/%3E%3Cpath d='M0 0C130 60 270 60 400 0V400H0z' fill='%23ffe9f0'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .hero-content {
-  max-width: 800px;
+  position: relative;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-size: clamp(2.5rem, 4vw, 4rem);
   font-weight: 800;
   margin-bottom: 1rem;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-  opacity: 0.95;
+  font-size: 1.3rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
 }
 
 .hero-actions {
@@ -530,106 +658,120 @@ onMounted(() => {
 }
 
 .section-header h2 {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
+  margin-bottom: 0.6rem;
+  color: var(--text-color);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  font-size: 1.25rem;
-  color: #7f8c8d;
+  font-size: 1.15rem;
+  color: var(--text-muted);
 }
 
 .about-section {
   padding: 5rem 0;
-  background: #f8f9fa;
 }
 
 .about-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .about-card {
-  background: white;
+  background: var(--card-bg);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
   text-align: center;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .about-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.15);
 }
 
 .about-card i {
-  font-size: 3rem;
-  color: #e74c3c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: #fff1f5;
+  color: #f43f5e;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .about-card h3 {
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: var(--text-color);
   line-height: 1.6;
 }
 
 .statistics-section {
   padding: 5rem 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.9) 0%, var(--surface-ground) 100%);
 }
 
 .statistics-section .section-header h2 {
-  color: white;
+  color: var(--text-color);
 }
 
 .statistics-section .subtitle {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-muted);
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: var(--card-bg);
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-color);
   text-align: center;
-  transition: transform 0.3s;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 26px 60px rgba(79, 70, 229, 0.15);
 }
 
 .stat-icon {
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   margin: 0 auto 1rem;
-  border-radius: 50%;
+  border-radius: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.75rem;
+  color: white;
+  background: linear-gradient(135deg, #f43f5e, #f97316);
+  box-shadow: 0 14px 30px rgba(244, 63, 94, 0.35);
 }
 
 .stat-value {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-color);
 }
 
 .stat-label {
-  font-size: 1.1rem;
-  opacity: 0.9;
+  font-size: 1rem;
+  color: var(--text-muted);
 }
 
 .animals-section {
@@ -643,35 +785,41 @@ onMounted(() => {
 
 .animals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
   margin-bottom: 2rem;
 }
 
 .animal-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: 1.5rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 45px rgba(79, 70, 229, 0.12);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .animal-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 28px 60px rgba(79, 70, 229, 0.2);
 }
 
 .animal-image {
   position: relative;
-  height: 250px;
+  height: 230px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: #f8fafc;
 }
 
 .animal-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.animal-card:hover .animal-image img {
+  transform: scale(1.05);
 }
 
 .animal-placeholder {
@@ -681,19 +829,20 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 4rem;
-  color: #bdc3c7;
+  color: #cbd5f5;
 }
 
 .animal-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #e74c3c;
+  background: linear-gradient(120deg, #f43f5e, #f97316);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
   font-weight: 600;
+  box-shadow: 0 10px 30px rgba(244, 63, 94, 0.35);
 }
 
 .animal-info {
@@ -703,7 +852,7 @@ onMounted(() => {
 .animal-info h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 .animal-details {
@@ -712,7 +861,7 @@ onMounted(() => {
   gap: 1rem;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  color: #7f8c8d;
+  color: var(--text-muted);
 }
 
 .animal-details span {
@@ -722,7 +871,7 @@ onMounted(() => {
 }
 
 .animal-description {
-  color: #7f8c8d;
+  color: var(--text-muted);
   margin-bottom: 1rem;
   line-height: 1.6;
 }
@@ -734,48 +883,53 @@ onMounted(() => {
 
 .help-section {
   padding: 5rem 0;
-  background: #f8f9fa;
+  background: linear-gradient(180deg, #fdf2f8 0%, #ffffff 35%);
 }
 
 .help-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .help-card {
-  background: white;
+  border-radius: 1.25rem;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 25px 50px rgba(244, 114, 182, 0.15);
+  backdrop-filter: blur(6px);
   text-align: center;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .help-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 35px 70px rgba(244, 63, 94, 0.25);
 }
 
 .help-icon {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   margin: 0 auto 1rem;
-  border-radius: 50%;
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: white;
+  background: #f472b6;
+  box-shadow: 0 15px 30px rgba(244, 114, 182, 0.4);
 }
 
 .help-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #2c3e50;
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
 }
 
 .help-card p {
-  color: #7f8c8d;
+  color: var(--text-muted);
   margin-bottom: 1rem;
   line-height: 1.6;
 }
@@ -785,33 +939,27 @@ onMounted(() => {
 }
 
 .donation-card {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 60px rgba(14, 116, 144, 0.15);
 }
 
 .donation-type {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
-}
-
-.donation-type button {
-  flex: 1;
 }
 
 .donation-amounts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
-}
-
-.donation-amounts button {
-  width: 100%;
 }
 
 .donor-info {
@@ -820,12 +968,12 @@ onMounted(() => {
 
 .donor-info h3 {
   margin-bottom: 1rem;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -838,7 +986,7 @@ onMounted(() => {
 
 .form-field label {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-muted);
 }
 
 .w-full {
@@ -847,63 +995,74 @@ onMounted(() => {
 
 .contact-section {
   padding: 5rem 0;
-  background: #f8f9fa;
+  background: radial-gradient(circle at top, #ffffff 0%, #f0f4ff 100%);
 }
 
 .contact-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .contact-card {
-  background: white;
+  background: var(--card-bg);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-color);
   text-align: center;
+  box-shadow: 0 15px 35px rgba(148, 163, 184, 0.2);
 }
 
 .contact-card i {
-  font-size: 3rem;
-  color: #e74c3c;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  color: #6366f1;
+  margin-bottom: 0.75rem;
 }
 
 .contact-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #2c3e50;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
 }
 
 .contact-card a {
-  color: #3498db;
+  color: #2563eb;
   text-decoration: none;
+  font-weight: 600;
 }
 
 .contact-card a:hover {
   text-decoration: underline;
 }
 
+:global([data-theme='dark'] .hero) {
+  color: #f8fafc;
+  background: radial-gradient(circle at top, rgba(36, 16, 64, 0.9) 0%, #0f172a 65%, #0b1120 100%);
+}
+
+:global([data-theme='dark'] .statistics-section) {
+  background: radial-gradient(circle at top, rgba(30, 27, 75, 0.9) 0%, #0f172a 100%);
+}
+
+:global([data-theme='dark'] .help-section) {
+  background: linear-gradient(180deg, rgba(36, 16, 64, 0.95) 0%, #0f172a 60%);
+}
+
+:global([data-theme='dark'] .contact-section) {
+  background: radial-gradient(circle at top, rgba(30, 27, 75, 0.75) 0%, #0b1120 100%);
+}
+
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
+  .hero {
+    padding: 4rem 1.5rem;
   }
 
-  .hero-subtitle {
-    font-size: 1.1rem;
+  .hero-actions {
+    flex-direction: column;
   }
 
-  .section-header h2 {
-    font-size: 2rem;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .donation-amounts {
-    grid-template-columns: repeat(2, 1fr);
+  .container {
+    padding: 0 1.5rem;
   }
 }
 </style>

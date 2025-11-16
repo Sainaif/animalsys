@@ -21,7 +21,12 @@
     "learnMore": "Dowiedz się więcej",
     "donate": "Wspomóż",
     "adoptNow": "Adoptuj teraz",
-    "readMore": "Czytaj więcej"
+    "readMore": "Czytaj więcej",
+    "day": "Dzień",
+    "enableDarkMode": "Włącz tryb ciemny",
+    "enableLightMode": "Włącz tryb jasny",
+    "openMenu": "Otwórz menu nawigacji",
+    "closeMenu": "Zamknij menu nawigacji"
   },
   "auth": {
     "login": "Zaloguj",
@@ -60,7 +65,8 @@
     "aboutUs": "O nas",
     "adoptAnimal": "Adoptuj zwierzę",
     "howToHelp": "Jak pomóc",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "notifications": "Powiadomienia"
   },
   "home": {
     "hero": {
@@ -87,10 +93,13 @@
     "adoptions": {
       "title": "Poznaj nasze zwierzęta",
       "subtitle": "Znajdź swojego nowego najlepszego przyjaciela",
-      "available": "Dostępne do adopcji",
-      "viewProfile": "Zobacz profil",
-      "allAnimals": "Zobacz wszystkie zwierzęta",
-      "age": "Wiek",
+    "available": "Dostępne do adopcji",
+    "viewProfile": "Zobacz profil",
+    "allAnimals": "Zobacz wszystkie zwierzęta",
+    "searchPlaceholder": "Szukaj po imieniu lub opisie",
+    "allSpecies": "Wszystkie gatunki",
+    "loadMore": "Wczytaj więcej zwierząt",
+    "age": "Wiek",
       "gender": "Płeć",
       "breed": "Rasa",
       "years": "lat",
@@ -212,7 +221,30 @@
     "filterBySpecies": "Filtruj według gatunku",
     "filterByStatus": "Filtruj według statusu",
     "filterBySize": "Filtruj według rozmiaru",
-    "noAnimalsFound": "Nie znaleziono zwierząt"
+    "noAnimalsFound": "Nie znaleziono zwierząt",
+    "otherSpecies": "Inne",
+    "speciesNames": {
+      "dog": "Pies",
+      "cat": "Kot",
+      "rabbit": "Królik",
+      "bird": "Ptak"
+    },
+    "colorNames": {
+      "black": "czarny",
+      "brown": "brązowy",
+      "golden": "złoty",
+      "white": "biały",
+      "brindle": "pręgowany",
+      "orange": "pomarańczowy",
+      "gray": "szary",
+      "grey": "szary",
+      "calico": "szylkretowy",
+      "tabby": "pręgowany",
+      "spotted": "cętkowany",
+      "green": "zielony",
+      "blue": "niebieski",
+      "yellow": "żółty"
+    }
   },
   "adoption": {
     "title": "Adopcje",
@@ -283,6 +315,8 @@
     "quickStats": "Szybkie statystyki",
     "recentActivity": "Ostatnia aktywność",
     "upcomingTasks": "Nadchodzące zadania",
+    "noRecentActivity": "Brak ostatniej aktywności",
+    "lastUpdated": "Ostatnia aktualizacja: {time}",
     "totalAnimals": "Wszystkie zwierzęta",
     "availableAnimals": "Dostępne do adopcji",
     "adoptionsThisMonth": "Adopcje w tym miesiącu",
@@ -303,6 +337,34 @@
     "viewReports": "Generuj i przeglądaj raporty analityczne",
     "manageContacts": "Zarządzaj informacjami kontaktowymi"
   },
+  "tasks": {
+    "noUpcoming": "Brak nadchodzących zadań",
+    "noDueDate": "Brak terminu",
+    "statuses": {
+      "pending": "Oczekujące",
+      "in_progress": "W realizacji",
+      "completed": "Zakończone",
+      "cancelled": "Anulowane",
+      "on_hold": "Wstrzymane"
+    },
+    "priorities": {
+      "low": "Niski priorytet",
+      "medium": "Średni priorytet",
+      "high": "Wysoki priorytet",
+      "urgent": "Pilne"
+    },
+    "categories": {
+      "animal_care": "Opieka nad zwierzętami",
+      "medical": "Medyczne",
+      "adoption": "Adopcje",
+      "maintenance": "Utrzymanie",
+      "administrative": "Administracyjne",
+      "event": "Wydarzenia",
+      "fundraising": "Zbiórki",
+      "volunteer": "Wolontariat",
+      "other": "Inne"
+    }
+  },
   "veterinary": {
     "title": "Weterynaria",
     "visits": "Wizyty",
@@ -320,6 +382,11 @@
     "addMedication": "Dodaj lek",
     "addTreatmentPlan": "Dodaj plan leczenia",
     "addMedicalCondition": "Dodaj stan medyczny",
+    "manageVisits": "Zarządzaj wizytami i badaniami weterynaryjnymi",
+    "trackVaccinations": "Śledź szczepienia i harmonogramy",
+    "manageMedications": "Zarządzaj lekami i receptami",
+    "manageTreatmentPlans": "Zarządzaj planami leczenia i postępami",
+    "trackMedicalConditions": "Monitoruj schorzenia i diagnozy",
     "visitDate": "Data wizyty",
     "visitType": "Typ wizyty",
     "checkup": "Kontrola",
@@ -696,5 +763,83 @@
     "agreementCreated": "Umowa została utworzona",
     "agreementUpdated": "Umowa została zaktualizowana",
     "agreementDeleted": "Umowa została usunięta"
+  },
+  "inventory": {
+    "title": "Inwentarz",
+    "items": "Pozycje",
+    "transactions": "Transakcje",
+    "addItem": "Dodaj pozycję",
+    "addTransaction": "Dodaj transakcję",
+    "itemName": "Nazwa przedmiotu",
+    "category": "Kategoria",
+    "food": "Żywność",
+    "medicine": "Leki",
+    "supplies": "Materiały",
+    "equipment": "Sprzęt",
+    "sku": "SKU",
+    "unit": "Jednostka",
+    "quantityInStock": "Ilość na stanie",
+    "minimumQuantity": "Minimalna ilość",
+    "maximumQuantity": "Maksymalna ilość",
+    "unitCost": "Koszt jednostkowy",
+    "totalValue": "Łączna wartość",
+    "supplier": "Dostawca",
+    "expirationDate": "Data ważności",
+    "lastRestockedDate": "Data ostatniego uzupełnienia",
+    "inStock": "W magazynie",
+    "lowStock": "Niski stan",
+    "outOfStock": "Brak na stanie",
+    "transactionType": "Rodzaj transakcji",
+    "purchase": "Zakup",
+    "usage": "Zużycie",
+    "disposal": "Utylizacja",
+    "adjustment": "Korekta",
+    "quantity": "Ilość",
+    "transactionDate": "Data transakcji",
+    "referenceNumber": "Numer referencyjny",
+    "noItemsFound": "Nie znaleziono pozycji magazynowych",
+    "noTransactionsFound": "Nie znaleziono transakcji",
+    "itemCreated": "Pozycja została pomyślnie utworzona",
+    "itemUpdated": "Pozycja została pomyślnie zaktualizowana",
+    "itemDeleted": "Pozycja została pomyślnie usunięta",
+    "transactionCreated": "Transakcja została pomyślnie utworzona"
+  },
+  "system": {
+    "title": "Zarządzanie systemem",
+    "users": "Użytkownicy",
+    "tasks": "Zadania",
+    "documents": "Dokumenty",
+    "addUser": "Dodaj użytkownika",
+    "addTask": "Dodaj zadanie",
+    "addDocument": "Dodaj dokument",
+    "username": "Nazwa użytkownika",
+    "role": "Rola",
+    "admin": "Administrator",
+    "staff": "Personel",
+    "volunteer": "Wolontariusz",
+    "taskName": "Nazwa zadania",
+    "assignedTo": "Przypisano do",
+    "dueDate": "Termin",
+    "priority": "Priorytet",
+    "high": "Wysoki",
+    "low": "Niski",
+    "documentName": "Nazwa dokumentu",
+    "documentType": "Typ dokumentu",
+    "fileUrl": "URL pliku",
+    "noUsersFound": "Nie znaleziono użytkowników",
+    "noTasksFound": "Nie znaleziono zadań",
+    "noDocumentsFound": "Nie znaleziono dokumentów"
+  },
+  "reports": {
+    "title": "Raporty i analizy",
+    "animalReports": "Raporty zwierząt",
+    "adoptionReports": "Raporty adopcji",
+    "financeReports": "Raporty finansowe",
+    "inventoryReports": "Raporty inwentarza",
+    "generateReport": "Generuj raport",
+    "reportType": "Typ raportu",
+    "dateRange": "Zakres dat",
+    "from": "Od",
+    "to": "Do"
   }
 }

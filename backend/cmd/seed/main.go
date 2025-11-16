@@ -257,56 +257,185 @@ func seedSpecies() {
 func seedAnimals() {
 	log.Println("\n🐕 Seeding animals...")
 
-	totalAnimals := randInt(200, 400)
-	dogNames := []string{"Buddy", "Max", "Charlie", "Lucy", "Bella", "Cooper", "Rocky", "Sadie"}
-	catNames := []string{"Whiskers", "Shadow", "Mittens", "Simba", "Cleo", "Felix"}
-	otherNames := []string{"Fluffy", "Cotton", "Nibbles", "Thumper"}
+	type speciesProfile struct {
+		name         string
+		polishName   string
+		category     entities.AnimalCategory
+		englishNames []string
+		polishNames  []string
+		breeds       []string
+		colors       []string
+		sizes        []entities.AnimalSize
+		minWeight    float64
+		maxWeight    float64
+	}
 
+	speciesProfiles := []speciesProfile{
+		{
+			name:         "Dog",
+			polishName:   "Pies",
+			category:     entities.CategoryMammal,
+			englishNames: []string{"Buddy", "Max", "Charlie", "Lucy", "Bella", "Cooper", "Rocky", "Sadie"},
+			polishNames:  []string{"Borys", "Maks", "Figa", "Luna", "Bella", "Kora", "Rocky"},
+			breeds:       []string{"Labrador Retriever", "German Shepherd", "Golden Retriever", "Border Collie", "Beagle", "Mixed Breed"},
+			colors:       []string{"Black", "Brown", "Golden", "White", "Brindle"},
+			sizes:        []entities.AnimalSize{entities.SizeSmall, entities.SizeMedium, entities.SizeLarge},
+			minWeight:    8,
+			maxWeight:    45,
+		},
+		{
+			name:         "Cat",
+			polishName:   "Kot",
+			category:     entities.CategoryMammal,
+			englishNames: []string{"Whiskers", "Shadow", "Mittens", "Simba", "Cleo", "Felix", "Luna"},
+			polishNames:  []string{"Mruczek", "Ciapek", "Luna", "Kleo", "Feliks"},
+			breeds:       []string{"Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Domestic Shorthair"},
+			colors:       []string{"Black", "White", "Orange", "Gray", "Calico", "Tabby"},
+			sizes:        []entities.AnimalSize{entities.SizeSmall, entities.SizeMedium},
+			minWeight:    3,
+			maxWeight:    8,
+		},
+		{
+			name:         "Rabbit",
+			polishName:   "Królik",
+			category:     entities.CategoryMammal,
+			englishNames: []string{"Fluffy", "Cotton", "Nibbles", "Thumper", "Snowball"},
+			polishNames:  []string{"Puszek", "Bąbel", "Śnieżek", "Uszek"},
+			breeds:       []string{"Holland Lop", "Netherland Dwarf", "Flemish Giant", "Rex"},
+			colors:       []string{"White", "Gray", "Brown", "Spotted"},
+			sizes:        []entities.AnimalSize{entities.SizeSmall},
+			minWeight:    1,
+			maxWeight:    6,
+		},
+		{
+			name:         "Bird",
+			polishName:   "Ptak",
+			category:     entities.CategoryBird,
+			englishNames: []string{"Sunny", "Skye", "Kiwi", "Rio", "Echo"},
+			polishNames:  []string{"Słoneczko", "Niebieska", "Kiwi", "Rio"},
+			breeds:       []string{"Parakeet", "Cockatiel", "African Grey", "Macaw"},
+			colors:       []string{"Green", "Blue", "Yellow", "Grey"},
+			sizes:        []entities.AnimalSize{entities.SizeSmall},
+			minWeight:    0.1,
+			maxWeight:    1.5,
+		},
+	}
+
+	colorTranslations := map[string]string{
+		"black":   "czarny",
+		"brown":   "brązowy",
+		"golden":  "złoty",
+		"white":   "biały",
+		"brindle": "pręgowany",
+		"orange":  "pomarańczowy",
+		"gray":    "szary",
+		"grey":    "szary",
+		"calico":  "szylkretowy",
+		"tabby":   "pręgowany",
+		"spotted": "cętkowany",
+		"green":   "zielony",
+		"blue":    "niebieski",
+		"yellow":  "żółty",
+	}
+
+	totalAnimals := randInt(200, 400)
 	adoptedCount := 0
 	availableCount := 0
 
 	for i := 0; i < totalAnimals; i++ {
-		speciesIdx := rand.Intn(len(speciesIDs))
-		
-		var name string
-		if speciesIdx == 0 { // Dog
-			name = dogNames[rand.Intn(len(dogNames))]
-		} else if speciesIdx == 1 { // Cat
-			name = catNames[rand.Intn(len(catNames))]
-		} else {
-			name = otherNames[rand.Intn(len(otherNames))]
-		}
-		name = fmt.Sprintf("%s %d", name, randInt(1, 999))
+		profile := speciesProfiles[rand.Intn(len(speciesProfiles))]
 
-		intakeDate := randomDate(startDate, currentDate.AddDate(0, -1, 0))
+		englishName := fmt.Sprintf("%s %d", profile.englishNames[rand.Intn(len(profile.englishNames))], randInt(1, 999))
+		polishName := fmt.Sprintf("%s %d", profile.polishNames[rand.Intn(len(profile.polishNames))], randInt(1, 999))
 
-		var status string
-		if rand.Float64() < 0.60 {
-			status = "adopted"
+		birthDate := randomDate(startDate.AddDate(-8, 0, 0), currentDate.AddDate(0, -1, 0))
+		intakeDate := randomDate(birthDate, currentDate)
+
+		sexes := []entities.AnimalSex{entities.SexMale, entities.SexFemale}
+		status := entities.AnimalStatusAvailable
+		if rand.Float64() < 0.45 {
+			status = entities.AnimalStatusAdopted
 			adoptedCount++
 		} else {
-			status = "available"
 			availableCount++
 		}
 
-		id := primitive.NewObjectID()
-		animal := map[string]interface{}{
-			"_id":          id,
-			"name":         name,
-			"species":      randomChoice([]string{"Dog", "Cat", "Rabbit", "Bird"}),
-			"breed":        "Mixed Breed",
-			"age":          randInt(1, 15),
-			"gender":       randomChoice([]string{"Male", "Female"}),
-			"status":       status,
-			"intake_date":  intakeDate,
-			"microchip_id": fmt.Sprintf("MC%012d", rand.Intn(1000000000000)),
-			"added_by":     employeeIDs[rand.Intn(len(employeeIDs))],
-			"created_at":   intakeDate,
-			"updated_at":   currentDate,
+		caretakerID := employeeIDs[rand.Intn(len(employeeIDs))]
+		assignedCaretaker := caretakerID
+		adoptionInfo := entities.AdoptionInfo{
+			AdoptionFee: float64(randInt(50, 300)),
+			Requirements: []string{
+				"Completed adoption form",
+				"Meet & greet",
+			},
+		}
+		if status == entities.AnimalStatusAdopted {
+			adoptionDate := randomDate(intakeDate, currentDate)
+			adoptionInfo.AdoptionDate = &adoptionDate
 		}
 
-		db.Collection("animals").InsertOne(ctx, animal)
-		animalIDs = append(animalIDs, id)
+		color := randomChoice(profile.colors)
+		colorPL := strings.ToLower(color)
+		if translated, ok := colorTranslations[strings.ToLower(color)]; ok {
+			colorPL = translated
+		}
+
+		descriptionEN := fmt.Sprintf("%s is a %s %s who enjoys playtime and cozy naps.", englishName, strings.ToLower(color), strings.ToLower(profile.name))
+		descriptionPL := fmt.Sprintf("%s to %s %s, który lubi zabawę i drzemki.", polishName, colorPL, strings.ToLower(profile.polishName))
+
+		animal := entities.Animal{
+			ID:           primitive.NewObjectID(),
+			Name:         entities.MultilingualName{English: englishName, Polish: polishName},
+			Category:     profile.category,
+			Species:      profile.name,
+			Breed:        randomChoice(profile.breeds),
+			Sex:          sexes[rand.Intn(len(sexes))],
+			Status:       status,
+			DateOfBirth:  &birthDate,
+			AgeEstimated: rand.Intn(2) == 0,
+			Color:        color,
+			Size:         profile.sizes[rand.Intn(len(profile.sizes))],
+			Weight:       randomFloat(profile.minWeight, profile.maxWeight),
+			Description: entities.MultilingualName{
+				English: descriptionEN,
+				Polish:  descriptionPL,
+			},
+			Images: entities.AnimalImages{
+				Primary: fmt.Sprintf("https://placehold.co/600x400?text=%s", strings.ReplaceAll(profile.name, " ", "+")),
+			},
+			Medical: entities.MedicalInfo{
+				Vaccinated:      true,
+				Sterilized:      rand.Intn(2) == 0,
+				Microchipped:    true,
+				MicrochipNumber: fmt.Sprintf("MC%012d", rand.Intn(1000000000000)),
+				HealthStatus:    randomChoice([]string{"healthy", "recovering"}),
+			},
+			Behavior: entities.BehaviorInfo{
+				Temperament: []entities.Temperament{
+					entities.TemperamentFriendly,
+					entities.TemperamentPlayful,
+				},
+				GoodWithKids: rand.Intn(2) == 0,
+				GoodWithDogs: rand.Intn(2) == 0,
+				GoodWithCats: rand.Intn(2) == 0,
+				HouseTrained: rand.Intn(2) == 0,
+			},
+			Shelter: entities.ShelterInfo{
+				IntakeDate:        intakeDate,
+				IntakeReason:      randomChoice([]string{"rescue", "surrender", "transfer"}),
+				Location:          fmt.Sprintf("%s %d", randomChoice([]string{"Kennel", "Suite", "Room"}), randInt(1, 40)),
+				AssignedCaretaker: &assignedCaretaker,
+			},
+			Adoption:  adoptionInfo,
+			CreatedBy: caretakerID,
+			UpdatedBy: caretakerID,
+			CreatedAt: intakeDate,
+			UpdatedAt: currentDate,
+		}
+
+		if _, err := db.Collection("animals").InsertOne(ctx, animal); err == nil {
+			animalIDs = append(animalIDs, animal.ID)
+		}
 	}
 
 	log.Printf("✓ Created %d animals (%d adopted, %d available)", totalAnimals, adoptedCount, availableCount)
@@ -323,15 +452,15 @@ func seedDonors() {
 
 		id := primitive.NewObjectID()
 		donor := map[string]interface{}{
-			"_id":         id,
-			"type":        "individual",
-			"first_name":  firstName,
-			"last_name":   lastName,
-			"email":       fmt.Sprintf("%s.%s%d@email.com", strings.ToLower(firstName), strings.ToLower(lastName), randInt(1, 9999)),
-			"phone":       fmt.Sprintf("+1-555-%04d", rand.Intn(10000)),
-			"status":      "active",
-			"created_at":  randomDate(startDate, currentDate),
-			"updated_at":  currentDate,
+			"_id":        id,
+			"type":       "individual",
+			"first_name": firstName,
+			"last_name":  lastName,
+			"email":      fmt.Sprintf("%s.%s%d@email.com", strings.ToLower(firstName), strings.ToLower(lastName), randInt(1, 9999)),
+			"phone":      fmt.Sprintf("+1-555-%04d", rand.Intn(10000)),
+			"status":     "active",
+			"created_at": randomDate(startDate, currentDate),
+			"updated_at": currentDate,
 		}
 
 		db.Collection("donors").InsertOne(ctx, donor)
@@ -585,13 +714,13 @@ func seedVeterinaryRecords() {
 		if rand.Float64() < 0.8 {
 			vaccineDate := randomDate(startDate, currentDate)
 			vaccination := map[string]interface{}{
-				"_id":              primitive.NewObjectID(),
-				"animal_id":        animalID,
-				"vaccine_name":     randomChoice([]string{"Rabies", "DHPP", "Bordetella"}),
+				"_id":               primitive.NewObjectID(),
+				"animal_id":         animalID,
+				"vaccine_name":      randomChoice([]string{"Rabies", "DHPP", "Bordetella"}),
 				"administered_date": vaccineDate,
-				"veterinarian":     "Dr. " + randomChoice([]string{"Smith", "Johnson"}),
-				"created_at":       vaccineDate,
-				"updated_at":       currentDate,
+				"veterinarian":      "Dr. " + randomChoice([]string{"Smith", "Johnson"}),
+				"created_at":        vaccineDate,
+				"updated_at":        currentDate,
 			}
 
 			db.Collection("vaccinations").InsertOne(ctx, vaccination)
@@ -738,6 +867,10 @@ func randomDate(min, max time.Time) time.Time {
 	delta := max.Unix() - min.Unix()
 	sec := rand.Int63n(delta)
 	return min.Add(time.Duration(sec) * time.Second)
+}
+
+func randomFloat(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
 }
 
 func randomChoice(choices []string) string {

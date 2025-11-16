@@ -1,0 +1,25 @@
+[plugin:vite:vue] [vue/compiler-sfc] Identifier 'formatStatusLabel' has already been declared. (157:6)
+
+/app/src/views/staff/animals/AnimalList.vue
+324|  }
+325|  
+326|  const formatStatusLabel = (status) => {
+327|    if (!status) return t('animal.status')
+328|    const key = `animal.${status}`
+/app/src/views/staff/animals/AnimalList.vue:157:6
+136|                  <Button
+137|                    icon="pi pi-pencil"
+138|                    class="p-button-rounded p-button-text"
+   |             ^
+139|                    v-tooltip.top="$t('common.edit')"
+140|                    @click="router.push(`/staff/animals/${slotProps.data.id}/edit`)"
+    at constructor (/app/node_modules/@babel/parser/lib/index.js:367:19)
+    at Parser.raise (/app/node_modules/@babel/parser/lib/index.js:6624:19)
+    at ScopeHandler.checkRedeclarationInScope (/app/node_modules/@babel/parser/lib/index.js:1646:19)
+    at ScopeHandler.declareName (/app/node_modules/@babel/parser/lib/index.js:1612:12)
+    at Parser.declareNameFromIdentifier (/app/node_modules/@babel/parser/lib/index.js:7594:16)
+    at Parser.checkIdentifier (/app/node_modules/@babel/parser/lib/index.js:7590:12)
+    at Parser.checkLVal (/app/node_modules/@babel/parser/lib/index.js:7527:12)
+    at Parser.parseVarId (/app/node_modules/@babel/parser/lib/index.js:13488:10)
+    at Parser.parseVar (/app/node_modules/@babel/parser/lib/index.js:13459:12)
+    at Parser.parseVarStatement (/app/node_modules/@babel/parser/lib/index.js:13306:10
