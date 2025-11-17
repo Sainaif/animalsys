@@ -2,9 +2,25 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
+const resolveBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname, port } = window.location
+    if (port === '23001') {
+      return `${protocol}//${hostname}:23000/api/v1`
+    }
+    return `${protocol}//${hostname}${port ? `:${port}` : ''}/api/v1`
+  }
+
+  return '/api/v1'
+}
+
 // Create axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: resolveBaseURL(),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
