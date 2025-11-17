@@ -3,21 +3,21 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">
-          User Management
+          {{ $t('users.title') }}
         </h1>
         <p class="page-subtitle">
-          Invite new teammates, adjust permissions, and keep your workspace secure.
+          {{ $t('users.subtitle') }}
         </p>
       </div>
       <div class="header-actions">
         <Button
-          label="Refresh"
+          :label="$t('users.actions.refresh')"
           icon="pi pi-refresh"
           class="p-button-text"
           @click="loadUsers"
         />
         <Button
-          label="Invite User"
+          :label="$t('users.actions.inviteUser')"
           icon="pi pi-user-plus"
           :disabled="!authStore.isAdmin"
           @click="openCreateDialog"
@@ -48,29 +48,29 @@
       v-model="filters"
       :show-date-range="false"
       :show-export="false"
-      search-placeholder="Search by name or email"
+      :search-placeholder="$t('users.searchPlaceholder')"
       @filter="applyFilters"
     >
       <div class="filter-field">
-        <label>Role</label>
+        <label>{{ $t('users.filters.role') }}</label>
         <Dropdown
           v-model="filters.role"
           :options="roleOptions"
           option-label="label"
           option-value="value"
-          placeholder="All roles"
+          :placeholder="$t('users.filters.allRoles')"
           show-clear
           @change="applyFilters"
         />
       </div>
       <div class="filter-field">
-        <label>Status</label>
+        <label>{{ $t('users.filters.status') }}</label>
         <Dropdown
           v-model="filters.status"
           :options="statusOptions"
           option-label="label"
           option-value="value"
-          placeholder="All statuses"
+          :placeholder="$t('users.filters.allStatuses')"
           show-clear
           @change="applyFilters"
         />
@@ -93,7 +93,7 @@
         >
           <Column
             field="name"
-            header="Name"
+            :header="$t('users.table.name')"
           >
             <template #body="slotProps">
               <div class="user-name-cell">
@@ -118,7 +118,7 @@
           </Column>
           <Column
             field="role"
-            header="Role"
+            :header="$t('users.table.role')"
           >
             <template #body="slotProps">
               <Badge :variant="getRoleVariant(slotProps.data.role)">
@@ -128,7 +128,7 @@
           </Column>
           <Column
             field="status"
-            header="Status"
+            :header="$t('users.table.status')"
           >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
@@ -138,22 +138,22 @@
           </Column>
           <Column
             field="phone"
-            header="Phone"
+            :header="$t('users.table.phone')"
           >
             <template #body="slotProps">
-              {{ slotProps.data.phone || '—' }}
+              {{ slotProps.data.phone || $t('common.notAvailable') }}
             </template>
           </Column>
           <Column
             field="last_login"
-            header="Last Login"
+            :header="$t('users.table.lastLogin')"
           >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.last_login) }}
             </template>
           </Column>
           <Column
-            header="Actions"
+            :header="$t('common.actions')"
             :style="{ width: '150px' }"
           >
             <template #body="slotProps">
@@ -162,20 +162,20 @@
                 @click.stop
               >
                 <Button
-                  v-tooltip.top="'View details'"
+                  v-tooltip.top="$t('users.tooltips.viewDetails')"
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-text"
                   @click="openDetails({ data: slotProps.data })"
                 />
                 <Button
-                  v-tooltip.top="'Edit user'"
+                  v-tooltip.top="$t('users.tooltips.editUser')"
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-text"
                   :disabled="!authStore.isAdmin"
                   @click="openEditDialog(slotProps.data)"
                 />
                 <Button
-                  v-tooltip.top="'More actions'"
+                  v-tooltip.top="$t('users.tooltips.moreActions')"
                   icon="pi pi-ellipsis-v"
                   class="p-button-rounded p-button-text"
                   @click="openActionMenu($event, slotProps.data)"
@@ -190,14 +190,14 @@
     <LoadingSpinner v-if="loading && users.length === 0" />
     <EmptyState
       v-if="!loading && users.length === 0"
-      message="No users found for the selected filters."
+      :message="$t('users.messages.empty')"
     />
 
     <!-- Create/Edit dialog -->
     <Dialog
       v-model:visible="userDialog.visible"
       modal
-      :header="userDialog.mode === 'create' ? 'Invite User' : 'Update User'"
+      :header="userDialog.mode === 'create' ? $t('users.dialog.createTitle') : $t('users.dialog.editTitle')"
       :style="{ width: '520px' }"
     >
       <form
@@ -205,7 +205,7 @@
         @submit.prevent="saveUser"
       >
         <div class="form-group">
-          <label for="firstName">First name</label>
+          <label for="firstName">{{ $t('users.form.firstName') }}</label>
           <InputText
             id="firstName"
             v-model="userDialog.form.first_name"
@@ -213,7 +213,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="lastName">Last name</label>
+          <label for="lastName">{{ $t('users.form.lastName') }}</label>
           <InputText
             id="lastName"
             v-model="userDialog.form.last_name"
@@ -221,7 +221,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ $t('users.form.email') }}</label>
           <InputText
             id="email"
             v-model="userDialog.form.email"
@@ -231,14 +231,14 @@
           />
         </div>
         <div class="form-group">
-          <label for="phone">Phone</label>
+          <label for="phone">{{ $t('users.form.phone') }}</label>
           <InputText
             id="phone"
             v-model="userDialog.form.phone"
           />
         </div>
         <div class="form-group">
-          <label for="role">Role</label>
+          <label for="role">{{ $t('users.form.role') }}</label>
           <Dropdown
             id="role"
             v-model="userDialog.form.role"
@@ -249,7 +249,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="status">Status</label>
+          <label for="status">{{ $t('users.form.status') }}</label>
           <Dropdown
             id="status"
             v-model="userDialog.form.status"
@@ -259,7 +259,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="language">Language</label>
+          <label for="language">{{ $t('users.form.language') }}</label>
           <Dropdown
             id="language"
             v-model="userDialog.form.language"
@@ -269,7 +269,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="theme">Theme</label>
+          <label for="theme">{{ $t('users.form.theme') }}</label>
           <Dropdown
             id="theme"
             v-model="userDialog.form.theme"
@@ -282,7 +282,7 @@
           v-if="userDialog.mode === 'create'"
           class="form-group"
         >
-          <label for="password">Temporary password</label>
+          <label for="password">{{ $t('users.form.password') }}</label>
           <InputText
             id="password"
             v-model="userDialog.form.password"
@@ -294,13 +294,13 @@
 
         <div class="dialog-actions">
           <Button
-            label="Cancel"
+            :label="$t('common.cancel')"
             text
             type="button"
             @click="userDialog.visible = false"
           />
           <Button
-            label="Save"
+            :label="$t('common.save')"
             icon="pi pi-check"
             type="submit"
             :loading="userDialog.saving"
@@ -314,7 +314,7 @@
     <Dialog
       v-model:visible="detailDialog.visible"
       modal
-      header="User details"
+      :header="$t('users.dialog.detailTitle')"
       :style="{ width: '480px' }"
     >
       <div
@@ -342,44 +342,44 @@
         </div>
         <ul class="detail-list">
           <li>
-            <span>Role</span>
+            <span>{{ $t('users.detail.role') }}</span>
             <strong>{{ formatRole(detailDialog.user.role) }}</strong>
           </li>
           <li>
-            <span>Phone</span>
-            <strong>{{ detailDialog.user.phone || '—' }}</strong>
+            <span>{{ $t('users.detail.phone') }}</span>
+            <strong>{{ detailDialog.user.phone || $t('common.notAvailable') }}</strong>
           </li>
           <li>
-            <span>Language</span>
-            <strong>{{ detailDialog.user.language?.toUpperCase() }}</strong>
+            <span>{{ $t('users.detail.language') }}</span>
+            <strong>{{ formatLanguage(detailDialog.user.language) }}</strong>
           </li>
           <li>
-            <span>Theme</span>
-            <strong>{{ detailDialog.user.theme }}</strong>
+            <span>{{ $t('users.detail.theme') }}</span>
+            <strong>{{ formatTheme(detailDialog.user.theme) }}</strong>
           </li>
           <li>
-            <span>Last login</span>
+            <span>{{ $t('users.detail.lastLogin') }}</span>
             <strong>{{ formatDate(detailDialog.user.last_login) }}</strong>
           </li>
           <li>
-            <span>Created</span>
+            <span>{{ $t('users.detail.created') }}</span>
             <strong>{{ formatDate(detailDialog.user.created_at) }}</strong>
           </li>
           <li>
-            <span>Updated</span>
+            <span>{{ $t('users.detail.updated') }}</span>
             <strong>{{ formatDate(detailDialog.user.updated_at) }}</strong>
           </li>
         </ul>
         <div class="detail-actions">
           <Button
-            label="Reset password"
+            :label="$t('users.actions.resetPassword')"
             icon="pi pi-lock"
             class="p-button-text"
             :disabled="!authStore.isAdmin"
             @click="openPasswordDialog(detailDialog.user)"
           />
           <Button
-            label="Deactivate"
+            :label="$t('users.actions.deactivate')"
             icon="pi pi-user-minus"
             class="p-button-danger p-button-text"
             :disabled="!authStore.isAdmin || detailDialog.user.status !== 'active'"
@@ -393,7 +393,7 @@
     <Dialog
       v-model:visible="passwordDialog.visible"
       modal
-      header="Reset password"
+      :header="$t('users.dialog.passwordTitle')"
       :style="{ width: '420px' }"
     >
       <form
@@ -401,11 +401,10 @@
         @submit.prevent="resetPassword"
       >
         <p class="dialog-hint">
-          Generate a secure password and share it with the user using a trusted channel. They will be asked to change it
-          on first login.
+          {{ $t('users.password.hint') }}
         </p>
         <div class="form-group">
-          <label for="newPassword">New password</label>
+          <label for="newPassword">{{ $t('users.password.newPassword') }}</label>
           <InputText
             id="newPassword"
             v-model="passwordDialog.password"
@@ -416,13 +415,13 @@
         </div>
         <div class="dialog-actions">
           <Button
-            label="Cancel"
+            :label="$t('common.cancel')"
             text
             type="button"
             @click="passwordDialog.visible = false"
           />
           <Button
-            label="Reset password"
+            :label="$t('users.actions.resetPassword')"
             icon="pi pi-check"
             type="submit"
             :loading="passwordDialog.saving"
@@ -438,6 +437,7 @@
 
 <script setup>
 import { onMounted, reactive, ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import Card from 'primevue/card'
@@ -458,6 +458,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const toast = useToast()
 const confirm = useConfirm()
+const { t } = useI18n()
 
 const users = ref([])
 const loading = ref(false)
@@ -492,29 +493,29 @@ const passwordDialog = reactive({
   password: ''
 })
 
-const roleOptions = [
-  { label: 'Super Admin', value: 'super_admin' },
-  { label: 'Admin', value: 'admin' },
-  { label: 'Employee', value: 'employee' },
-  { label: 'Volunteer', value: 'volunteer' },
-  { label: 'User', value: 'user' }
-]
+const roleOptions = computed(() => [
+  { label: t('users.roles.super_admin'), value: 'super_admin' },
+  { label: t('users.roles.admin'), value: 'admin' },
+  { label: t('users.roles.employee'), value: 'employee' },
+  { label: t('users.roles.volunteer'), value: 'volunteer' },
+  { label: t('users.roles.user'), value: 'user' }
+])
 
-const statusOptions = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-  { label: 'Suspended', value: 'suspended' }
-]
+const statusOptions = computed(() => [
+  { label: t('users.statuses.active'), value: 'active' },
+  { label: t('users.statuses.inactive'), value: 'inactive' },
+  { label: t('users.statuses.suspended'), value: 'suspended' }
+])
 
-const languageOptions = [
-  { label: 'Polish', value: 'pl' },
-  { label: 'English', value: 'en' }
-]
+const languageOptions = computed(() => [
+  { label: t('users.languages.pl'), value: 'pl' },
+  { label: t('users.languages.en'), value: 'en' }
+])
 
-const themeOptions = [
-  { label: 'Light', value: 'light' },
-  { label: 'Dark', value: 'dark' }
-]
+const themeOptions = computed(() => [
+  { label: t('users.themes.light'), value: 'light' },
+  { label: t('users.themes.dark'), value: 'dark' }
+])
 
 const userStats = computed(() => {
   const counts = users.value.reduce(
@@ -527,10 +528,10 @@ const userStats = computed(() => {
   )
 
   return [
-    { label: 'Total users', value: pagination.total },
-    { label: 'Active', value: counts.active || 0, description: 'Authorized today' },
-    { label: 'Administrators', value: (counts.super_admin || 0) + (counts.admin || 0) },
-    { label: 'Inactive & suspended', value: (counts.inactive || 0) + (counts.suspended || 0) }
+    { label: t('users.stats.total'), value: pagination.total },
+    { label: t('users.stats.active'), value: counts.active || 0, description: t('users.stats.activeDescription') },
+    { label: t('users.stats.admins'), value: (counts.super_admin || 0) + (counts.admin || 0) },
+    { label: t('users.stats.inactiveSuspended'), value: (counts.inactive || 0) + (counts.suspended || 0) }
   ]
 })
 
@@ -574,7 +575,7 @@ const loadUsers = async () => {
     users.value = response.data
     pagination.total = response.total
   } catch (error) {
-    showError('Unable to load users', error)
+    showError(t('users.notifications.loadError'), error)
   } finally {
     loading.value = false
   }
@@ -617,7 +618,7 @@ const saveUser = async () => {
         language: userDialog.form.language,
         theme: userDialog.form.theme
       })
-      toast.add({ severity: 'success', summary: 'User invited', detail: 'A new account has been created.', life: 3000 })
+      toast.add({ severity: 'success', summary: t('users.notifications.inviteSuccess'), detail: t('users.notifications.inviteDetail'), life: 3000 })
     } else {
       const payload = {
         first_name: userDialog.form.first_name,
@@ -629,12 +630,12 @@ const saveUser = async () => {
         theme: userDialog.form.theme
       }
       await userService.updateUser(userDialog.form.id, payload)
-      toast.add({ severity: 'success', summary: 'User updated', detail: 'Changes were saved successfully.', life: 3000 })
+      toast.add({ severity: 'success', summary: t('users.notifications.updateSuccess'), detail: t('users.notifications.updateDetail'), life: 3000 })
     }
     userDialog.visible = false
     await loadUsers()
   } catch (error) {
-    showError('Unable to save user', error)
+    showError(t('users.notifications.saveError'), error)
   } finally {
     userDialog.saving = false
   }
@@ -657,30 +658,31 @@ const resetPassword = async () => {
   try {
     passwordDialog.saving = true
     await userService.resetPassword(passwordDialog.userId, passwordDialog.password)
-    toast.add({ severity: 'success', summary: 'Password reset', detail: 'The user will need to sign in again.', life: 3000 })
+    toast.add({ severity: 'success', summary: t('users.notifications.passwordReset'), detail: t('users.notifications.passwordResetDetail'), life: 3000 })
     passwordDialog.visible = false
   } catch (error) {
-    showError('Unable to reset password', error)
+    showError(t('users.notifications.passwordError'), error)
   } finally {
     passwordDialog.saving = false
   }
 }
 
 const setUserStatus = (user, status) => {
+  const name = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email
   confirm.require({
-    message: `Are you sure you want to mark ${user.first_name} as ${status}?`,
-    header: 'Confirm status change',
+    message: t('users.confirmStatusMessage', { name, status: formatStatus(status) }),
+    header: t('users.confirmStatusTitle'),
     icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Yes, update',
-    rejectLabel: 'Cancel',
+    acceptLabel: t('users.actions.confirmUpdate'),
+    rejectLabel: t('common.cancel'),
     accept: async () => {
       try {
         await userService.updateUser(user.id, { status })
-        toast.add({ severity: 'success', summary: 'Status updated', detail: 'The account state has changed.', life: 3000 })
+        toast.add({ severity: 'success', summary: t('users.notifications.updateStatusSuccess'), detail: t('users.notifications.updateStatusDetail'), life: 3000 })
         await loadUsers()
         detailDialog.visible = false
       } catch (error) {
-        showError('Unable to update status', error)
+        showError(t('users.notifications.updateStatusError'), error)
       }
     }
   })
@@ -690,28 +692,40 @@ const openActionMenu = (event, user) => {
   event.preventDefault()
   event.stopPropagation()
   confirm.require({
-    message: 'Select action for this user',
+    message: t('users.actions.selectAction'),
     header: `${user.first_name} ${user.last_name}`,
-    acceptLabel: 'Reset password',
-    rejectLabel: user.status === 'active' ? 'Deactivate' : 'Activate',
+    acceptLabel: t('users.actions.resetPassword'),
+    rejectLabel: user.status === 'active' ? t('users.actions.deactivate') : t('users.actions.activate'),
     accept: () => openPasswordDialog(user),
     reject: () => setUserStatus(user, user.status === 'active' ? 'inactive' : 'active')
   })
 }
 
 const formatDate = (value) => {
-  if (!value) return 'Never'
+  if (!value) return t('users.messages.neverLoggedIn')
   return new Date(value).toLocaleString()
 }
 
 const formatRole = (role) => {
-  const option = roleOptions.find((item) => item.value === role)
+  const option = roleOptions.value.find((item) => item.value === role)
   return option ? option.label : role
 }
 
 const formatStatus = (status) => {
-  const option = statusOptions.find((item) => item.value === status)
+  const option = statusOptions.value.find((item) => item.value === status)
   return option ? option.label : status
+}
+
+const formatLanguage = (language) => {
+  if (!language) return t('common.notAvailable')
+  const option = languageOptions.value.find((item) => item.value === language)
+  return option ? option.label : language.toUpperCase()
+}
+
+const formatTheme = (theme) => {
+  if (!theme) return t('common.notAvailable')
+  const option = themeOptions.value.find((item) => item.value === theme)
+  return option ? option.label : theme
 }
 
 const getStatusVariant = (status) => {
@@ -749,7 +763,7 @@ const getInitials = (user) => {
 }
 
 const showError = (message, error) => {
-  const detail = error?.response?.data?.error || error.message || 'Unexpected error'
+  const detail = error?.response?.data?.error || error.message || t('common.genericError')
   toast.add({ severity: 'error', summary: message, detail, life: 4000 })
 }
 
@@ -780,7 +794,7 @@ onMounted(() => {
 
 .page-subtitle {
   margin: 0.35rem 0 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .header-actions {
@@ -800,29 +814,32 @@ onMounted(() => {
 
 .stat-card {
   padding: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  background: #f9fafb;
+  background: var(--card-bg);
 }
 
 .stat-label {
   display: block;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .stat-value {
   display: block;
   font-size: 1.7rem;
-  color: #111827;
+  color: var(--heading-color);
 }
 
 .stat-description {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .table-card {
   overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
 }
 
 .user-name-cell {
@@ -835,12 +852,12 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: var(--card-muted-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
   text-transform: uppercase;
   overflow: hidden;
 }
@@ -864,12 +881,12 @@ onMounted(() => {
 .user-name {
   margin: 0;
   font-weight: 600;
-  color: #111827;
+  color: var(--heading-color);
 }
 
 .user-email {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .action-buttons {
@@ -892,7 +909,7 @@ onMounted(() => {
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .dialog-actions {
@@ -921,7 +938,7 @@ onMounted(() => {
 
 .detail-panel p {
   margin: 0.15rem 0 0.5rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .detail-list {
@@ -937,11 +954,11 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .detail-list span {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .detail-actions {
@@ -950,7 +967,7 @@ onMounted(() => {
 }
 
 .dialog-hint {
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: 0;
 }
 

@@ -34,6 +34,18 @@ func NewDonationUseCase(
 	}
 }
 
+// PublicDonationRequest represents a public donation submission from the website
+type PublicDonationRequest struct {
+	FirstName    string  `json:"first_name"`
+	LastName     string  `json:"last_name"`
+	Email        string  `json:"email"`
+	Phone        string  `json:"phone"`
+	Amount       float64 `json:"amount"`
+	DonationType string  `json:"donation_type"` // e.g. one-time, monthly
+	Message      string  `json:"message"`
+	Currency     string  `json:"currency"`
+}
+
 // CreateDonation creates a new donation
 func (uc *DonationUseCase) CreateDonation(ctx context.Context, donation *entities.Donation, userID primitive.ObjectID) error {
 	// Validate donation
@@ -78,6 +90,116 @@ func (uc *DonationUseCase) CreateDonation(ctx context.Context, donation *entitie
 	_ = uc.auditLogRepo.Create(ctx, auditLog)
 
 	return nil
+}
+
+// CreatePublicDonation handles donations submitted via the public website form
+func (uc *DonationUseCase) CreatePublicDonation(ctx context.Context, req *PublicDonationRequest) (*entities.Donation, error) {
+	if req == nil {
+		return nil, errors.NewBadRequest("invalid request")
+	}
+	if req.FirstName == "" || req.Email == "" {
+		return nil, errors.NewBadRequest("name and email are required")
+	}
+	if req.Amount <= 0 {
+		return nil, errors.NewBadRequest("amount must be greater than zero")
+	}
+
+	donor, err := uc.ensurePublicDonor(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	donation := &entities.Donation{
+		DonorID:      donor.ID,
+		DonorName:    donor.GetFullName(),
+		DonorEmail:   donor.Contact.Email,
+		Type:         entities.DonationTypeMonetary,
+		Status:       entities.DonationStatusCompleted,
+		Amount:       req.Amount,
+		Currency:     selectCurrency(req.Currency),
+		DonationDate: now,
+		Payment: entities.PaymentInfo{
+			Method: entities.PaymentMethodOther,
+		},
+		PaymentDate: &now,
+		IsRecurring: req.DonationType == "monthly",
+		Source:      "public_site",
+		Notes:       req.Message,
+		CreatedBy:   primitive.NilObjectID,
+		UpdatedBy:   primitive.NilObjectID,
+		ProcessedBy: primitive.NilObjectID,
+	}
+
+	if donation.IsRecurring {
+		donation.RecurringInfo = &entities.RecurringInfo{
+			Frequency: entities.RecurrenceMonthly,
+			StartDate: now,
+			Active:    true,
+		}
+	}
+
+	donation.CalculateNetAmount()
+
+	if err := uc.donationRepo.Create(ctx, donation); err != nil {
+		return nil, err
+	}
+
+	// update donor stats
+	donor.UpdateDonationStats(req.Amount)
+	donor.UpdatedBy = primitive.NilObjectID
+	_ = uc.donorRepo.Update(ctx, donor)
+
+	return donation, nil
+}
+
+func selectCurrency(currency string) string {
+	if currency == "" {
+		return "USD"
+	}
+	return currency
+}
+
+func (uc *DonationUseCase) ensurePublicDonor(ctx context.Context, req *PublicDonationRequest) (*entities.Donor, error) {
+	existing, err := uc.donorRepo.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if existing != nil {
+		updated := false
+		if existing.FirstName == "" && req.FirstName != "" {
+			existing.FirstName = req.FirstName
+			updated = true
+		}
+		if existing.LastName == "" && req.LastName != "" {
+			existing.LastName = req.LastName
+			updated = true
+		}
+		if req.Phone != "" && existing.Contact.Phone != req.Phone {
+			existing.Contact.Phone = req.Phone
+			updated = true
+		}
+		if updated {
+			existing.UpdatedBy = primitive.NilObjectID
+			_ = uc.donorRepo.Update(ctx, existing)
+		}
+		return existing, nil
+	}
+
+	donor := entities.NewDonor(entities.DonorTypeIndividual, primitive.NilObjectID)
+	donor.FirstName = req.FirstName
+	donor.LastName = req.LastName
+	donor.Contact.Email = req.Email
+	donor.Contact.Phone = req.Phone
+	donor.Source = "public_site"
+	donor.Preferences.PreferredContact = entities.PreferredContactEmail
+
+	if err := uc.donorRepo.Create(ctx, donor); err != nil {
+		return nil, err
+	}
+
+	return donor, nil
 }
 
 // ProcessDonation processes a donation (marks as completed and updates statistics)

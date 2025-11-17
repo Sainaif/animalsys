@@ -249,7 +249,7 @@ const loadVolunteer = async () => {
     loading.value = true
     volunteer.value = await eventService.getVolunteer(route.params.id)
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load volunteer', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to load volunteer', life: 3000 })
     router.push('/staff/volunteers')
   } finally {
     loading.value = false
@@ -262,16 +262,16 @@ const getBackgroundCheckVariant = (status) => ({ pending: 'warning', approved: '
 
 const confirmDelete = () => {
   confirm.require({
-    message: 'Are you sure you want to delete this volunteer?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await eventService.deleteVolunteer(volunteer.value.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('event.volunteerDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('event.volunteerDeleted'), life: 3000 })
         router.push('/staff/volunteers')
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete volunteer', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -283,17 +283,17 @@ onMounted(loadVolunteer)
 <style scoped>
 .volunteer-detail { max-width: 1200px; margin: 0 auto; }
 .detail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-.detail-header h1 { flex: 1; font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.detail-header h1 { flex: 1; font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .header-actions { display: flex; gap: 0.5rem; }
 .status-card { margin-bottom: 1.5rem; }
 .status-info { display: flex; gap: 2rem; align-items: center; }
 .status-item { display: flex; flex-direction: column; gap: 0.5rem; }
-.status-item label { font-weight: 600; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; }
-.status-item p { color: #2c3e50; font-size: 1rem; margin: 0; }
+.status-item label { font-weight: 600; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; }
+.status-item p { color: var(--heading-color); font-size: 1rem; margin: 0; }
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
 .info-item { display: flex; flex-direction: column; gap: 0.5rem; }
-.info-item label { font-weight: 600; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; }
-.info-item p { color: #2c3e50; font-size: 1rem; margin: 0; line-height: 1.6; }
+.info-item label { font-weight: 600; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; }
+.info-item p { color: var(--heading-color); font-size: 1rem; margin: 0; line-height: 1.6; }
 .full-width { grid-column: 1 / -1; }
 .skills-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .availability-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }

@@ -1,6 +1,6 @@
 # Database Seed Script
 
-This seed script generates **3 years of realistic data** for the Happy Paws Animal Foundation, simulating a mature organization with extensive operations.
+This seed script generates **3 years of realistic data** for an animal foundation (defaults to Happy Paws) and can now be fully customized via environment variables.
 
 ## What Gets Seeded
 
@@ -91,6 +91,14 @@ docker-compose up -d
 docker-compose exec backend go run ./cmd/seed
 ```
 
+### Reset & Seed in one step
+
+```bash
+make reseed
+```
+
+This command runs `scripts/reseed.sh`, drops the MongoDB database, and executes the seed script from inside the backend container.
+
 ### Locally
 
 ```bash
@@ -105,7 +113,8 @@ The script uses these environment variables (or defaults):
 
 ```bash
 MONGODB_URI=mongodb://mongodb:27017  # Default for Docker
-MONGODB_DATABASE=animalsys            # Default database name
+MONGODB_DATABASE=animalsys           # Default database name
+# Organization overrides come from docker-compose.yml (backend service environment)
 ```
 
 ## Default Credentials
@@ -162,17 +171,9 @@ The script drops all collections before seeding. Only run this on:
 
 ## Customization
 
-To adjust the data volume, edit constants in `main.go`:
-
-```go
-const (
-    foundationStartDate = "2022-11-09"  // Change start date
-    minStaff            = 20             // Minimum employees
-    maxStaff            = 40             // Maximum employees
-    minVolunteers       = 30             // Minimum volunteers
-    maxVolunteers       = 60             // Maximum volunteers
-)
-```
+- **Organization branding**: update the `ORG_*` variables under the `backend` service in `docker-compose.yml` to change the name, contact info, domain, center name, and default password used throughout the seed data.
+- **Super admin profile**: override `ORG_SUPER_ADMIN_*` values to control the initial account.
+- **Data volumes**: adjust the constants near the top of `main.go` (`minStaff`, `maxStaff`, etc.) if you need larger or smaller datasets.
 
 ## Verification
 

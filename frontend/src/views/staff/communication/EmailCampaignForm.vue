@@ -151,7 +151,7 @@ const loadCampaign = async () => {
       scheduled_date: response.data.scheduled_date ? new Date(response.data.scheduled_date) : null
     })
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load campaign', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to load campaign', life: 3000 })
     router.push('/staff/communication/campaigns')
   }
 }
@@ -165,14 +165,14 @@ const handleSubmit = async () => {
 
     if (isEdit.value) {
       await communicationService.updateEmailCampaign(route.params.id, dataToSend)
-      toast.add({ severity: 'success', summary: 'Success', detail: t('communication.emailCampaignUpdated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('common.success'), detail: t('communication.emailCampaignUpdated'), life: 3000 })
     } else {
       await communicationService.createEmailCampaign(dataToSend)
-      toast.add({ severity: 'success', summary: 'Success', detail: t('communication.emailCampaignCreated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('common.success'), detail: t('communication.emailCampaignCreated'), life: 3000 })
     }
     router.push('/staff/communication/campaigns')
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to save campaign', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to save campaign', life: 3000 })
   }
 }
 
@@ -185,10 +185,10 @@ onMounted(async () => {
 <style scoped>
 .email-campaign-form { max-width: 900px; margin: 0 auto; }
 .form-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-.form-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.form-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .form-field { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-field label { font-weight: 600; color: #374151; }
+.form-field label { font-weight: 600; color: var(--text-color); }
 .full-width { grid-column: 1 / -1; }
 .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
 </style>

@@ -71,7 +71,7 @@
             :header="$t('finance.donorType')"
           >
             <template #body="slotProps">
-              {{ $t(`finance.${slotProps.data.donor_type}`) }}
+              {{ translateFinanceKey(slotProps.data.donor_type) }}
             </template>
           </Column>
           <Column
@@ -92,7 +92,7 @@
           >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.donor_status)">
-                {{ $t(`finance.${slotProps.data.donor_status}`) }}
+                {{ translateFinanceKey(slotProps.data.donor_status) }}
               </Badge>
             </template>
           </Column>
@@ -165,27 +165,33 @@ const loadDonors = async () => {
     const response = await financeService.getDonors(filters)
     donors.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load donors', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: t('finance.loadDonorsError'), life: 3000 })
   } finally {
     loading.value = false
   }
 }
 
-const formatCurrency = (amount) => amount ? `$${amount.toFixed(2)}` : '$0.00'
+const formatCurrency = (amount) => (typeof amount === 'number' ? `$${amount.toFixed(2)}` : '$0.00')
 const getStatusVariant = (status) => ({ active: 'success', inactive: 'neutral', lapsed: 'warning' }[status] || 'neutral')
+const translateFinanceKey = (value) => {
+  if (!value) return t('common.notAvailable')
+  const key = `finance.${value}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
 
 const confirmDelete = (donor) => {
   confirm.require({
-    message: 'Are you sure you want to delete this donor?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await financeService.deleteDonor(donor.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('finance.donorDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('finance.donorDeleted'), life: 3000 })
         loadDonors()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete donor', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -219,9 +225,9 @@ const exportDonors = () => {
     const timestamp = new Date().toISOString().split('T')[0]
     exportService.exportToCSV(donors.value, `donors_${timestamp}.csv`, columns)
 
-    toast.add({ severity: 'success', summary: 'Success', detail: 'Donors exported successfully', life: 3000 })
+    toast.add({ severity: 'success', summary: t('common.success'), detail: 'Donors exported successfully', life: 3000 })
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to export donors', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to export donors', life: 3000 })
   }
 }
 
@@ -231,7 +237,7 @@ onMounted(loadDonors)
 <style scoped>
 .donor-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .header-actions { display: flex; gap: 0.75rem; }
 .filters-card { margin-bottom: 1.5rem; }
 .filters { display: flex; gap: 1rem; flex-wrap: wrap; }

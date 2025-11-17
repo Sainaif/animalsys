@@ -249,7 +249,7 @@ const loadDonation = async () => {
       donation_date: donation.donation_date ? new Date(donation.donation_date) : new Date()
     })
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load donation', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to load donation', life: 3000 })
     router.push('/staff/finance/donations')
   }
 }
@@ -264,14 +264,14 @@ const handleSubmit = async () => {
 
     if (isEdit.value) {
       await financeService.updateDonation(route.params.id, dataToSend)
-      toast.add({ severity: 'success', summary: 'Success', detail: t('finance.donationUpdated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('common.success'), detail: t('finance.donationUpdated'), life: 3000 })
     } else {
       await financeService.createDonation(dataToSend)
-      toast.add({ severity: 'success', summary: 'Success', detail: t('finance.donationCreated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('common.success'), detail: t('finance.donationCreated'), life: 3000 })
     }
     router.push('/staff/finance/donations')
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to save donation', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to save donation', life: 3000 })
   } finally {
     saving.value = false
   }
@@ -283,10 +283,10 @@ onMounted(loadDonation)
 <style scoped>
 .donation-form-container { max-width: 1000px; margin: 0 auto; }
 .form-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-.form-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.form-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .form-field { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-field label { font-weight: 600; color: #374151; }
+.form-field label { font-weight: 600; color: var(--text-color); }
 .checkbox-label { flex-direction: row !important; align-items: center; gap: 0.75rem !important; }
 .full-width { grid-column: 1 / -1; }
 .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }

@@ -440,7 +440,7 @@ const showError = (summary, error) => {
 
 .page-subtitle {
   margin: 0.4rem 0 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .profile-grid {
@@ -469,7 +469,7 @@ const showError = (summary, error) => {
   justify-content: center;
   font-weight: 600;
   font-size: 1.5rem;
-  color: #374151;
+  color: var(--text-color);
   overflow: hidden;
 }
 
@@ -497,11 +497,11 @@ const showError = (summary, error) => {
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .form-group small {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .full-width {
@@ -526,12 +526,12 @@ const showError = (summary, error) => {
 .detail-list li {
   display: flex;
   justify-content: space-between;
-  color: #374151;
+  color: var(--text-color);
   font-size: 0.95rem;
 }
 
 .detail-list span {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .tip-box {
@@ -542,7 +542,7 @@ const showError = (summary, error) => {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .security-hint {

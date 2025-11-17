@@ -51,6 +51,19 @@ services:
       - ENVIRONMENT=development
       - DB_URI=mongodb://mongodb:27017
       - REDIS_HOST=redis
+      - ORG_NAME=Happy Paws Animal Foundation
+      - ORG_SHORT_NAME=Animal Foundation
+      - ORG_LEGAL_NAME=Happy Paws Animal Foundation
+      - ORG_DOMAIN=happypaws.org
+      - ORG_DESCRIPTION=Dedicated to rescuing and rehoming animals in need
+      - ORG_EMAIL=info@happypaws.org
+      - ORG_PHONE=+1-555-ANIMALS
+      - ORG_WEBSITE=https://happypaws.org
+      - ORG_ADDRESS=123 Rescue Lane, Animal City, AC 12345
+      - ORG_CENTER_NAME=Happy Paws Center
+      - ORG_DEFAULT_PASSWORD=password123
+      - ORG_SUPER_ADMIN_FIRST_NAME=Sarah
+      - ORG_SUPER_ADMIN_LAST_NAME=Johnson
     volumes:
       - ./backend:/app
       - backend_uploads:/home/app/uploads
@@ -76,6 +89,14 @@ services:
       - /app/node_modules
     environment:
       - VITE_API_URL=http://localhost/api/v1
+      - VITE_ORG_NAME=Animal Foundation
+      - VITE_ORG_SHORT_NAME=Animal Foundation
+      - VITE_ORG_LEGAL_NAME=Animal Foundation
+      - VITE_ORG_TAGLINE=Saving lives, one paw at a time
+      - VITE_ORG_WEBSITE=https://animalfoundation.org
+      - VITE_ORG_EMAIL=info@animalfoundation.org
+      - VITE_ORG_PHONE=+1 (234) 567-890
+      - VITE_ORG_ADDRESS=123 Animal Street, City, State 12345
     networks:
       - animalsys-network
     command: npm run dev

@@ -50,6 +50,32 @@ func (h *DonationHandler) CreateDonation(c *gin.Context) {
 	c.JSON(http.StatusCreated, donation)
 }
 
+// CreatePublicDonation handles donations submitted from the public website
+// @Summary Submit a public donation
+// @Tags donations
+// @Accept json
+// @Produce json
+// @Param donation body donation.PublicDonationRequest true "Public donation data"
+// @Success 201 {object} map[string]interface{}
+// @Router /public/donations [post]
+func (h *DonationHandler) CreatePublicDonation(c *gin.Context) {
+	var req donation.PublicDonationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	newDonation, err := h.donationUseCase.CreatePublicDonation(c.Request.Context(), &req)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"donation": newDonation,
+	})
+}
+
 // ProcessDonation processes a donation
 // @Summary Process a donation
 // @Tags donations
@@ -459,4 +485,3 @@ func (h *DonationHandler) GetDonationsByDateRange(c *gin.Context) {
 func (h *DonationHandler) GetDonationReceipt(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"receipt": map[string]interface{}{}})
 }
-

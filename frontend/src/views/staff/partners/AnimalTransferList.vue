@@ -173,7 +173,7 @@ const loadTransfers = async () => {
     const response = await partnerService.getAnimalTransfers(params)
     transfers.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load transfers', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to load transfers', life: 3000 })
   } finally {
     loading.value = false
   }
@@ -189,16 +189,16 @@ const getStatusVariant = (status) => ({
 
 const confirmDelete = (transfer) => {
   confirm.require({
-    message: 'Are you sure you want to delete this transfer?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await partnerService.deleteAnimalTransfer(transfer.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('partner.transferDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('partner.transferDeleted'), life: 3000 })
         loadTransfers()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete transfer', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -210,7 +210,7 @@ onMounted(loadTransfers)
 <style scoped>
 .animal-transfer-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .filters-card { margin-bottom: 1.5rem; }
 .filters { display: flex; gap: 1rem; flex-wrap: wrap; }
 .filters > * { min-width: 200px; }

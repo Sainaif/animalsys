@@ -432,7 +432,7 @@ onMounted(() => {
 
 .page-subtitle {
   margin: 0.2rem 0 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .settings-grid {
@@ -459,11 +459,11 @@ onMounted(() => {
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .form-group small {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .full-width {

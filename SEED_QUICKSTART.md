@@ -3,6 +3,9 @@
 ## Run the Seed Script
 
 ```bash
+# Drop the DB and reseed in one command
+make reseed
+
 # Using Docker (Recommended)
 docker-compose exec backend go run ./cmd/seed
 
@@ -18,11 +21,11 @@ docker-compose exec backend go run ./cmd/seed
 
 ## Login Credentials
 
-**Super Admin:**
+**Super Admin (configurable via `ORG_*` in `docker-compose.yml`):**
 - Email: `sarah.johnson@happypaws.org`
 - Password: `password123`
 
-**Other Admins:**
+**Other Admins (generated with your domain):**
 - `michael.chen@happypaws.org`
 - `emily.rodriguez@happypaws.org`
 - Password: `password123` (all users)

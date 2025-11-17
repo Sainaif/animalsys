@@ -183,14 +183,14 @@ onMounted(loadDashboard)
 
 <style scoped>
 .communication-dashboard { max-width: 1400px; margin: 0 auto; }
-.communication-dashboard h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin-bottom: 2rem; }
+.communication-dashboard h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin-bottom: 2rem; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { cursor: pointer; transition: transform 0.2s; }
 .stat-card:hover { transform: translateY(-5px); }
 .stat-content { display: flex; align-items: center; gap: 1.5rem; }
 .stat-info { flex: 1; }
-.stat-info h3 { font-size: 1rem; color: #6b7280; margin: 0 0 0.5rem 0; }
-.stat-number { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.stat-info h3 { font-size: 1rem; color: var(--text-muted); margin: 0 0 0.5rem 0; }
+.stat-number { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .recent-section { margin-top: 2rem; }
-.recent-section h2 { font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin: 0; padding: 1rem; }
+.recent-section h2 { font-size: 1.5rem; font-weight: 700; color: var(--heading-color); margin: 0; padding: 1rem; }
 </style>

@@ -1,11 +1,20 @@
 export interface Event {
   id: string
-  name: string
+  name: string | Record<string, string>
   event_type: 'fundraiser' | 'adoption_event' | 'education' | 'volunteer' | 'community' | 'other'
-  description?: string
+  description?: string | Record<string, string>
   start_date: string
   end_date?: string
-  location?: string
+  location?:
+    | string
+    | {
+        name?: string
+        address?: string
+        city?: string
+        state?: string
+        zip_code?: string
+        country?: string
+      }
   organizer_name?: string
   organizer_email?: string
   max_participants?: number
@@ -15,6 +24,7 @@ export interface Event {
   status: 'planned' | 'active' | 'completed' | 'cancelled'
   budget?: number
   raised_amount?: number
+  current_amount?: number
   notes?: string
   created_at?: string
   updated_at?: string

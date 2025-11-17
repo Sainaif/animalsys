@@ -207,6 +207,14 @@ This creates a backup file: `backup_YYYYMMDD_HHMMSS.archive`
 make restore-db FILE=backup_20250108_120000.archive
 ```
 
+### Reseed with Demo Data
+
+```bash
+make reseed
+```
+
+This command runs `scripts/reseed.sh`, drops the configured MongoDB database, and executes the Go seed script to repopulate it with realistic demo data. Use it whenever you need a clean environment.
+
 ## 🔧 Configuration
 
 ### Environment Variables
@@ -222,6 +230,15 @@ Key environment variables in `.env`:
 | `REDIS_HOST` | Redis host | `redis` |
 | `JWT_SECRET` | JWT signing key | (must change in production) |
 | `STORAGE_TYPE` | Storage type (`local` or `s3`) | `local` |
+
+### Organization Branding
+
+Organization-specific values now live directly in `docker-compose.yml`:
+
+- **Backend/seed**: edit the `ORG_*` variables under the `backend` service to change the foundation name, contact info, domain, and seed defaults.
+- **Frontend**: edit the `VITE_ORG_*` variables under the `frontend` service to sync the public/staff UI branding with the backend values.
+
+Customize those entries once and every container (including the seed script) will pick up the new identity automatically.
 
 ### Third-Party Services
 

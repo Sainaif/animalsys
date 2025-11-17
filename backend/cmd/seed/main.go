@@ -40,10 +40,13 @@ var (
 	employeeIDs  []primitive.ObjectID
 	partnerIDs   []primitive.ObjectID
 	speciesIDs   []primitive.ObjectID
+
+	orgConfig = loadOrganizationConfig()
 )
 
 func main() {
-	log.Println("🌱 Starting Animal Foundation Seed Script")
+	log.Printf("🌱 Starting %s seed script\n", orgConfig.ShortName)
+	log.Println("🏢 Organization:", orgConfig.Name)
 	log.Println("📅 Foundation established:", foundationStartDate)
 
 	if err := godotenv.Load(); err != nil {
@@ -123,21 +126,8 @@ func disconnectDB() {
 }
 
 func clearDatabase() error {
-	log.Println("🗑️  Clearing existing data...")
-
-	collections := []string{
-		"users", "animals", "species", "adoptions", "adoption_applications",
-		"donors", "donations", "campaigns", "events",
-		"volunteers", "veterinary_visits", "vaccinations",
-		"partners", "inventory_items", "tasks", "documents",
-		"communications", "notifications", "audit_logs", "settings",
-	}
-
-	for _, coll := range collections {
-		db.Collection(coll).Drop(ctx)
-	}
-
-	return nil
+	log.Printf("🗑️  Dropping database '%s'...\n", db.Name())
+	return db.Drop(ctx)
 }
 
 func seedSystemSettings() {
@@ -146,12 +136,13 @@ func seedSystemSettings() {
 	settings := map[string]interface{}{
 		"_id": primitive.NewObjectID(),
 		"organization": map[string]interface{}{
-			"name":        "Happy Paws Animal Foundation",
-			"description": "Dedicated to rescuing and rehoming animals in need",
-			"address":     "123 Rescue Lane, Animal City, AC 12345",
-			"phone":       "+1-555-ANIMALS",
-			"email":       "info@happypaws.org",
-			"website":     "https://happypaws.org",
+			"name":        orgConfig.Name,
+			"legal_name":  orgConfig.LegalName,
+			"description": orgConfig.Description,
+			"address":     orgConfig.Address,
+			"phone":       orgConfig.Phone,
+			"email":       orgConfig.Email,
+			"website":     orgConfig.Website,
 		},
 		"created_at": startDate,
 		"updated_at": currentDate,
@@ -165,10 +156,17 @@ func seedUsers() {
 	log.Println("\n👥 Seeding users...")
 
 	hasher := security.NewPasswordService()
-	passwordHash, _ := hasher.HashPassword("password123")
+	passwordHash, _ := hasher.HashPassword(orgConfig.DefaultPassword)
 
 	// Super admin
-	superAdmin := createUser("Sarah", "Johnson", "sarah.johnson@happypaws.org", entities.RoleSuperAdmin, passwordHash, startDate)
+	superAdmin := createUser(
+		orgConfig.SuperAdminFirstName,
+		orgConfig.SuperAdminLastName,
+		orgConfig.SuperAdminEmail,
+		entities.RoleSuperAdmin,
+		passwordHash,
+		startDate,
+	)
 	userIDs = append(userIDs, superAdmin)
 	adminIDs = append(adminIDs, superAdmin)
 
@@ -179,7 +177,8 @@ func seedUsers() {
 	}
 
 	for _, name := range adminNames {
-		admin := createUser(name[0], name[1], fmt.Sprintf("%s.%s@happypaws.org", strings.ToLower(name[0]), strings.ToLower(name[1])), entities.RoleAdmin, passwordHash, randomDate(startDate, startDate.AddDate(0, 6, 0)))
+		local := fmt.Sprintf("%s.%s", strings.ToLower(name[0]), strings.ToLower(name[1]))
+		admin := createUser(name[0], name[1], buildEmail(local), entities.RoleAdmin, passwordHash, randomDate(startDate, startDate.AddDate(0, 6, 0)))
 		userIDs = append(userIDs, admin)
 		adminIDs = append(adminIDs, admin)
 	}
@@ -193,7 +192,8 @@ func seedUsers() {
 	for i := 0; i < employeeCount; i++ {
 		firstName := firstNames[rand.Intn(len(firstNames))]
 		lastName := lastNames[rand.Intn(len(lastNames))]
-		email := fmt.Sprintf("%s.%s%d@happypaws.org", strings.ToLower(firstName), strings.ToLower(lastName), randInt(1, 999))
+		local := fmt.Sprintf("%s.%s%d", strings.ToLower(firstName), strings.ToLower(lastName), randInt(1, 999))
+		email := buildEmail(local)
 		employee := createUser(firstName, lastName, email, entities.RoleEmployee, passwordHash, randomDate(startDate, currentDate.AddDate(0, -1, 0)))
 		userIDs = append(userIDs, employee)
 		employeeIDs = append(employeeIDs, employee)
@@ -667,7 +667,7 @@ func seedEvents() {
 				"description": "Community event",
 				"start_date":  eventDate,
 				"end_date":    eventDate.Add(time.Hour * 4),
-				"location":    "Happy Paws Center",
+				"location":    orgConfig.CenterName,
 				"status":      "completed",
 				"created_by":  adminIDs[rand.Intn(len(adminIDs))],
 				"created_at":  eventDate.AddDate(0, 0, -14),
@@ -853,8 +853,8 @@ func printSummary() {
 
 	log.Println(strings.Repeat("=", 60))
 	log.Println("\n✨ Database seeded with 3 years of data!")
-	log.Println("📧 Default password for all users: password123")
-	log.Println("🔐 Super Admin: sarah.johnson@happypaws.org")
+	log.Printf("📧 Default password for all users: %s", orgConfig.DefaultPassword)
+	log.Printf("🔐 Super Admin: %s", orgConfig.SuperAdminEmail)
 	log.Println(strings.Repeat("=", 60))
 }
 
@@ -875,4 +875,11 @@ func randomFloat(min, max float64) float64 {
 
 func randomChoice(choices []string) string {
 	return choices[rand.Intn(len(choices))]
+}
+
+func buildEmail(localPart string) string {
+	if strings.Contains(localPart, "@") {
+		return localPart
+	}
+	return fmt.Sprintf("%s@%s", localPart, orgConfig.Domain)
 }

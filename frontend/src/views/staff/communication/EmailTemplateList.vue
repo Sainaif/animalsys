@@ -101,7 +101,7 @@ const loadTemplates = async () => {
     const response = await communicationService.getEmailTemplates()
     templates.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load email templates', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: 'Failed to load email templates', life: 3000 })
   } finally {
     loading.value = false
   }
@@ -109,16 +109,16 @@ const loadTemplates = async () => {
 
 const confirmDelete = (template) => {
   confirm.require({
-    message: 'Are you sure you want to delete this template?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await communicationService.deleteEmailTemplate(template.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('communication.emailTemplateDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('communication.emailTemplateDeleted'), life: 3000 })
         loadTemplates()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete template', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -130,6 +130,6 @@ onMounted(loadTemplates)
 <style scoped>
 .email-template-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .action-buttons { display: flex; gap: 0.5rem; }
 </style>

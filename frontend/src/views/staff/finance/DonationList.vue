@@ -45,7 +45,7 @@
             :header="$t('finance.donationType')"
           >
             <template #body="slotProps">
-              {{ $t(`finance.${slotProps.data.donation_type}`) }}
+              {{ translateFinanceKey(slotProps.data.donation_type) }}
             </template>
           </Column>
           <Column
@@ -54,7 +54,7 @@
           >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.payment_status)">
-                {{ $t(`finance.${slotProps.data.payment_status}`) }}
+                {{ translateFinanceKey(slotProps.data.payment_status) }}
               </Badge>
             </template>
           </Column>
@@ -110,28 +110,34 @@ const loadDonations = async () => {
     const response = await financeService.getDonations()
     donations.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load donations', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: t('finance.loadDonationsError'), life: 3000 })
   } finally {
     loading.value = false
   }
 }
 
 const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
-const formatCurrency = (amount) => amount ? `$${amount.toFixed(2)}` : '$0.00'
+const formatCurrency = (amount) => (typeof amount === 'number' ? `$${amount.toFixed(2)}` : '$0.00')
 const getStatusVariant = (status) => ({ pending: 'warning', completed: 'success', failed: 'danger', refunded: 'neutral' }[status] || 'neutral')
+const translateFinanceKey = (value) => {
+  if (!value) return t('common.notAvailable')
+  const key = `finance.${value}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
 
 const confirmDelete = (donation) => {
   confirm.require({
-    message: 'Are you sure you want to delete this donation?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await financeService.deleteDonation(donation.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('finance.donationDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('finance.donationDeleted'), life: 3000 })
         loadDonations()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete donation', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -143,5 +149,5 @@ onMounted(loadDonations)
 <style scoped>
 .donation-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 </style>

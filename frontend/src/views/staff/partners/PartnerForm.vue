@@ -234,10 +234,10 @@ onMounted(loadPartner)
 <style scoped>
 .partner-form { max-width: 900px; margin: 0 auto; }
 .form-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-.form-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.form-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .form-field { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-field label { font-weight: 600; color: #374151; }
+.form-field label { font-weight: 600; color: var(--text-color); }
 .full-width { grid-column: 1 / -1; }
 .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
 </style>

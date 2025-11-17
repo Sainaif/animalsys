@@ -9,12 +9,25 @@ import type {
   VeterinaryStatistics
 } from '@/types/veterinary'
 
+const resolveCollection = <T>(payload: any, key: string): T[] => {
+  if (Array.isArray(payload?.[key])) {
+    return payload[key]
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data
+  }
+  if (Array.isArray(payload)) {
+    return payload
+  }
+  return []
+}
+
 const toPaginatedResponse = <T>(
   payload: any,
   key: string,
   params?: QueryParams
 ): PaginatedResponse<T> => {
-  const items = Array.isArray(payload?.[key]) ? payload[key] : []
+  const items = resolveCollection<T>(payload, key)
   return {
     data: items,
     total: typeof payload?.total === 'number' ? payload.total : items.length,
@@ -27,19 +40,16 @@ const toPaginatedResponse = <T>(
   }
 }
 
-const toList = <T>(payload: any, key: string): T[] => {
-  if (Array.isArray(payload?.[key])) {
-    return payload[key]
-  }
-  if (Array.isArray(payload)) {
-    return payload
-  }
-  return []
-}
+const toList = <T>(payload: any, key: string): T[] => resolveCollection<T>(payload, key)
 
 const extractItem = <T>(payload: any, key: string): T => {
-  if (payload && typeof payload === 'object' && key in payload) {
-    return payload[key]
+  if (payload && typeof payload === 'object') {
+    if (key in payload) {
+      return payload[key]
+    }
+    if ('data' in payload) {
+      return payload.data
+    }
   }
   return payload as T
 }
@@ -107,66 +117,69 @@ export const veterinaryService = {
 
   // Medications
   async getMedications(params?: QueryParams): Promise<PaginatedResponse<Medication>> {
-    const response = await api.get('/veterinary/medications', { params })
+    const response = await api.get('/medications', { params })
     return toPaginatedResponse<Medication>(response.data, 'medications', params)
   },
 
   async getMedication(id: string): Promise<Medication> {
-    const response = await api.get(`/veterinary/medications/${id}`)
+    const response = await api.get(`/medications/${id}`)
     return extractItem<Medication>(response.data, 'medication')
   },
 
   async createMedication(data: Partial<Medication>): Promise<Medication> {
-    const response = await api.post('/veterinary/medications', data)
+    const response = await api.post('/medications', data)
     return response.data
   },
 
   async updateMedication(id: string, data: Partial<Medication>): Promise<Medication> {
-    const response = await api.put(`/veterinary/medications/${id}`, data)
+    const response = await api.put(`/medications/${id}`, data)
     return response.data
   },
 
   async deleteMedication(id: string): Promise<void> {
-    await api.delete(`/veterinary/medications/${id}`)
+    await api.delete(`/medications/${id}`)
   },
 
   async getAnimalMedications(animalId: string): Promise<Medication[]> {
-    const response = await api.get(`/animals/${animalId}/medications`)
+    const response = await api.get('/medications', { params: { animal_id: animalId } })
     return toList<Medication>(response.data, 'medications')
   },
 
   async discontinueMedication(id: string, reason: string): Promise<Medication> {
-    const response = await api.post(`/veterinary/medications/${id}/discontinue`, { reason })
+    const response = await api.post(`/medications/${id}/administer`, {
+      dosage_given: reason,
+      notes: reason
+    })
     return response.data
   },
 
   // Treatment Plans
   async getTreatmentPlans(params?: QueryParams): Promise<PaginatedResponse<TreatmentPlan>> {
-    const response = await api.get('/veterinary/treatment-plans', { params })
+    const response = await api.get('/treatment-plans', { params })
     return toPaginatedResponse<TreatmentPlan>(response.data, 'treatment_plans', params)
   },
 
   async getTreatmentPlan(id: string): Promise<TreatmentPlan> {
-    const response = await api.get(`/veterinary/treatment-plans/${id}`)
+    const response = await api.get(`/treatment-plans/${id}`)
     return extractItem<TreatmentPlan>(response.data, 'treatment_plan')
   },
 
   async createTreatmentPlan(data: Partial<TreatmentPlan>): Promise<TreatmentPlan> {
-    const response = await api.post('/veterinary/treatment-plans', data)
+    const response = await api.post('/treatment-plans', data)
     return response.data
   },
 
   async updateTreatmentPlan(id: string, data: Partial<TreatmentPlan>): Promise<TreatmentPlan> {
-    const response = await api.put(`/veterinary/treatment-plans/${id}`, data)
+    const response = await api.put(`/treatment-plans/${id}`, data)
     return response.data
   },
 
   async deleteTreatmentPlan(id: string): Promise<void> {
-    await api.delete(`/veterinary/treatment-plans/${id}`)
+    await api.delete(`/treatment-plans/${id}`)
   },
 
   async getAnimalTreatmentPlans(animalId: string): Promise<TreatmentPlan[]> {
-    const response = await api.get(`/animals/${animalId}/treatment-plans`)
+    const response = await api.get('/treatment-plans', { params: { animal_id: animalId } })
     return toList<TreatmentPlan>(response.data, 'treatment_plans')
   },
 
@@ -174,23 +187,23 @@ export const veterinaryService = {
     planId: string,
     note: { date: string; note: string; recorded_by: string }
   ): Promise<TreatmentPlan> {
-    const response = await api.post(`/veterinary/treatment-plans/${planId}/progress-notes`, note)
+    const response = await api.post(`/treatment-plans/${planId}/progress`, note)
     return response.data
   },
 
   // Medical Conditions
   async getMedicalConditions(params?: QueryParams): Promise<PaginatedResponse<MedicalCondition>> {
-    const response = await api.get('/veterinary/medical-conditions', { params })
+    const response = await api.get('/medical-conditions', { params })
     return toPaginatedResponse<MedicalCondition>(response.data, 'conditions', params)
   },
 
   async getMedicalCondition(id: string): Promise<MedicalCondition> {
-    const response = await api.get(`/veterinary/medical-conditions/${id}`)
+    const response = await api.get(`/medical-conditions/${id}`)
     return extractItem<MedicalCondition>(response.data, 'condition')
   },
 
   async createMedicalCondition(data: Partial<MedicalCondition>): Promise<MedicalCondition> {
-    const response = await api.post('/veterinary/medical-conditions', data)
+    const response = await api.post('/medical-conditions', data)
     return response.data
   },
 
@@ -198,16 +211,16 @@ export const veterinaryService = {
     id: string,
     data: Partial<MedicalCondition>
   ): Promise<MedicalCondition> {
-    const response = await api.put(`/veterinary/medical-conditions/${id}`, data)
+    const response = await api.put(`/medical-conditions/${id}`, data)
     return response.data
   },
 
   async deleteMedicalCondition(id: string): Promise<void> {
-    await api.delete(`/veterinary/medical-conditions/${id}`)
+    await api.delete(`/medical-conditions/${id}`)
   },
 
   async getAnimalMedicalConditions(animalId: string): Promise<MedicalCondition[]> {
-    const response = await api.get(`/animals/${animalId}/medical-conditions`)
+    const response = await api.get('/medical-conditions', { params: { animal_id: animalId } })
     return toList<MedicalCondition>(response.data, 'conditions')
   },
 

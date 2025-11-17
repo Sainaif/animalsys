@@ -10,6 +10,7 @@
   --primary-color: #3B82F6;
   --surface-ground: #f5f7fb;
   --text-color: #0f172a;
+  --heading-color: #1f2937;
   --nav-text: #0f172a;
   --card-bg: #ffffff;
   --card-muted-bg: #f8fafc;
@@ -26,11 +27,16 @@
   --topbar-text: #0f172a;
   --surface-overlay: #ffffff;
   --input-bg: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(244, 114, 182, 0.2);
+  --hero-accent: #fff1f5;
+  --hero-accent-alt: #fdf2f8;
 }
 
 :root[data-theme='dark'] {
   --surface-ground: #0b1120;
   --text-color: #e2e8f0;
+  --heading-color: #f1f5f9;
   --nav-text: #e2e8f0;
   --card-bg: #17203a;
   --card-muted-bg: #11182b;
@@ -48,6 +54,10 @@
   --topbar-text: #f8fafc;
   --surface-overlay: #101935;
   --input-bg: #11182b;
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(129, 140, 248, 0.35);
+  --hero-accent: rgba(36, 16, 64, 0.85);
+  --hero-accent-alt: rgba(15, 23, 42, 0.85);
 }
 
 body {
@@ -131,6 +141,87 @@ body {
 
 .p-datatable .p-datatable-tbody > tr:hover {
   background: var(--card-muted-bg);
+}
+
+.p-paginator {
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  color: var(--text-color);
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page {
+  border: 1px solid transparent;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover,
+.p-paginator .p-paginator-first:hover,
+.p-paginator .p-paginator-prev:hover,
+.p-paginator .p-paginator-next:hover,
+.p-paginator .p-paginator-last:hover {
+  background: var(--card-muted-bg);
+  border-radius: 999px;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: var(--card-muted-bg);
+  border-radius: 999px;
+  border-color: var(--border-color);
+  color: var(--primary-color);
+}
+
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu,
+.p-menubar,
+.p-menubar-root-list,
+.p-submenu-list,
+.p-overlaypanel,
+.p-confirm-popup,
+.p-panelmenu {
+  background: var(--surface-overlay);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.p-menu .p-menuitem-link,
+.p-tieredmenu .p-menuitem-link,
+.p-panelmenu .p-menuitem-link,
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link,
+.p-submenu-list .p-menuitem-link {
+  color: var(--text-color);
+}
+
+.p-menu .p-menuitem-link:hover,
+.p-tieredmenu .p-menuitem-link:hover,
+.p-panelmenu .p-menuitem-link:hover,
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:hover,
+.p-submenu-list .p-menuitem-link:hover {
+  background: var(--card-muted-bg);
+  color: var(--text-color);
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.p-dialog .p-dialog-content {
+  border-top: 1px solid var(--border-color);
+}
+
+.p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--border-color);
 }
 
 /* Utility Classes */

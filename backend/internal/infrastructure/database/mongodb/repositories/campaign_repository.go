@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
@@ -44,8 +45,8 @@ func (r *campaignRepository) Create(ctx context.Context, campaign *entities.Camp
 // FindByID finds a campaign by ID
 func (r *campaignRepository) FindByID(ctx context.Context, id primitive.ObjectID) (*entities.Campaign, error) {
 	collection := r.db.Collection(mongodb.Collections.Campaigns)
-	var campaign entities.Campaign
-	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&campaign)
+	var raw bson.M
+	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&raw)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.ErrNotFound
@@ -53,7 +54,7 @@ func (r *campaignRepository) FindByID(ctx context.Context, id primitive.ObjectID
 		return nil, errors.Wrap(err, 500, "failed to find campaign")
 	}
 
-	return &campaign, nil
+	return mapCampaignDocument(raw), nil
 }
 
 // Update updates a campaign
@@ -130,9 +131,9 @@ func (r *campaignRepository) List(ctx context.Context, filter *repositories.Camp
 	}
 	defer cursor.Close(ctx)
 
-	var campaigns []*entities.Campaign
-	if err = cursor.All(ctx, &campaigns); err != nil {
-		return nil, 0, errors.Wrap(err, 500, "failed to decode campaigns")
+	campaigns, err := r.decodeCampaignCursor(ctx, cursor, "failed to decode campaigns")
+	if err != nil {
+		return nil, 0, err
 	}
 
 	return campaigns, total, nil
@@ -236,9 +237,9 @@ func (r *campaignRepository) GetActiveCampaigns(ctx context.Context) ([]*entitie
 	}
 	defer cursor.Close(ctx)
 
-	var campaigns []*entities.Campaign
-	if err = cursor.All(ctx, &campaigns); err != nil {
-		return nil, errors.Wrap(err, 500, "failed to decode active campaigns")
+	campaigns, err := r.decodeCampaignCursor(ctx, cursor, "failed to decode active campaigns")
+	if err != nil {
+		return nil, err
 	}
 
 	return campaigns, nil
@@ -270,9 +271,9 @@ func (r *campaignRepository) GetFeaturedCampaigns(ctx context.Context) ([]*entit
 	}
 	defer cursor.Close(ctx)
 
-	var campaigns []*entities.Campaign
-	if err = cursor.All(ctx, &campaigns); err != nil {
-		return nil, errors.Wrap(err, 500, "failed to decode featured campaigns")
+	campaigns, err := r.decodeCampaignCursor(ctx, cursor, "failed to decode featured campaigns")
+	if err != nil {
+		return nil, err
 	}
 
 	return campaigns, nil
@@ -304,9 +305,9 @@ func (r *campaignRepository) GetPublicCampaigns(ctx context.Context) ([]*entitie
 	}
 	defer cursor.Close(ctx)
 
-	var campaigns []*entities.Campaign
-	if err = cursor.All(ctx, &campaigns); err != nil {
-		return nil, errors.Wrap(err, 500, "failed to decode public campaigns")
+	campaigns, err := r.decodeCampaignCursor(ctx, cursor, "failed to decode public campaigns")
+	if err != nil {
+		return nil, err
 	}
 
 	return campaigns, nil
@@ -325,9 +326,9 @@ func (r *campaignRepository) GetCampaignsByManager(ctx context.Context, managerI
 	}
 	defer cursor.Close(ctx)
 
-	var campaigns []*entities.Campaign
-	if err = cursor.All(ctx, &campaigns); err != nil {
-		return nil, errors.Wrap(err, 500, "failed to decode campaigns")
+	campaigns, err := r.decodeCampaignCursor(ctx, cursor, "failed to decode campaigns")
+	if err != nil {
+		return nil, err
 	}
 
 	return campaigns, nil
@@ -506,18 +507,18 @@ func (r *campaignRepository) GetCampaignStatistics(ctx context.Context) (*reposi
 	amountPipeline := []bson.M{
 		{
 			"$group": bson.M{
-				"_id":          nil,
-				"totalGoal":    bson.M{"$sum": "$goal_amount"},
-				"totalRaised":  bson.M{"$sum": "$current_amount"},
-				"totalDonors":  bson.M{"$sum": "$donor_count"},
+				"_id":         nil,
+				"totalGoal":   bson.M{"$sum": "$goal_amount"},
+				"totalRaised": bson.M{"$sum": "$current_amount"},
+				"totalDonors": bson.M{"$sum": "$donor_count"},
 			},
 		},
 	}
 
 	var amountResult struct {
-		TotalGoal    float64 `bson:"totalGoal"`
-		TotalRaised  float64 `bson:"totalRaised"`
-		TotalDonors  int64   `bson:"totalDonors"`
+		TotalGoal   float64 `bson:"totalGoal"`
+		TotalRaised float64 `bson:"totalRaised"`
+		TotalDonors int64   `bson:"totalDonors"`
 	}
 
 	amountCursor, err := collection.Aggregate(ctx, amountPipeline)
@@ -538,4 +539,255 @@ func (r *campaignRepository) GetCampaignStatistics(ctx context.Context) (*reposi
 	}
 
 	return stats, nil
+}
+
+func (r *campaignRepository) decodeCampaignCursor(ctx context.Context, cursor *mongo.Cursor, message string) ([]*entities.Campaign, error) {
+	var rawDocs []bson.M
+	if err := cursor.All(ctx, &rawDocs); err != nil {
+		return nil, errors.Wrap(err, 500, message)
+	}
+
+	campaigns := make([]*entities.Campaign, 0, len(rawDocs))
+	for _, raw := range rawDocs {
+		campaigns = append(campaigns, mapCampaignDocument(raw))
+	}
+
+	return campaigns, nil
+}
+
+func mapCampaignDocument(raw bson.M) *entities.Campaign {
+	if raw == nil {
+		return &entities.Campaign{}
+	}
+
+	defaultName := stringFromRaw(raw["name"])
+	if defaultName == "" {
+		defaultName = "Campaign"
+	}
+
+	campaign := &entities.Campaign{
+		ID:              objectIDFromRaw(raw["_id"]),
+		Name:            decodeMultilingualName(raw["name"], defaultName),
+		Description:     entities.MultilingualName{},
+		Type:            entities.CampaignType(stringFromRaw(raw["type"])),
+		Status:          entities.CampaignStatus(stringFromRaw(raw["status"])),
+		GoalAmount:      float64FromRaw(raw["goal_amount"]),
+		CurrentAmount:   float64FromRaw(raw["current_amount"]),
+		DonorCount:      intFromRaw(raw["donor_count"]),
+		DonationCount:   intFromRaw(raw["donation_count"]),
+		AverageDonation: float64FromRaw(raw["average_donation"]),
+		StartDate:       timeFromRaw(raw["start_date"]),
+		EndDate:         timePtrFromRaw(raw["end_date"]),
+		ImageURL:        stringFromRaw(raw["image_url"]),
+		VideoURL:        stringFromRaw(raw["video_url"]),
+		Tags:            stringSliceFromRaw(raw["tags"]),
+		Public:          boolFromRaw(raw["public"]),
+		Featured:        boolFromRaw(raw["featured"]),
+		Manager:         objectIDFromRaw(raw["manager"]),
+		ContactEmail:    stringFromRaw(raw["contact_email"]),
+		ContactPhone:    stringFromRaw(raw["contact_phone"]),
+		Notes:           stringFromRaw(raw["notes"]),
+		CreatedBy:       objectIDFromRaw(raw["created_by"]),
+		UpdatedBy:       objectIDFromRaw(raw["updated_by"]),
+		CreatedAt:       timeFromRaw(raw["created_at"]),
+		UpdatedAt:       timeFromRaw(raw["updated_at"]),
+	}
+
+	campaign.Description = decodeMultilingualName(raw["description"], campaign.Name.English)
+
+	if campaign.Type == "" {
+		campaign.Type = entities.CampaignTypeGeneral
+	}
+	if campaign.Status == "" {
+		campaign.Status = entities.CampaignStatusDraft
+	}
+
+	if campaign.GoalAmount == 0 {
+		campaign.GoalAmount = float64FromRaw(raw["goal"])
+	}
+	if campaign.CurrentAmount == 0 {
+		campaign.CurrentAmount = float64FromRaw(raw["raised"])
+	}
+
+	if campaign.Description.English == "" && campaign.Description.Polish == "" {
+		campaign.Description = campaign.Name
+	}
+
+	if campaign.CreatedAt.IsZero() {
+		campaign.CreatedAt = time.Now()
+	}
+	if campaign.UpdatedAt.IsZero() {
+		campaign.UpdatedAt = campaign.CreatedAt
+	}
+	if campaign.StartDate.IsZero() {
+		campaign.StartDate = campaign.CreatedAt
+	}
+
+	return campaign
+}
+
+func decodeMultilingualName(value interface{}, fallback string) entities.MultilingualName {
+	result := entities.MultilingualName{}
+
+	switch v := value.(type) {
+	case nil:
+	case string:
+		result.English = v
+		result.Polish = v
+	case bson.M:
+		result.English = stringFromRaw(v["en"])
+		result.Polish = stringFromRaw(v["pl"])
+		result.Latin = stringFromRaw(v["latin"])
+	case map[string]interface{}:
+		result.English = stringFromRaw(v["en"])
+		result.Polish = stringFromRaw(v["pl"])
+		result.Latin = stringFromRaw(v["latin"])
+	case primitive.D:
+		return decodeMultilingualName(v.Map(), fallback)
+	default:
+		str := stringFromRaw(value)
+		if str != "" {
+			result.English = str
+			result.Polish = str
+		}
+	}
+
+	if result.English == "" {
+		result.English = fallback
+	}
+	if result.Polish == "" {
+		result.Polish = fallback
+	}
+	if result.Latin == "" {
+		result.Latin = fallback
+	}
+
+	return result
+}
+
+func stringFromRaw(value interface{}) string {
+	switch v := value.(type) {
+	case string:
+		return v
+	case []byte:
+		return string(v)
+	case primitive.ObjectID:
+		return v.Hex()
+	default:
+		return ""
+	}
+}
+
+func stringSliceFromRaw(value interface{}) []string {
+	switch v := value.(type) {
+	case []string:
+		return v
+	case []interface{}:
+		result := make([]string, 0, len(v))
+		for _, item := range v {
+			if str := stringFromRaw(item); str != "" {
+				result = append(result, str)
+			}
+		}
+		if len(result) == 0 {
+			return nil
+		}
+		return result
+	default:
+		return nil
+	}
+}
+
+func float64FromRaw(value interface{}) float64 {
+	switch v := value.(type) {
+	case float64:
+		return v
+	case float32:
+		return float64(v)
+	case int:
+		return float64(v)
+	case int32:
+		return float64(v)
+	case int64:
+		return float64(v)
+	case primitive.Decimal128:
+		if parsed, err := strconv.ParseFloat(v.String(), 64); err == nil {
+			return parsed
+		}
+	}
+	return 0
+}
+
+func intFromRaw(value interface{}) int {
+	switch v := value.(type) {
+	case int:
+		return v
+	case int32:
+		return int(v)
+	case int64:
+		return int(v)
+	case float64:
+		return int(v)
+	default:
+		return 0
+	}
+}
+
+func boolFromRaw(value interface{}) bool {
+	switch v := value.(type) {
+	case bool:
+		return v
+	case string:
+		parsed, err := strconv.ParseBool(v)
+		if err == nil {
+			return parsed
+		}
+	case int:
+		return v != 0
+	case int32:
+		return v != 0
+	case int64:
+		return v != 0
+	case float64:
+		return v != 0
+	default:
+		return false
+	}
+	return false
+}
+
+func timeFromRaw(value interface{}) time.Time {
+	switch v := value.(type) {
+	case time.Time:
+		return v
+	case primitive.DateTime:
+		return v.Time()
+	case string:
+		if parsed, err := time.Parse(time.RFC3339, v); err == nil {
+			return parsed
+		}
+	default:
+		return time.Time{}
+	}
+	return time.Time{}
+}
+
+func timePtrFromRaw(value interface{}) *time.Time {
+	t := timeFromRaw(value)
+	if t.IsZero() {
+		return nil
+	}
+	return &t
+}
+
+func objectIDFromRaw(value interface{}) primitive.ObjectID {
+	switch v := value.(type) {
+	case primitive.ObjectID:
+		return v
+	case string:
+		if id, err := primitive.ObjectIDFromHex(v); err == nil {
+			return id
+		}
+	}
+	return primitive.NilObjectID
 }

@@ -29,8 +29,13 @@
     "closeMenu": "Close navigation menu",
     "success": "Success",
     "error": "Error",
+    "deleteConfirmation": "Are you sure you want to delete this item?",
+    "deleteError": "Failed to delete this item.",
     "genericError": "Something went wrong. Please try again.",
-    "notAvailable": "Not available"
+    "notAvailable": "Not available",
+    "all": "All",
+    "never": "Never",
+    "unassigned": "Unassigned"
   },
   "auth": {
     "login": "Login",
@@ -39,7 +44,7 @@
     "password": "Password",
     "rememberMe": "Remember Me",
     "forgotPassword": "Forgot Password?",
-    "loginTitle": "Welcome to Animal Foundation CRM",
+    "loginTitle": "Welcome to {brand} CRM",
     "loginSubtitle": "Please sign in to continue",
     "invalidCredentials": "Invalid email or password",
     "staffLogin": "Staff Login",
@@ -498,6 +503,9 @@
     "donors": "Donors",
     "donations": "Donations",
     "campaigns": "Campaigns",
+    "donorModuleDescription": "Manage donors and donor relationships",
+    "donationModuleDescription": "Track donations and receipts",
+    "campaignModuleDescription": "Manage fundraising campaigns",
     "donor": "Donor",
     "donation": "Donation",
     "campaign": "Campaign",
@@ -540,6 +548,8 @@
     "completed": "Completed",
     "failed": "Failed",
     "refunded": "Refunded",
+    "draft": "Draft",
+    "paused": "Paused",
     "receiptSent": "Receipt Sent",
     "receiptNumber": "Receipt Number",
     "taxDeductible": "Tax Deductible",
@@ -555,6 +565,12 @@
     "fundraising": "Fundraising",
     "awareness": "Awareness",
     "event": "Event",
+    "general": "General",
+    "capital": "Capital",
+    "emergency": "Emergency",
+    "annual": "Annual",
+    "membership": "Membership",
+    "end_of_year": "End of year",
     "startDate": "Start Date",
     "endDate": "End Date",
     "goalAmount": "Goal Amount",
@@ -564,6 +580,9 @@
     "targetAudience": "Target Audience",
     "coordinator": "Coordinator",
     "donorCount": "Donor Count",
+    "loadDonorsError": "Failed to load donors.",
+    "loadDonationsError": "Failed to load donations.",
+    "loadCampaignsError": "Failed to load campaigns.",
     "noDonorsFound": "No donors found",
     "noDonationsFound": "No donations found",
     "noCampaignsFound": "No campaigns found",
@@ -605,6 +624,9 @@
     "budget": "Budget",
     "raisedAmount": "Raised Amount",
     "planned": "Planned",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
     "firstName": "First Name",
     "lastName": "Last Name",
     "emergencyContact": "Emergency Contact",
@@ -630,6 +652,7 @@
     "eventCreated": "Event created successfully",
     "eventUpdated": "Event updated successfully",
     "eventDeleted": "Event deleted successfully",
+    "loadError": "Failed to load events",
     "volunteerCreated": "Volunteer created successfully",
     "volunteerUpdated": "Volunteer updated successfully",
     "volunteerDeleted": "Volunteer deleted successfully",
@@ -849,6 +872,222 @@
     "phone": "+1 (234) 567-890",
     "address": "123 Animal Street<br>City, State 12345",
     "followUs": "Follow us"
+  },
+  "contacts": {
+    "title": "Relationships",
+    "subtitle": "Keep donors, adopters, volunteers, and partners in one connected place.",
+    "searchPlaceholder": "Search name, organisation or email",
+    "filters": {
+      "type": "Type",
+      "status": "Status",
+      "owner": "Owner",
+      "allTypes": "All types",
+      "allStatuses": "All statuses",
+      "allOwners": "All owners"
+    },
+    "actions": {
+      "export": "Export",
+      "add": "Add contact",
+      "save": "Save contact",
+      "copyEmail": "Copy email",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "stats": {
+      "total": "Total contacts",
+      "active": "Active relationships",
+      "activeDescription": "Ready to collaborate",
+      "prospects": "Prospects",
+      "prospectsDescription": "Need nurturing",
+      "upcoming": "Upcoming follow-ups",
+      "upcomingDescription": "Due this week"
+    },
+    "types": {
+      "adopter": "Adopter",
+      "donor": "Donor",
+      "volunteer": "Volunteer",
+      "partner": "Partner",
+      "vendor": "Vendor",
+      "other": "Other"
+    },
+    "statuses": {
+      "active": "Active",
+      "prospect": "Prospect",
+      "inactive": "Inactive",
+      "archived": "Archived"
+    },
+    "table": {
+      "name": "Name",
+      "organisation": "Organisation",
+      "tags": "Tags",
+      "owner": "Owner",
+      "lastContact": "Last contact",
+      "nextFollowUp": "Next follow-up"
+    },
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "organisation": "Organisation",
+      "type": "Type",
+      "status": "Status",
+      "owner": "Owner",
+      "tags": "Tags",
+      "nextFollowUp": "Next follow-up",
+      "notes": "Notes"
+    },
+    "detail": {
+      "title": "Contact details",
+      "info": "Contact information",
+      "email": "Email",
+      "phone": "Phone",
+      "organisation": "Organisation",
+      "owner": "Owner",
+      "status": "Status",
+      "nextFollowUp": "Next follow-up",
+      "tagsEmpty": "No tags yet",
+      "recent": "Recent touchpoints",
+      "noActivities": "No interactions logged yet.",
+      "noNotes": "No notes captured.",
+      "author": "By {name}",
+      "authorFallback": "Team member"
+    },
+    "dialog": {
+      "createTitle": "Add contact",
+      "editTitle": "Update contact"
+    },
+    "messages": {
+      "empty": "No contacts match your filters."
+    },
+    "confirmDeleteTitle": "Delete contact",
+    "confirmDeleteMessage": "Delete {name}?",
+    "notifications": {
+      "loadError": "Unable to load contacts",
+      "saveError": "Unable to save contact",
+      "deleteError": "Unable to delete contact",
+      "createSuccess": "Contact added",
+      "createDetail": "The contact is now available.",
+      "updateSuccess": "Contact updated",
+      "updateDetail": "Changes have been saved.",
+      "deleteSuccess": "Contact removed",
+      "deleteDetail": "The record was deleted.",
+      "nothingToExport": "Nothing to export",
+      "nothingToExportDetail": "Adjust filters to see contacts first.",
+      "exportReady": "Export ready",
+      "exportReadyDetail": "CSV downloaded.",
+      "emailCopied": "Email copied",
+      "copyError": "Unable to copy email"
+    }
+  },
+  "users": {
+    "title": "User management",
+    "subtitle": "Invite new teammates, adjust permissions, and keep your workspace secure.",
+    "searchPlaceholder": "Search by name or email",
+    "filters": {
+      "role": "Role",
+      "status": "Status",
+      "allRoles": "All roles",
+      "allStatuses": "All statuses"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "inviteUser": "Invite user",
+      "resetPassword": "Reset password",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "confirmUpdate": "Yes, update",
+      "selectAction": "Select action for this user"
+    },
+    "tooltips": {
+      "viewDetails": "View details",
+      "editUser": "Edit user",
+      "moreActions": "More actions"
+    },
+    "table": {
+      "name": "Name",
+      "role": "Role",
+      "status": "Status",
+      "phone": "Phone",
+      "lastLogin": "Last login"
+    },
+    "stats": {
+      "total": "Total users",
+      "active": "Active",
+      "activeDescription": "Authorized today",
+      "admins": "Administrators",
+      "inactiveSuspended": "Inactive & suspended"
+    },
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "status": "Status",
+      "language": "Language",
+      "theme": "Theme",
+      "password": "Temporary password"
+    },
+    "dialog": {
+      "createTitle": "Invite user",
+      "editTitle": "Update user",
+      "detailTitle": "User details",
+      "passwordTitle": "Reset password"
+    },
+    "detail": {
+      "role": "Role",
+      "phone": "Phone",
+      "language": "Language",
+      "theme": "Theme",
+      "lastLogin": "Last login",
+      "created": "Created",
+      "updated": "Updated"
+    },
+    "password": {
+      "hint": "Generate a secure password and share it with the user using a trusted channel. They will be asked to change it on first login.",
+      "newPassword": "New password"
+    },
+    "messages": {
+      "empty": "No users found for the selected filters.",
+      "neverLoggedIn": "Never"
+    },
+    "confirmStatusTitle": "Confirm status change",
+    "confirmStatusMessage": "Are you sure you want to mark {name} as {status}?",
+    "notifications": {
+      "loadError": "Unable to load users",
+      "saveError": "Unable to save user",
+      "inviteSuccess": "User invited",
+      "inviteDetail": "A new account has been created.",
+      "updateSuccess": "User updated",
+      "updateDetail": "Changes were saved successfully.",
+      "passwordReset": "Password reset",
+      "passwordResetDetail": "The user will need to sign in again.",
+      "updateStatusSuccess": "Status updated",
+      "updateStatusDetail": "The account state has changed.",
+      "passwordError": "Unable to reset password",
+      "updateStatusError": "Unable to update status"
+    },
+    "roles": {
+      "super_admin": "Super Admin",
+      "admin": "Admin",
+      "employee": "Employee",
+      "volunteer": "Volunteer",
+      "user": "User"
+    },
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    },
+    "languages": {
+      "pl": "Polish",
+      "en": "English"
+    },
+    "themes": {
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "reports": {
     "title": "Reports & Analytics",

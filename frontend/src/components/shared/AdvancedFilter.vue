@@ -141,6 +141,6 @@ const clearFilters = () => {
 .advanced-filter { margin-bottom: 1.5rem; }
 .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end; }
 .filter-field { display: flex; flex-direction: column; gap: 0.5rem; }
-.filter-field label { font-weight: 600; color: #374151; font-size: 0.875rem; }
+.filter-field label { font-weight: 600; color: var(--text-color); font-size: 0.875rem; }
 .filter-actions { display: flex; gap: 0.5rem; align-items: center; }
 </style>

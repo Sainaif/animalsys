@@ -29,8 +29,13 @@
     "closeMenu": "Zamknij menu nawigacji",
     "success": "Sukces",
     "error": "Błąd",
+    "deleteConfirmation": "Czy na pewno chcesz usunąć ten element?",
+    "deleteError": "Nie udało się usunąć tego elementu.",
     "genericError": "Wystąpił błąd. Spróbuj ponownie.",
-    "notAvailable": "Brak danych"
+    "notAvailable": "Brak danych",
+    "all": "Wszystkie",
+    "never": "Nigdy",
+    "unassigned": "Nieprzypisane"
   },
   "auth": {
     "login": "Zaloguj się",
@@ -39,7 +44,7 @@
     "password": "Hasło",
     "rememberMe": "Zapamiętaj mnie",
     "forgotPassword": "Nie pamiętasz hasła?",
-    "loginTitle": "Witaj w CRM Fundacji Zwierząt",
+    "loginTitle": "Witaj w CRM {brand}",
     "loginSubtitle": "Zaloguj się, aby kontynuować",
     "invalidCredentials": "Nieprawidłowy adres e-mail lub hasło",
     "staffLogin": "Logowanie personelu",
@@ -166,6 +171,222 @@
     "phone": "+48 123 456 789",
     "address": "ul. Zwierzęca 123<br>00-001 Miasto",
     "followUs": "Śledź nas"
+  },
+  "contacts": {
+    "title": "Relacje",
+    "subtitle": "Utrzymuj darczyńców, adoptujących, wolontariuszy i partnerów w jednym miejscu.",
+    "searchPlaceholder": "Szukaj po imieniu, organizacji lub e-mailu",
+    "filters": {
+      "type": "Typ",
+      "status": "Status",
+      "owner": "Opiekun",
+      "allTypes": "Wszystkie typy",
+      "allStatuses": "Wszystkie statusy",
+      "allOwners": "Wszyscy opiekunowie"
+    },
+    "actions": {
+      "export": "Eksportuj",
+      "add": "Dodaj kontakt",
+      "save": "Zapisz kontakt",
+      "copyEmail": "Kopiuj e-mail",
+      "edit": "Edytuj",
+      "delete": "Usuń"
+    },
+    "stats": {
+      "total": "Łącznie kontaktów",
+      "active": "Aktywne relacje",
+      "activeDescription": "Gotowe do współpracy",
+      "prospects": "Potencjalni",
+      "prospectsDescription": "Wymagają pielęgnowania",
+      "upcoming": "Nadchodzące follow-upy",
+      "upcomingDescription": "Termin w tym tygodniu"
+    },
+    "types": {
+      "adopter": "Adoptujący",
+      "donor": "Darczyńca",
+      "volunteer": "Wolontariusz",
+      "partner": "Partner",
+      "vendor": "Dostawca",
+      "other": "Inny"
+    },
+    "statuses": {
+      "active": "Aktywny",
+      "prospect": "Potencjalny",
+      "inactive": "Nieaktywny",
+      "archived": "Zarchiwizowany"
+    },
+    "table": {
+      "name": "Imię i nazwisko",
+      "organisation": "Organizacja",
+      "tags": "Tagi",
+      "owner": "Opiekun",
+      "lastContact": "Ostatni kontakt",
+      "nextFollowUp": "Kolejny follow-up"
+    },
+    "form": {
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "organisation": "Organizacja",
+      "type": "Typ",
+      "status": "Status",
+      "owner": "Opiekun",
+      "tags": "Tagi",
+      "nextFollowUp": "Kolejny follow-up",
+      "notes": "Notatki"
+    },
+    "detail": {
+      "title": "Szczegóły kontaktu",
+      "info": "Informacje kontaktowe",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "organisation": "Organizacja",
+      "owner": "Opiekun",
+      "status": "Status",
+      "nextFollowUp": "Kolejny follow-up",
+      "tagsEmpty": "Brak tagów",
+      "recent": "Ostatnie interakcje",
+      "noActivities": "Brak zarejestrowanych interakcji.",
+      "noNotes": "Brak notatek.",
+      "author": "Autor: {name}",
+      "authorFallback": "Członek zespołu"
+    },
+    "dialog": {
+      "createTitle": "Dodaj kontakt",
+      "editTitle": "Aktualizuj kontakt"
+    },
+    "messages": {
+      "empty": "Brak kontaktów spełniających filtry."
+    },
+    "confirmDeleteTitle": "Usuń kontakt",
+    "confirmDeleteMessage": "Usunąć {name}?",
+    "notifications": {
+      "loadError": "Nie udało się wczytać kontaktów",
+      "saveError": "Nie udało się zapisać kontaktu",
+      "deleteError": "Nie udało się usunąć kontaktu",
+      "createSuccess": "Kontakt dodany",
+      "createDetail": "Kontakt jest już dostępny.",
+      "updateSuccess": "Kontakt zaktualizowany",
+      "updateDetail": "Zmiany zostały zapisane.",
+      "deleteSuccess": "Kontakt usunięty",
+      "deleteDetail": "Rekord został usunięty.",
+      "nothingToExport": "Brak danych do eksportu",
+      "nothingToExportDetail": "Dostosuj filtry, aby najpierw wyświetlić kontakty.",
+      "exportReady": "Eksport gotowy",
+      "exportReadyDetail": "Plik CSV został pobrany.",
+      "emailCopied": "Adres skopiowany",
+      "copyError": "Nie udało się skopiować adresu e-mail"
+    }
+  },
+  "users": {
+    "title": "Zarządzanie użytkownikami",
+    "subtitle": "Zapraszaj nowych członków zespołu, zarządzaj uprawnieniami i dbaj o bezpieczeństwo przestrzeni roboczej.",
+    "searchPlaceholder": "Szukaj po imieniu lub e-mailu",
+    "filters": {
+      "role": "Rola",
+      "status": "Status",
+      "allRoles": "Wszystkie role",
+      "allStatuses": "Wszystkie statusy"
+    },
+    "actions": {
+      "refresh": "Odśwież",
+      "inviteUser": "Zaproś użytkownika",
+      "resetPassword": "Resetuj hasło",
+      "deactivate": "Dezaktywuj",
+      "activate": "Aktywuj",
+      "confirmUpdate": "Tak, zaktualizuj",
+      "selectAction": "Wybierz działanie dla tego użytkownika"
+    },
+    "tooltips": {
+      "viewDetails": "Zobacz szczegóły",
+      "editUser": "Edytuj użytkownika",
+      "moreActions": "Więcej akcji"
+    },
+    "table": {
+      "name": "Imię i nazwisko",
+      "role": "Rola",
+      "status": "Status",
+      "phone": "Telefon",
+      "lastLogin": "Ostatnie logowanie"
+    },
+    "stats": {
+      "total": "Łącznie użytkowników",
+      "active": "Aktywni",
+      "activeDescription": "Autoryzowani dzisiaj",
+      "admins": "Administratorzy",
+      "inactiveSuspended": "Nieaktywni i zawieszeni"
+    },
+    "form": {
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "role": "Rola",
+      "status": "Status",
+      "language": "Język",
+      "theme": "Motyw",
+      "password": "Hasło tymczasowe"
+    },
+    "dialog": {
+      "createTitle": "Zaproś użytkownika",
+      "editTitle": "Aktualizuj użytkownika",
+      "detailTitle": "Szczegóły użytkownika",
+      "passwordTitle": "Resetuj hasło"
+    },
+    "detail": {
+      "role": "Rola",
+      "phone": "Telefon",
+      "language": "Język",
+      "theme": "Motyw",
+      "lastLogin": "Ostatnie logowanie",
+      "created": "Utworzono",
+      "updated": "Zaktualizowano"
+    },
+    "password": {
+      "hint": "Wygeneruj bezpieczne hasło i przekaż je użytkownikowi zaufanym kanałem. Przy pierwszym logowaniu będzie musiał je zmienić.",
+      "newPassword": "Nowe hasło"
+    },
+    "messages": {
+      "empty": "Brak użytkowników dla wybranych filtrów.",
+      "neverLoggedIn": "Nigdy"
+    },
+    "confirmStatusTitle": "Potwierdź zmianę statusu",
+    "confirmStatusMessage": "Czy na pewno chcesz oznaczyć {name} jako {status}?",
+    "notifications": {
+      "loadError": "Nie udało się wczytać użytkowników",
+      "saveError": "Nie udało się zapisać użytkownika",
+      "inviteSuccess": "Użytkownik zaproszony",
+      "inviteDetail": "Nowe konto zostało utworzone.",
+      "updateSuccess": "Użytkownik zaktualizowany",
+      "updateDetail": "Zmiany zostały zapisane.",
+      "passwordReset": "Hasło zresetowane",
+      "passwordResetDetail": "Użytkownik musi ponownie się zalogować.",
+      "updateStatusSuccess": "Status zaktualizowany",
+      "updateStatusDetail": "Stan konta został zmieniony.",
+      "passwordError": "Nie udało się zresetować hasła",
+      "updateStatusError": "Nie udało się zaktualizować statusu"
+    },
+    "roles": {
+      "super_admin": "Super administrator",
+      "admin": "Administrator",
+      "employee": "Pracownik",
+      "volunteer": "Wolontariusz",
+      "user": "Użytkownik"
+    },
+    "statuses": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny",
+      "suspended": "Zawieszony"
+    },
+    "languages": {
+      "pl": "Polski",
+      "en": "Angielski"
+    },
+    "themes": {
+      "light": "Jasny",
+      "dark": "Ciemny"
+    }
   },
   "animal": {
     "title": "Zwierzęta",
@@ -500,6 +721,9 @@
     "donors": "Darczyńcy",
     "donations": "Darowizny",
     "campaigns": "Kampanie",
+    "donorModuleDescription": "Zarządzaj darczyńcami i relacjami z nimi",
+    "donationModuleDescription": "Śledź darowizny i potwierdzenia",
+    "campaignModuleDescription": "Zarządzaj kampaniami fundraisingowymi",
     "donor": "Darczyńca",
     "donation": "Darowizna",
     "campaign": "Kampania",
@@ -542,6 +766,8 @@
     "completed": "Zakończona",
     "failed": "Nie powiodła się",
     "refunded": "Zwrócona",
+    "draft": "Szkic",
+    "paused": "Wstrzymana",
     "receiptSent": "Wysłano potwierdzenie",
     "receiptNumber": "Numer potwierdzenia",
     "taxDeductible": "Możliwość odliczenia od podatku",
@@ -557,6 +783,12 @@
     "fundraising": "Zbiórka pieniędzy",
     "awareness": "Świadomościowa",
     "event": "Wydarzenie",
+    "general": "Ogólna",
+    "capital": "Kapitałowa",
+    "emergency": "Awaryjna",
+    "annual": "Roczna",
+    "membership": "Członkowska",
+    "end_of_year": "Koniec roku",
     "startDate": "Data rozpoczęcia",
     "endDate": "Data zakończenia",
     "goalAmount": "Kwota docelowa",
@@ -566,6 +798,9 @@
     "targetAudience": "Grupa docelowa",
     "coordinator": "Koordynator",
     "donorCount": "Liczba darczyńców",
+    "loadDonorsError": "Nie udało się wczytać darczyńców.",
+    "loadDonationsError": "Nie udało się wczytać darowizn.",
+    "loadCampaignsError": "Nie udało się wczytać kampanii.",
     "noDonorsFound": "Nie znaleziono darczyńców",
     "noDonationsFound": "Nie znaleziono darowizn",
     "noCampaignsFound": "Nie znaleziono kampanii",
@@ -607,6 +842,9 @@
     "budget": "Budżet",
     "raisedAmount": "Zebrana kwota",
     "planned": "Zaplanowane",
+    "active": "Aktywne",
+    "completed": "Zakończone",
+    "cancelled": "Anulowane",
     "firstName": "Imię",
     "lastName": "Nazwisko",
     "emergencyContact": "Kontakt w nagłych wypadkach",
@@ -632,6 +870,7 @@
     "eventCreated": "Wydarzenie pomyślnie utworzone",
     "eventUpdated": "Wydarzenie pomyślnie zaktualizowane",
     "eventDeleted": "Wydarzenie pomyślnie usunięte",
+    "loadError": "Nie udało się wczytać wydarzeń",
     "volunteerCreated": "Wolontariusz pomyślnie utworzony",
     "volunteerUpdated": "Wolontariusz pomyślnie zaktualizowany",
     "volunteerDeleted": "Wolontariusz pomyślnie usunięty",

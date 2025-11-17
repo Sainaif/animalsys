@@ -54,6 +54,8 @@ func SetupRoutes(
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/refresh", authHandler.RefreshToken)
 		}
+
+		public.POST("/public/donations", donationHandler.CreatePublicDonation)
 	}
 
 	// Protected routes (authentication required)

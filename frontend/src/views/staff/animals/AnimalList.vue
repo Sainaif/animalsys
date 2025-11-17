@@ -450,7 +450,7 @@ onMounted(() => {
 .page-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--heading-color);
   margin: 0;
 }
 
@@ -496,7 +496,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 1.5rem;
 }
 

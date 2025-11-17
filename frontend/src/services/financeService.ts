@@ -2,11 +2,46 @@ import api from './api'
 import type { PaginatedResponse, QueryParams } from '@/types/common'
 import type { Donor, Donation, Campaign, FinanceStatistics } from '@/types/finance'
 
+const mapPaginatedResponse = <T>(payload: any, key: string, params?: QueryParams): PaginatedResponse<T> => {
+  const keyedCollection = Array.isArray(payload?.[key]) ? payload[key] : undefined
+  const dataCollection = Array.isArray(payload?.data) ? payload.data : undefined
+  const rawCollection = Array.isArray(payload) ? payload : undefined
+  const collection: T[] = (keyedCollection ?? dataCollection ?? rawCollection ?? []) as T[]
+
+  const total = typeof payload?.total === 'number' ? payload.total : collection.length
+  const limit = typeof payload?.limit === 'number'
+    ? payload.limit
+    : params?.limit ?? collection.length
+  const offset = typeof payload?.offset === 'number'
+    ? payload.offset
+    : params?.offset ?? 0
+
+  return {
+    data: collection,
+    total,
+    limit,
+    offset
+  }
+}
+
+const extractCollection = <T>(payload: any, key: string): T[] => {
+  if (Array.isArray(payload?.[key])) {
+    return payload[key]
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data
+  }
+  if (Array.isArray(payload)) {
+    return payload
+  }
+  return []
+}
+
 export const financeService = {
   // Donors
   async getDonors(params?: QueryParams): Promise<PaginatedResponse<Donor>> {
     const response = await api.get('/donors', { params })
-    return response.data
+    return mapPaginatedResponse<Donor>(response.data, 'donors', params)
   },
 
   async getDonor(id: string): Promise<Donor> {
@@ -30,13 +65,13 @@ export const financeService = {
 
   async getDonorDonations(donorId: string): Promise<Donation[]> {
     const response = await api.get(`/donors/${donorId}/donations`)
-    return response.data
+    return extractCollection<Donation>(response.data, 'donations')
   },
 
   // Donations
   async getDonations(params?: QueryParams): Promise<PaginatedResponse<Donation>> {
     const response = await api.get('/donations', { params })
-    return response.data
+    return mapPaginatedResponse<Donation>(response.data, 'donations', params)
   },
 
   async getDonation(id: string): Promise<Donation> {
@@ -65,7 +100,7 @@ export const financeService = {
   // Campaigns
   async getCampaigns(params?: QueryParams): Promise<PaginatedResponse<Campaign>> {
     const response = await api.get('/campaigns', { params })
-    return response.data
+    return mapPaginatedResponse<Campaign>(response.data, 'campaigns', params)
   },
 
   async getCampaign(id: string): Promise<Campaign> {
@@ -89,7 +124,7 @@ export const financeService = {
 
   async getCampaignDonations(campaignId: string): Promise<Donation[]> {
     const response = await api.get(`/campaigns/${campaignId}/donations`)
-    return response.data
+    return extractCollection<Donation>(response.data, 'donations')
   },
 
   // Statistics

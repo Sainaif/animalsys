@@ -114,13 +114,13 @@ const loadEvents = async () => {
     const response = await eventService.getEvents()
     events.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load events', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: t('event.loadError'), life: 3000 })
   } finally {
     loading.value = false
   }
 }
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
+const formatDate = (date) => date ? new Date(date).toLocaleDateString() : t('common.notAvailable')
 const getStatusVariant = (status) => ({ planned: 'neutral', active: 'success', completed: 'info', cancelled: 'danger' }[status] || 'neutral')
 const getEventName = (event) => {
   return getLocalizedValue(event?.name, locale.value) || t('common.notAvailable')
@@ -157,16 +157,16 @@ const getRegistrationCount = (event) => {
 
 const confirmDelete = (event) => {
   confirm.require({
-    message: 'Are you sure you want to delete this event?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await eventService.deleteEvent(event.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('event.eventDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('event.eventDeleted'), life: 3000 })
         loadEvents()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete event', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -178,5 +178,5 @@ onMounted(loadEvents)
 <style scoped>
 .event-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 </style>

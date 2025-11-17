@@ -7,6 +7,7 @@ import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import { useToast } from 'primevue/usetoast'
 import { useI18n } from 'vue-i18n'
+import organization from '@/config/organization'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -41,7 +42,7 @@ const handleLogin = async () => {
     <div class="login-card card">
       <div class="login-header">
         <h1 class="login-title">
-          {{ $t('auth.loginTitle') }}
+          {{ $t('auth.loginTitle', { brand: organization.shortName }) }}
         </h1>
         <p class="login-subtitle">
           {{ $t('auth.loginSubtitle') }}

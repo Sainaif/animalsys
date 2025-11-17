@@ -3,21 +3,21 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">
-          Relationships
+          {{ $t('contacts.title') }}
         </h1>
         <p class="page-subtitle">
-          Keep donors, adopters, volunteers, and partners in one connected place.
+          {{ $t('contacts.subtitle') }}
         </p>
       </div>
       <div class="header-actions">
         <Button
-          label="Export"
+          :label="$t('contacts.actions.export')"
           icon="pi pi-download"
           class="p-button-text"
           @click="exportContacts"
         />
         <Button
-          label="Add contact"
+          :label="$t('contacts.actions.add')"
           icon="pi pi-plus"
           @click="openCreateDialog"
         />
@@ -44,41 +44,41 @@
       v-model="filters"
       :show-date-range="false"
       :show-export="false"
-      search-placeholder="Search name, organisation or email"
+      :search-placeholder="$t('contacts.searchPlaceholder')"
       @filter="applyFilters"
     >
       <div class="filter-field">
-        <label>Type</label>
+        <label>{{ $t('contacts.filters.type') }}</label>
         <Dropdown
           v-model="filters.type"
           :options="typeOptions"
           option-label="label"
           option-value="value"
-          placeholder="All"
+          :placeholder="$t('contacts.filters.allTypes')"
           show-clear
           @change="applyFilters"
         />
       </div>
       <div class="filter-field">
-        <label>Status</label>
+        <label>{{ $t('contacts.filters.status') }}</label>
         <Dropdown
           v-model="filters.status"
           :options="statusOptions"
           option-label="label"
           option-value="value"
-          placeholder="All"
+          :placeholder="$t('contacts.filters.allStatuses')"
           show-clear
           @change="applyFilters"
         />
       </div>
       <div class="filter-field">
-        <label>Owner</label>
+        <label>{{ $t('contacts.filters.owner') }}</label>
         <Dropdown
           v-model="filters.owner_id"
           :options="ownerOptions"
           option-label="label"
           option-value="value"
-          placeholder="All"
+          :placeholder="$t('contacts.filters.allOwners')"
           show-clear
           @change="applyFilters"
         />
@@ -101,7 +101,7 @@
         >
           <Column
             field="name"
-            header="Name"
+            :header="$t('contacts.table.name')"
           >
             <template #body="slotProps">
               <div class="contact-name">
@@ -125,15 +125,15 @@
           </Column>
           <Column
             field="organization"
-            header="Organisation"
+            :header="$t('contacts.table.organisation')"
           >
             <template #body="slotProps">
-              {{ slotProps.data.organization || '—' }}
+              {{ slotProps.data.organization || $t('common.notAvailable') }}
             </template>
           </Column>
           <Column
             field="tags"
-            header="Tags"
+            :header="$t('contacts.table.tags')"
           >
             <template #body="slotProps">
               <Tag
@@ -143,20 +143,20 @@
                 class="mr-2"
                 severity="info"
               />
-              <span v-if="!slotProps.data.tags?.length">—</span>
+              <span v-if="!slotProps.data.tags?.length">{{ $t('common.notAvailable') }}</span>
             </template>
           </Column>
           <Column
             field="owner"
-            header="Owner"
+            :header="$t('contacts.table.owner')"
           >
             <template #body="slotProps">
-              {{ slotProps.data.owner_name || 'Unassigned' }}
+              {{ slotProps.data.owner_name || $t('common.unassigned') }}
             </template>
           </Column>
           <Column
             field="status"
-            header="Status"
+            :header="$t('contacts.form.status')"
           >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
@@ -166,7 +166,7 @@
           </Column>
           <Column
             field="last_contacted_at"
-            header="Last contact"
+            :header="$t('contacts.table.lastContact')"
           >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.last_contacted_at) }}
@@ -174,7 +174,7 @@
           </Column>
           <Column
             field="next_follow_up_at"
-            header="Next follow-up"
+            :header="$t('contacts.table.nextFollowUp')"
           >
             <template #body="slotProps">
               <span :class="{ overdue: isOverdue(slotProps.data.next_follow_up_at) }">
@@ -183,7 +183,7 @@
             </template>
           </Column>
           <Column
-            header="Actions"
+            :header="$t('common.actions')"
             :style="{ width: '140px' }"
           >
             <template #body="slotProps">
@@ -192,19 +192,19 @@
                 @click.stop
               >
                 <Button
-                  v-tooltip.top="'Edit'"
+                  v-tooltip.top="$t('common.edit')"
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-text"
                   @click="openEditDialog(slotProps.data)"
                 />
                 <Button
-                  v-tooltip.top="'Copy email'"
+                  v-tooltip.top="$t('contacts.actions.copyEmail')"
                   icon="pi pi-copy"
                   class="p-button-rounded p-button-text"
                   @click="copyEmail(slotProps.data.email)"
                 />
                 <Button
-                  v-tooltip.top="'Delete'"
+                  v-tooltip.top="$t('common.delete')"
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-text p-button-danger"
                   @click="confirmDelete(slotProps.data)"
@@ -219,14 +219,14 @@
     <LoadingSpinner v-if="loading && contacts.length === 0" />
     <EmptyState
       v-if="!loading && contacts.length === 0"
-      message="No contacts match your filters."
+      :message="$t('contacts.messages.empty')"
     />
 
     <!-- Create/Edit dialog -->
     <Dialog
       v-model:visible="contactDialog.visible"
       modal
-      :header="contactDialog.mode === 'create' ? 'Add contact' : 'Update contact'"
+      :header="contactDialog.mode === 'create' ? $t('contacts.dialog.createTitle') : $t('contacts.dialog.editTitle')"
       :style="{ width: '640px' }"
     >
       <form
@@ -234,7 +234,7 @@
         @submit.prevent="saveContact"
       >
         <div class="form-group">
-          <label for="firstName">First name</label>
+          <label for="firstName">{{ $t('contacts.form.firstName') }}</label>
           <InputText
             id="firstName"
             v-model="contactDialog.form.first_name"
@@ -242,7 +242,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="lastName">Last name</label>
+          <label for="lastName">{{ $t('contacts.form.lastName') }}</label>
           <InputText
             id="lastName"
             v-model="contactDialog.form.last_name"
@@ -250,7 +250,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ $t('contacts.form.email') }}</label>
           <InputText
             id="email"
             v-model="contactDialog.form.email"
@@ -258,21 +258,21 @@
           />
         </div>
         <div class="form-group">
-          <label for="phone">Phone</label>
+          <label for="phone">{{ $t('contacts.form.phone') }}</label>
           <InputText
             id="phone"
             v-model="contactDialog.form.phone"
           />
         </div>
         <div class="form-group">
-          <label for="organization">Organisation</label>
+          <label for="organization">{{ $t('contacts.form.organisation') }}</label>
           <InputText
             id="organization"
             v-model="contactDialog.form.organization"
           />
         </div>
         <div class="form-group">
-          <label for="type">Type</label>
+          <label for="type">{{ $t('contacts.form.type') }}</label>
           <Dropdown
             id="type"
             v-model="contactDialog.form.type"
@@ -283,7 +283,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="status">Status</label>
+          <label for="status">{{ $t('contacts.form.status') }}</label>
           <Dropdown
             id="status"
             v-model="contactDialog.form.status"
@@ -294,19 +294,19 @@
           />
         </div>
         <div class="form-group">
-          <label for="owner">Owner</label>
+          <label for="owner">{{ $t('contacts.form.owner') }}</label>
           <Dropdown
             id="owner"
             v-model="contactDialog.form.owner_id"
             :options="ownerOptions"
             option-label="label"
             option-value="value"
-            placeholder="Unassigned"
+            :placeholder="$t('common.unassigned')"
             show-clear
           />
         </div>
         <div class="form-group full-width">
-          <label for="tags">Tags</label>
+          <label for="tags">{{ $t('contacts.form.tags') }}</label>
           <Chips
             id="tags"
             v-model="contactDialog.form.tags"
@@ -314,7 +314,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="nextFollowUp">Next follow-up</label>
+          <label for="nextFollowUp">{{ $t('contacts.form.nextFollowUp') }}</label>
           <Calendar
             id="nextFollowUp"
             v-model="contactDialog.form.next_follow_up_at"
@@ -323,7 +323,7 @@
           />
         </div>
         <div class="form-group full-width">
-          <label for="notes">Notes</label>
+          <label for="notes">{{ $t('contacts.form.notes') }}</label>
           <Textarea
             id="notes"
             v-model="contactDialog.form.notes"
@@ -332,13 +332,13 @@
         </div>
         <div class="dialog-actions">
           <Button
-            label="Cancel"
+            :label="$t('common.cancel')"
             text
             type="button"
             @click="contactDialog.visible = false"
           />
           <Button
-            label="Save contact"
+            :label="$t('contacts.actions.save')"
             icon="pi pi-check"
             type="submit"
             :loading="contactDialog.saving"
@@ -351,7 +351,7 @@
     <Dialog
       v-model:visible="detailDialog.visible"
       modal
-      :header="detailDialog.contact ? `${detailDialog.contact.first_name} ${detailDialog.contact.last_name}` : 'Contact details'"
+      :header="detailDialog.contact ? getContactName(detailDialog.contact) : $t('contacts.detail.title')"
       :style="{ width: '720px' }"
     >
       <div
@@ -359,30 +359,30 @@
         class="detail-layout"
       >
         <section>
-          <h3>Contact information</h3>
+          <h3>{{ $t('contacts.detail.info') }}</h3>
           <ul class="detail-list">
             <li>
-              <span>Email</span>
-              <strong>{{ detailDialog.contact.email || '—' }}</strong>
+              <span>{{ $t('contacts.detail.email') }}</span>
+              <strong>{{ detailDialog.contact.email || $t('common.notAvailable') }}</strong>
             </li>
             <li>
-              <span>Phone</span>
-              <strong>{{ detailDialog.contact.phone || '—' }}</strong>
+              <span>{{ $t('contacts.detail.phone') }}</span>
+              <strong>{{ detailDialog.contact.phone || $t('common.notAvailable') }}</strong>
             </li>
             <li>
-              <span>Organisation</span>
-              <strong>{{ detailDialog.contact.organization || '—' }}</strong>
+              <span>{{ $t('contacts.detail.organisation') }}</span>
+              <strong>{{ detailDialog.contact.organization || $t('common.notAvailable') }}</strong>
             </li>
             <li>
-              <span>Owner</span>
-              <strong>{{ detailDialog.contact.owner_name || 'Unassigned' }}</strong>
+              <span>{{ $t('contacts.detail.owner') }}</span>
+              <strong>{{ detailDialog.contact.owner_name || $t('common.unassigned') }}</strong>
             </li>
             <li>
-              <span>Status</span>
+              <span>{{ $t('contacts.detail.status') }}</span>
               <strong>{{ formatStatus(detailDialog.contact.status) }}</strong>
             </li>
             <li>
-              <span>Next follow-up</span>
+              <span>{{ $t('contacts.detail.nextFollowUp') }}</span>
               <strong>{{ formatDate(detailDialog.contact.next_follow_up_at) }}</strong>
             </li>
           </ul>
@@ -393,11 +393,11 @@
               :value="tag"
               severity="info"
             />
-            <span v-if="!detailDialog.contact.tags?.length">No tags yet</span>
+            <span v-if="!detailDialog.contact.tags?.length">{{ $t('contacts.detail.tagsEmpty') }}</span>
           </div>
         </section>
         <section>
-          <h3>Recent touchpoints</h3>
+          <h3>{{ $t('contacts.detail.recent') }}</h3>
           <div
             v-if="detailDialog.contact.activities?.length"
             class="timeline"
@@ -416,15 +416,15 @@
                   {{ activity.subject }}
                 </p>
                 <p class="timeline-body">
-                  {{ activity.description || 'No notes captured.' }}
+                  {{ activity.description || $t('contacts.detail.noNotes') }}
                 </p>
-                <small>By {{ activity.created_by?.name || 'Team member' }}</small>
+                <small>{{ $t('contacts.detail.author', { name: activity.created_by?.name || $t('contacts.detail.authorFallback') }) }}</small>
               </div>
             </div>
           </div>
           <EmptyState
             v-else
-            message="No interactions logged yet."
+            :message="$t('contacts.detail.noActivities')"
           />
         </section>
       </div>
@@ -436,6 +436,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import Card from 'primevue/card'
@@ -458,6 +459,7 @@ import { contactService } from '@/services/contactService'
 
 const toast = useToast()
 const confirm = useConfirm()
+const { t } = useI18n()
 
 const contacts = ref([])
 const loading = ref(false)
@@ -486,21 +488,21 @@ const detailDialog = reactive({
   contact: null
 })
 
-const typeOptions = [
-  { label: 'Adopter', value: 'adopter' },
-  { label: 'Donor', value: 'donor' },
-  { label: 'Volunteer', value: 'volunteer' },
-  { label: 'Partner', value: 'partner' },
-  { label: 'Vendor', value: 'vendor' },
-  { label: 'Other', value: 'other' }
-]
+const typeOptions = computed(() => [
+  { label: t('contacts.types.adopter'), value: 'adopter' },
+  { label: t('contacts.types.donor'), value: 'donor' },
+  { label: t('contacts.types.volunteer'), value: 'volunteer' },
+  { label: t('contacts.types.partner'), value: 'partner' },
+  { label: t('contacts.types.vendor'), value: 'vendor' },
+  { label: t('contacts.types.other'), value: 'other' }
+])
 
-const statusOptions = [
-  { label: 'Active', value: 'active' },
-  { label: 'Prospect', value: 'prospect' },
-  { label: 'Inactive', value: 'inactive' },
-  { label: 'Archived', value: 'archived' }
-]
+const statusOptions = computed(() => [
+  { label: t('contacts.statuses.active'), value: 'active' },
+  { label: t('contacts.statuses.prospect'), value: 'prospect' },
+  { label: t('contacts.statuses.inactive'), value: 'inactive' },
+  { label: t('contacts.statuses.archived'), value: 'archived' }
+])
 
 const ownerOptions = computed(() => {
   const map = new Map()
@@ -521,21 +523,21 @@ const contactStats = computed(() => {
   }).length
 
   return [
-    { label: 'Total contacts', value: pagination.total },
+    { label: t('contacts.stats.total'), value: pagination.total },
     {
-      label: 'Active relationships',
+      label: t('contacts.stats.active'),
       value: contacts.value.filter((contact) => contact.status === 'active').length,
-      description: 'Ready to collaborate'
+      description: t('contacts.stats.activeDescription')
     },
     {
-      label: 'Prospects',
+      label: t('contacts.stats.prospects'),
       value: contacts.value.filter((contact) => contact.status === 'prospect').length,
-      description: 'Need nurturing'
+      description: t('contacts.stats.prospectsDescription')
     },
     {
-      label: 'Upcoming follow-ups',
+      label: t('contacts.stats.upcoming'),
       value: upcoming,
-      description: 'Due this week'
+      description: t('contacts.stats.upcomingDescription')
     }
   ]
 })
@@ -573,7 +575,7 @@ const loadContacts = async () => {
   } catch (error) {
     contacts.value = []
     pagination.total = 0
-    showError('Unable to load contacts', error)
+    showError(t('contacts.notifications.loadError'), error)
   } finally {
     loading.value = false
   }
@@ -636,15 +638,15 @@ const saveContact = async () => {
     contactDialog.saving = true
     if (contactDialog.mode === 'create') {
       await contactService.createContact(payload)
-      toast.add({ severity: 'success', summary: 'Contact added', detail: 'The contact is now available.', life: 3000 })
+      toast.add({ severity: 'success', summary: t('contacts.notifications.createSuccess'), detail: t('contacts.notifications.createDetail'), life: 3000 })
     } else {
       await contactService.updateContact(contactDialog.form.id, payload)
-      toast.add({ severity: 'success', summary: 'Contact updated', detail: 'Changes have been saved.', life: 3000 })
+      toast.add({ severity: 'success', summary: t('contacts.notifications.updateSuccess'), detail: t('contacts.notifications.updateDetail'), life: 3000 })
     }
     contactDialog.visible = false
     await loadContacts()
   } catch (error) {
-    showError('Unable to save contact', error)
+    showError(t('contacts.notifications.saveError'), error)
   } finally {
     contactDialog.saving = false
   }
@@ -656,19 +658,20 @@ const openDetails = (event) => {
 }
 
 const confirmDelete = (contact) => {
+  const name = getContactName(contact)
   confirm.require({
-    message: `Delete ${contact.first_name} ${contact.last_name}?`,
-    header: 'Delete contact',
-    acceptLabel: 'Delete',
-    rejectLabel: 'Cancel',
+    message: t('contacts.confirmDeleteMessage', { name }),
+    header: t('contacts.confirmDeleteTitle'),
+    acceptLabel: t('common.delete'),
+    rejectLabel: t('common.cancel'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await contactService.deleteContact(contact.id)
-        toast.add({ severity: 'success', summary: 'Contact removed', detail: 'The record was deleted.', life: 3000 })
+        toast.add({ severity: 'success', summary: t('contacts.notifications.deleteSuccess'), detail: t('contacts.notifications.deleteDetail'), life: 3000 })
         loadContacts()
       } catch (error) {
-        showError('Unable to delete contact', error)
+        showError(t('contacts.notifications.deleteError'), error)
       }
     }
   })
@@ -676,10 +679,18 @@ const confirmDelete = (contact) => {
 
 const exportContacts = () => {
   if (!contacts.value.length) {
-    toast.add({ severity: 'info', summary: 'Nothing to export', detail: 'Adjust filters to see contacts first.', life: 3000 })
+    toast.add({ severity: 'info', summary: t('contacts.notifications.nothingToExport'), detail: t('contacts.notifications.nothingToExportDetail'), life: 3000 })
     return
   }
-  const headers = ['First name', 'Last name', 'Email', 'Phone', 'Type', 'Status', 'Owner']
+  const headers = [
+    t('contacts.form.firstName'),
+    t('contacts.form.lastName'),
+    t('contacts.form.email'),
+    t('contacts.form.phone'),
+    t('contacts.form.type'),
+    t('contacts.form.status'),
+    t('contacts.form.owner')
+  ]
   const rows = contacts.value.map((contact) => [
     contact.first_name,
     contact.last_name,
@@ -697,16 +708,16 @@ const exportContacts = () => {
   link.download = `contacts-${new Date().toISOString().slice(0, 10)}.csv`
   link.click()
   window.URL.revokeObjectURL(url)
-  toast.add({ severity: 'success', summary: 'Export ready', detail: 'CSV downloaded.', life: 3000 })
+  toast.add({ severity: 'success', summary: t('contacts.notifications.exportReady'), detail: t('contacts.notifications.exportReadyDetail'), life: 3000 })
 }
 
 const copyEmail = async (email) => {
   if (!email) return
   try {
     await navigator.clipboard.writeText(email)
-    toast.add({ severity: 'info', summary: 'Email copied', detail: email, life: 2000 })
+    toast.add({ severity: 'info', summary: t('contacts.notifications.emailCopied'), detail: email, life: 2000 })
   } catch (error) {
-    showError('Unable to copy email', error)
+    showError(t('contacts.notifications.copyError'), error)
   }
 }
 
@@ -716,18 +727,24 @@ const getInitials = (contact) => {
   return `${first}${last}`.toUpperCase() || 'C'
 }
 
+const getContactName = (contact) => {
+  if (!contact) return t('contacts.detail.title')
+  const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ').trim()
+  return name || t('contacts.detail.title')
+}
+
 const formatDate = (value) => {
-  if (!value) return '—'
+  if (!value) return t('common.notAvailable')
   return new Date(value).toLocaleDateString()
 }
 
 const formatType = (type) => {
-  const option = typeOptions.find((item) => item.value === type)
+  const option = typeOptions.value.find((item) => item.value === type)
   return option ? option.label : type
 }
 
 const formatStatus = (status) => {
-  const option = statusOptions.find((item) => item.value === status)
+  const option = statusOptions.value.find((item) => item.value === status)
   return option ? option.label : status
 }
 
@@ -780,7 +797,7 @@ const activityIcon = (type) => {
 }
 
 const showError = (summary, error) => {
-  const detail = error?.response?.data?.error || error?.message || 'Unexpected error'
+  const detail = error?.response?.data?.error || error?.message || t('common.genericError')
   toast.add({ severity: 'error', summary, detail, life: 4000 })
 }
 
@@ -811,7 +828,7 @@ onMounted(() => {
 
 .page-subtitle {
   margin: 0.35rem 0 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .header-actions {
@@ -827,25 +844,28 @@ onMounted(() => {
 
 .stat-card {
   padding: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  background: #f9fafb;
+  background: var(--card-bg);
 }
 
 .stat-label {
   display: block;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .stat-value {
   display: block;
   font-size: 1.65rem;
-  color: #111827;
+  color: var(--heading-color);
 }
 
 .table-card {
   overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
 }
 
 .contact-name {
@@ -864,18 +884,18 @@ onMounted(() => {
 
 .contact-email {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .avatar {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: var(--card-muted-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #374151;
+  color: var(--text-color);
   font-weight: 600;
 }
 
@@ -902,7 +922,7 @@ onMounted(() => {
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .full-width {
@@ -934,11 +954,11 @@ onMounted(() => {
 .detail-list li {
   display: flex;
   justify-content: space-between;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .detail-list span {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .tag-list {
@@ -962,13 +982,14 @@ onMounted(() => {
 
 .timeline-time {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .timeline-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
+  background: var(--card-bg);
 }
 
 .timeline-title {
@@ -981,7 +1002,7 @@ onMounted(() => {
 
 .timeline-body {
   margin: 0.35rem 0;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .overdue {

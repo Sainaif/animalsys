@@ -233,7 +233,7 @@ func main() {
 		auditLogRepo,
 		storageService,
 	)
-	_ = veterinaryUC.NewVeterinaryUseCase(
+	veterinaryUseCase := veterinaryUC.NewVeterinaryUseCase(
 		veterinaryVisitRepo,
 		vaccinationRepo,
 		animalRepo,
@@ -347,7 +347,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(authUseCase)
 	userHandler := handlers.NewUserHandler(userUseCase)
 	animalHandler := handlers.NewAnimalHandler(animalUseCase)
-	veterinaryHandler := handlers.NewVeterinaryHandler()
+	veterinaryHandler := handlers.NewVeterinaryHandler(veterinaryUseCase)
 	adoptionHandler := handlers.NewAdoptionHandler(adoptionUseCase)
 	donorHandler := handlers.NewDonorHandler(donorUseCase)
 	donationHandler := handlers.NewDonationHandler(donationUseCase)

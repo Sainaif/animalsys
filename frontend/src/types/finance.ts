@@ -62,17 +62,23 @@ export interface Donation {
   updated_at?: string
 }
 
+type LocalizedText = string | Record<string, string>
+
 export interface Campaign {
   id: string
-  name: string
-  description?: string
-  campaign_type: 'fundraising' | 'awareness' | 'adoption' | 'event' | 'other'
+  name: LocalizedText
+  description?: LocalizedText
+  campaign_type?: 'fundraising' | 'awareness' | 'adoption' | 'event' | 'other' | 'general' | 'capital' | 'emergency' | 'annual' | 'membership' | 'end_of_year'
+  type?: 'fundraising' | 'awareness' | 'adoption' | 'event' | 'other' | 'general' | 'capital' | 'emergency' | 'annual' | 'membership' | 'end_of_year'
   start_date: string
   end_date?: string
   goal_amount?: number
+  goal?: number
+  current_amount?: number
+  currentAmount?: number
   raised_amount?: number
-  currency: string
-  status: 'planning' | 'active' | 'completed' | 'cancelled'
+  currency?: string
+  status: 'planning' | 'active' | 'completed' | 'cancelled' | 'draft' | 'paused'
   target_audience?: string
   coordinator_name?: string
   coordinator_email?: string
@@ -80,6 +86,9 @@ export interface Campaign {
   donor_count?: number
   success_metrics?: string
   notes?: string
+  public?: boolean
+  featured?: boolean
+  manager?: string
   created_at?: string
   updated_at?: string
 }

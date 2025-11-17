@@ -88,3 +88,6 @@ seed: ## Seed database with initial admin user
 	@echo "Seeding database..."
 	docker-compose exec backend go run ./cmd/seed
 	@echo "Database seeded!"
+
+reseed: ## Drop the Mongo database and run the seed script
+	./scripts/reseed.sh

@@ -7,7 +7,7 @@
           class="navbar-brand"
         >
           <i class="pi pi-heart" />
-          <span>Animal Foundation</span>
+          <span>{{ organization.shortName }}</span>
         </router-link>
 
         <div
@@ -114,8 +114,8 @@
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-section">
-          <h3><i class="pi pi-heart" /> Animal Foundation</h3>
-          <p>{{ $t('home.hero.subtitle') }}</p>
+          <h3><i class="pi pi-heart" /> {{ organization.shortName }}</h3>
+          <p>{{ organization.tagline }}</p>
         </div>
         <div class="footer-section">
           <h4>{{ $t('home.footer.about') }}</h4>
@@ -127,8 +127,9 @@
         </div>
         <div class="footer-section">
           <h4>{{ $t('home.footer.contact') }}</h4>
-          <a href="mailto:info@animalfoundation.org">info@animalfoundation.org</a>
-          <a href="tel:+1234567890">+1 (234) 567-890</a>
+          <a :href="`mailto:${organization.contact.email}`">{{ organization.contact.email }}</a>
+          <a :href="`tel:${organization.contact.phone}`">{{ organization.contact.phone }}</a>
+          <p>{{ organization.contact.address }}</p>
         </div>
         <div class="footer-section">
           <h4>{{ $t('home.footer.followUs') }}</h4>
@@ -149,7 +150,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 Animal Foundation. {{ $t('home.footer.rights') }}</p>
+        <p>&copy; {{ organization.currentYear }} {{ organization.legalName }}. {{ $t('home.footer.rights') }}</p>
       </div>
     </footer>
   </div>
@@ -162,6 +163,7 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import useTheme from '@/composables/useTheme'
+import organization from '@/config/organization'
 
 const { locale } = useI18n()
 const menuActive = ref(false)

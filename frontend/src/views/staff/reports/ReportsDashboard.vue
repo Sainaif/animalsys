@@ -89,11 +89,11 @@ const generateReport = (reportType) => {
 
 <style scoped>
 .reports-dashboard { max-width: 1400px; margin: 0 auto; }
-.reports-dashboard h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin-bottom: 2rem; }
+.reports-dashboard h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin-bottom: 2rem; }
 .reports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
 .report-card { height: 100%; }
 .card-header { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f3f4f6; }
 .card-header i { font-size: 2rem; color: #3b82f6; }
-.card-header h2 { font-size: 1.25rem; font-weight: 600; color: #2c3e50; margin: 0; }
-.report-card p { color: #6b7280; margin-bottom: 1rem; }
+.card-header h2 { font-size: 1.25rem; font-weight: 600; color: var(--heading-color); margin: 0; }
+.report-card p { color: var(--text-muted); margin-bottom: 1rem; }
 </style>

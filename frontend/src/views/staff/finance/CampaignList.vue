@@ -16,16 +16,14 @@
           paginator
           :rows="20"
         >
-          <Column
-            field="name"
-            :header="$t('finance.campaignName')"
-          />
-          <Column
-            field="campaign_type"
-            :header="$t('finance.campaignType')"
-          >
+          <Column :header="$t('finance.campaignName')">
             <template #body="slotProps">
-              {{ $t(`finance.${slotProps.data.campaign_type}`) }}
+              {{ getCampaignName(slotProps.data) }}
+            </template>
+          </Column>
+          <Column :header="$t('finance.campaignType')">
+            <template #body="slotProps">
+              {{ translateFinanceKey(slotProps.data.campaign_type || slotProps.data.type) }}
             </template>
           </Column>
           <Column
@@ -36,20 +34,14 @@
               {{ formatDate(slotProps.data.start_date) }}
             </template>
           </Column>
-          <Column
-            field="goal_amount"
-            :header="$t('finance.goalAmount')"
-          >
+          <Column :header="$t('finance.goalAmount')">
             <template #body="slotProps">
-              {{ formatCurrency(slotProps.data.goal_amount) }}
+              {{ formatCurrency(getGoalAmount(slotProps.data)) }}
             </template>
           </Column>
-          <Column
-            field="raised_amount"
-            :header="$t('finance.raisedAmount')"
-          >
+          <Column :header="$t('finance.raisedAmount')">
             <template #body="slotProps">
-              {{ formatCurrency(slotProps.data.raised_amount) }}
+              {{ formatCurrency(getRaisedAmount(slotProps.data)) }}
             </template>
           </Column>
           <Column
@@ -58,7 +50,7 @@
           >
             <template #body="slotProps">
               <Badge :variant="getStatusVariant(slotProps.data.status)">
-                {{ $t(`finance.${slotProps.data.status}`) }}
+                {{ translateFinanceKey(slotProps.data.status) }}
               </Badge>
             </template>
           </Column>
@@ -91,6 +83,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { financeService } from '@/services/financeService'
+import { getLocalizedValue } from '@/utils/animalHelpers'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -101,7 +94,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
 import EmptyState from '@/components/shared/EmptyState.vue'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -114,28 +107,56 @@ const loadCampaigns = async () => {
     const response = await financeService.getCampaigns()
     campaigns.value = response.data
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load campaigns', life: 3000 })
+    toast.add({ severity: 'error', summary: t('common.error'), detail: t('finance.loadCampaignsError'), life: 3000 })
   } finally {
     loading.value = false
   }
 }
 
 const formatDate = (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
-const formatCurrency = (amount) => amount ? `$${amount.toFixed(2)}` : '$0.00'
-const getStatusVariant = (status) => ({ planning: 'neutral', active: 'success', completed: 'info', cancelled: 'danger' }[status] || 'neutral')
+const formatCurrency = (amount) => (typeof amount === 'number' ? `$${amount.toFixed(2)}` : '$0.00')
+const getStatusVariant = (status) => ({ planning: 'neutral', active: 'success', completed: 'info', cancelled: 'danger', draft: 'neutral', paused: 'warning' }[status] || 'neutral')
+const translateFinanceKey = (value) => {
+  if (!value) return t('common.notAvailable')
+  const key = `finance.${value}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
+const getGoalAmount = (campaign) => {
+  if (typeof campaign?.goal_amount === 'number') {
+    return campaign.goal_amount
+  }
+  if (typeof campaign?.goal === 'number') {
+    return campaign.goal
+  }
+  return 0
+}
+const getRaisedAmount = (campaign) => {
+  if (typeof campaign?.raised_amount === 'number') {
+    return campaign.raised_amount
+  }
+  if (typeof campaign?.current_amount === 'number') {
+    return campaign.current_amount
+  }
+  if (typeof campaign?.currentAmount === 'number') {
+    return campaign.currentAmount
+  }
+  return 0
+}
+const getCampaignName = (campaign) => getLocalizedValue(campaign?.name, locale.value) || t('common.notAvailable')
 
 const confirmDelete = (campaign) => {
   confirm.require({
-    message: 'Are you sure you want to delete this campaign?',
-    header: 'Confirmation',
+    message: t('common.deleteConfirmation'),
+    header: t('common.confirm'),
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
         await financeService.deleteCampaign(campaign.id)
-        toast.add({ severity: 'success', summary: 'Success', detail: t('finance.campaignDeleted'), life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('finance.campaignDeleted'), life: 3000 })
         loadCampaigns()
       } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete campaign', life: 3000 })
+        toast.add({ severity: 'error', summary: t('common.error'), detail: t('common.deleteError'), life: 3000 })
       }
     }
   })
@@ -147,5 +168,5 @@ onMounted(loadCampaigns)
 <style scoped>
 .campaign-list { max-width: 1400px; margin: 0 auto; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 </style>

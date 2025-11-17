@@ -10,7 +10,7 @@
           class="brand"
         >
           <i class="pi pi-heart" />
-          <span v-if="!sidebarCollapsed">Animal Foundation</span>
+          <span v-if="!sidebarCollapsed">{{ organization.shortName }}</span>
         </router-link>
         <button
           class="collapse-btn"
@@ -190,6 +190,7 @@ import Divider from 'primevue/divider'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import useTheme from '@/composables/useTheme'
+import organization from '@/config/organization'
 
 const router = useRouter()
 const route = useRoute()
@@ -418,6 +419,30 @@ if (savedState !== null) {
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--sidebar-text, #fff);
+}
+
+:deep(.p-menu) {
+  background: var(--surface-overlay);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25);
+}
+
+:deep(.p-tieredmenu),
+:deep(.p-submenu-list) {
+  background: var(--surface-overlay);
+  color: var(--text-color);
+  border-color: var(--border-color);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25);
+}
+
+:deep(.p-menu .p-menuitem-link) {
+  color: var(--text-color);
+}
+
+:deep(.p-menu .p-menuitem-link:hover) {
+  background: var(--card-muted-bg);
+  color: var(--text-color);
 }
 
 .nav-item.router-link-active {

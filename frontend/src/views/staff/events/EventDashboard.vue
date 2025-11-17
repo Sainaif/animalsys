@@ -57,12 +57,12 @@ const router = useRouter()
 <style scoped>
 .event-dashboard { max-width: 1400px; margin: 0 auto; }
 .page-header { margin-bottom: 2rem; }
-.page-header h1 { font-size: 2rem; font-weight: 700; color: #2c3e50; margin: 0; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: var(--heading-color); margin: 0; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 .module-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
 .module-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
 .module-content { text-align: center; padding: 2rem 1rem; }
 .module-icon { font-size: 3rem; color: #f59e0b; margin-bottom: 1rem; }
-.module-content h2 { font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin: 0 0 0.5rem 0; }
-.module-content p { color: #6b7280; margin: 0; }
+.module-content h2 { font-size: 1.5rem; font-weight: 600; color: var(--heading-color); margin: 0 0 0.5rem 0; }
+.module-content p { color: var(--text-muted); margin: 0; }
 </style>

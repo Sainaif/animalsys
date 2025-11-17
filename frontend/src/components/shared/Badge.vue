@@ -63,6 +63,6 @@ const variantClass = computed(() => `badge-${props.variant}`)
 
 .badge-neutral {
   background-color: #f3f4f6;
-  color: #374151;
+  color: var(--text-color);
 }
 </style>

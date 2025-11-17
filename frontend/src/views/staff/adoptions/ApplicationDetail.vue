@@ -503,7 +503,7 @@ onMounted(() => {
   flex: 1;
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--heading-color);
   margin: 0;
 }
 
@@ -530,13 +530,13 @@ onMounted(() => {
 
 .status-item label {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   text-transform: uppercase;
 }
 
 .status-item p {
-  color: #2c3e50;
+  color: var(--heading-color);
   font-size: 1rem;
   margin: 0;
 }
@@ -567,13 +567,13 @@ onMounted(() => {
 
 .info-item label {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   text-transform: uppercase;
 }
 
 .info-item p {
-  color: #2c3e50;
+  color: var(--heading-color);
   font-size: 1rem;
   margin: 0;
   line-height: 1.6;
@@ -596,7 +596,7 @@ onMounted(() => {
 
 .reference-info h3 {
   margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  color: var(--heading-color);
   font-size: 1.125rem;
 }
 
@@ -613,6 +613,6 @@ onMounted(() => {
 
 .dialog-content label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 </style>

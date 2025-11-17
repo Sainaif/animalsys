@@ -93,7 +93,7 @@ const router = useRouter()
 .page-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--heading-color);
   margin: 0;
 }
 
@@ -127,12 +127,12 @@ const router = useRouter()
 .module-content h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--heading-color);
   margin: 0 0 0.5rem 0;
 }
 
 .module-content p {
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 </style>

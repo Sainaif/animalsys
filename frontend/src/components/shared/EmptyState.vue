@@ -55,7 +55,7 @@ const handleAction = () => {
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .empty-state i {
@@ -67,7 +67,7 @@ const handleAction = () => {
 .empty-state h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
   margin-bottom: 0.5rem;
 }
 

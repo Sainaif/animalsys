@@ -2,73 +2,336 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/sainaif/animalsys/backend/internal/infrastructure/middleware"
+	"github.com/sainaif/animalsys/backend/internal/usecase/veterinary"
+	"github.com/sainaif/animalsys/backend/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type VeterinaryHandler struct{}
-
-func NewVeterinaryHandler() *VeterinaryHandler {
-	return &VeterinaryHandler{}
+// VeterinaryHandler wires veterinary HTTP endpoints to the use case layer.
+type VeterinaryHandler struct {
+	useCase  *veterinary.VeterinaryUseCase
+	validate *validator.Validate
 }
 
-// Existing methods that were in routes
+// NewVeterinaryHandler creates a fully wired veterinary handler.
+func NewVeterinaryHandler(useCase *veterinary.VeterinaryUseCase) *VeterinaryHandler {
+	return &VeterinaryHandler{
+		useCase:  useCase,
+		validate: validator.New(),
+	}
+}
+
+func (h *VeterinaryHandler) respondWithError(c *gin.Context, err error) {
+	if err == nil {
+		return
+	}
+
+	if appErr, ok := err.(*errors.AppError); ok {
+		c.JSON(appErr.Code, gin.H{"error": appErr.Message})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+	}
+}
+
+// GetVisitsByAnimal returns all veterinary visits for a specific animal.
 func (h *VeterinaryHandler) GetVisitsByAnimal(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"visits": []interface{}{}, "total": 0})
+	animalID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid animal ID"})
+		return
+	}
+
+	visits, err := h.useCase.GetVisitsByAnimalID(c.Request.Context(), animalID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"visits": visits,
+		"total":  len(visits),
+	})
 }
 
+// GetVaccinationsByAnimal returns all vaccinations for a specific animal.
 func (h *VeterinaryHandler) GetVaccinationsByAnimal(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"vaccinations": []interface{}{}, "total": 0})
+	animalID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid animal ID"})
+		return
+	}
+
+	vaccinations, err := h.useCase.GetVaccinationsByAnimalID(c.Request.Context(), animalID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"vaccinations": vaccinations,
+		"total":        len(vaccinations),
+	})
 }
 
+// ListVisits lists veterinary visits with optional filters.
 func (h *VeterinaryHandler) ListVisits(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"visits": []interface{}{}, "total": 0})
+	var req veterinary.ListVisitsRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	visits, total, err := h.useCase.ListVisits(c.Request.Context(), &req)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"visits": visits,
+		"total":  total,
+		"limit":  req.Limit,
+		"offset": req.Offset,
+	})
 }
 
+// GetUpcomingVisits lists upcoming scheduled visits within the provided number of days.
 func (h *VeterinaryHandler) GetUpcomingVisits(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"visits": []interface{}{}, "total": 0})
+	daysStr := c.DefaultQuery("days", "30")
+	days, err := strconv.Atoi(daysStr)
+	if err != nil || days < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid days parameter"})
+		return
+	}
+
+	visits, err := h.useCase.GetUpcomingVisits(c.Request.Context(), days)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"visits": visits,
+		"total":  len(visits),
+	})
 }
 
+// GetVisit returns a single veterinary visit.
 func (h *VeterinaryHandler) GetVisit(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"visit": map[string]interface{}{}})
+	visitID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid visit ID"})
+		return
+	}
+
+	visit, err := h.useCase.GetVisitByID(c.Request.Context(), visitID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"visit": visit})
 }
 
+// CreateVisit creates a new veterinary visit.
 func (h *VeterinaryHandler) CreateVisit(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{"message": "Visit created"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var req veterinary.CreateVisitRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	visit, err := h.useCase.CreateVisit(c.Request.Context(), &req, *userID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, visit)
 }
 
+// UpdateVisit updates an existing veterinary visit.
 func (h *VeterinaryHandler) UpdateVisit(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Visit updated"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	visitID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid visit ID"})
+		return
+	}
+
+	var req veterinary.UpdateVisitRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	visit, err := h.useCase.UpdateVisit(c.Request.Context(), visitID, &req, *userID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, visit)
 }
 
+// DeleteVisit deletes a veterinary visit.
 func (h *VeterinaryHandler) DeleteVisit(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Visit deleted"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	visitID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid visit ID"})
+		return
+	}
+
+	if err := h.useCase.DeleteVisit(c.Request.Context(), visitID, *userID); err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "visit deleted"})
 }
 
+// ListVaccinations lists vaccination records with optional filtering.
 func (h *VeterinaryHandler) ListVaccinations(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"vaccinations": []interface{}{}, "total": 0})
+	var req veterinary.ListVaccinationsRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	vaccinations, total, err := h.useCase.ListVaccinations(c.Request.Context(), &req)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"vaccinations": vaccinations,
+		"total":        total,
+		"limit":        req.Limit,
+		"offset":       req.Offset,
+	})
 }
 
+// GetDueVaccinations lists vaccinations that are due within provided days.
 func (h *VeterinaryHandler) GetDueVaccinations(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"vaccinations": []interface{}{}, "total": 0})
+	daysStr := c.DefaultQuery("days", "30")
+	days, err := strconv.Atoi(daysStr)
+	if err != nil || days < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid days parameter"})
+		return
+	}
+
+	vaccinations, err := h.useCase.GetDueVaccinations(c.Request.Context(), days)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"vaccinations": vaccinations,
+		"total":        len(vaccinations),
+	})
 }
 
+// GetVaccination returns a single vaccination record.
 func (h *VeterinaryHandler) GetVaccination(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"vaccination": map[string]interface{}{}})
+	vaccinationID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid vaccination ID"})
+		return
+	}
+
+	vaccination, err := h.useCase.GetVaccinationByID(c.Request.Context(), vaccinationID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"vaccination": vaccination})
 }
 
+// CreateVaccination creates a new vaccination record.
 func (h *VeterinaryHandler) CreateVaccination(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{"message": "Vaccination created"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var req veterinary.CreateVaccinationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	vaccination, err := h.useCase.CreateVaccination(c.Request.Context(), &req, *userID)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, vaccination)
 }
 
+// DeleteVaccination deletes an existing vaccination record.
 func (h *VeterinaryHandler) DeleteVaccination(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Vaccination deleted"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	vaccinationID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid vaccination ID"})
+		return
+	}
+
+	if err := h.useCase.DeleteVaccination(c.Request.Context(), vaccinationID, *userID); err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "vaccination deleted"})
 }
 
-// New methods for missing endpoints
+// Placeholder endpoints for future veterinary records features.
 func (h *VeterinaryHandler) CreateVeterinaryRecord(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Veterinary record created"})
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
 func (h *VeterinaryHandler) ListVeterinaryRecords(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"records": []interface{}{}, "total": 0})
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }

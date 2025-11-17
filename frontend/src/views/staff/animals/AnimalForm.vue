@@ -504,7 +504,7 @@ onMounted(() => {
 .form-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--heading-color);
   margin: 0;
 }
 
@@ -522,7 +522,7 @@ onMounted(() => {
 
 .form-field label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color);
 }
 
 .checkbox-label {

@@ -439,8 +439,23 @@ const donorInfo = ref({
   message: ''
 })
 
+const getDonationAmount = () => {
+  if (donationAmount.value) {
+    return donationAmount.value
+  }
+  const raw = customAmount.value
+  if (typeof raw === 'number') {
+    return raw
+  }
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    const parsed = parseFloat(raw)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+  return 0
+}
+
 const isValidDonation = computed(() => {
-  const amount = donationAmount.value || customAmount.value
+  const amount = getDonationAmount()
   return amount > 0 && donorInfo.value.firstName && donorInfo.value.email
 })
 
@@ -624,10 +639,21 @@ const viewAllAnimals = () => {
 
 const submitDonation = async () => {
   try {
-    const amount = donationAmount.value || customAmount.value
+    const amount = getDonationAmount()
+    if (amount <= 0) {
+      return
+    }
 
-    // Here you would integrate with a payment processor
-    // For now, just show a success message
+    await api.post('/public/donations', {
+      first_name: donorInfo.value.firstName.trim(),
+      last_name: donorInfo.value.lastName.trim(),
+      email: donorInfo.value.email.trim(),
+      phone: donorInfo.value.phone.trim(),
+      amount,
+      donation_type: donationType.value,
+      message: donorInfo.value.message
+    })
+
     toast.add({
       severity: 'success',
       summary: t('home.donation.thankYou'),
@@ -635,7 +661,6 @@ const submitDonation = async () => {
       life: 5000
     })
 
-    // Reset form
     donationAmount.value = 50
     customAmount.value = null
     donorInfo.value = {
@@ -890,7 +915,7 @@ watch(
   position: relative;
   height: 230px;
   overflow: hidden;
-  background: #f8fafc;
+  background: var(--card-muted-bg);
 }
 
 .animal-image img {
@@ -911,7 +936,7 @@ watch(
   align-items: center;
   justify-content: center;
   font-size: 4rem;
-  color: #cbd5f5;
+  color: var(--text-muted);
 }
 
 .animal-badge {
@@ -965,7 +990,7 @@ watch(
 
 .help-section {
   padding: 5rem 0;
-  background: linear-gradient(180deg, #fdf2f8 0%, #ffffff 35%);
+  background: linear-gradient(180deg, var(--hero-accent) 0%, var(--hero-accent-alt) 35%);
 }
 
 .help-grid {
@@ -977,8 +1002,8 @@ watch(
 .help-card {
   border-radius: 1.25rem;
   padding: 2rem;
-  border: 1px solid rgba(244, 114, 182, 0.2);
-  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
   box-shadow: 0 25px 50px rgba(244, 114, 182, 0.15);
   backdrop-filter: blur(6px);
   text-align: center;
@@ -1077,7 +1102,7 @@ watch(
 
 .contact-section {
   padding: 5rem 0;
-  background: radial-gradient(circle at top, #ffffff 0%, #f0f4ff 100%);
+  background: radial-gradient(circle at top, var(--hero-accent) 0%, var(--hero-accent-alt) 100%);
 }
 
 .contact-info {
@@ -1108,7 +1133,7 @@ watch(
 }
 
 .contact-card a {
-  color: #2563eb;
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
 }
