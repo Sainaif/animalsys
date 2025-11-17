@@ -2,6 +2,8 @@ name: Build & Publish
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -31,9 +33,12 @@ jobs:
         run: |
           if [ -n "${{ github.event.inputs.tag }}" ]; then
             echo "version=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
-          else
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             ref="${GITHUB_REF##*/}"
             echo "version=${ref}" >> "$GITHUB_OUTPUT"
+          else
+            short_sha=$(git rev-parse --short HEAD)
+            echo "version=${short_sha}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up QEMU
