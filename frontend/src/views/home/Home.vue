@@ -354,18 +354,18 @@
         <div class="contact-info">
           <div class="contact-card">
             <i class="pi pi-envelope" />
-            <h3>{{ $t('home.footer.contact') }}</h3>
-            <a :href="`mailto:${$t('contact.email')}`">{{ $t('contact.email') }}</a>
+            <h3>{{ $t('contactInfo.email') }}</h3>
+            <a :href="`mailto:${organization.contact.email}`">{{ organization.contact.email }}</a>
           </div>
           <div class="contact-card">
             <i class="pi pi-phone" />
-            <h3>{{ $t('contact.phone') }}</h3>
-            <a :href="`tel:${$t('contact.phone')}`">{{ $t('contact.phone') }}</a>
+            <h3>{{ $t('contactInfo.phone') }}</h3>
+            <a :href="`tel:${organization.contact.phone}`">{{ organization.contact.phone }}</a>
           </div>
           <div class="contact-card">
             <i class="pi pi-map-marker" />
-            <h3>{{ $t('contact.address') }}</h3>
-            <p v-html="$t('contact.address')" />
+            <h3>{{ $t('contactInfo.address') }}</h3>
+            <p>{{ organization.contact.address }}</p>
           </div>
         </div>
       </div>
@@ -386,6 +386,7 @@ import Textarea from 'primevue/textarea'
 import Divider from 'primevue/divider'
 import ProgressSpinner from 'primevue/progressspinner'
 import api from '@/services/api'
+import organization from '@/config/organization'
 import { getLocalizedValue, getAnimalImage, getAnimalGender, translateValue } from '@/utils/animalHelpers'
 
 const { t, locale } = useI18n()

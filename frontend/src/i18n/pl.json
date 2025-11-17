@@ -166,11 +166,10 @@
       "rights": "Wszelkie prawa zastrzeżone"
     }
   },
-  "contact": {
-    "email": "hello@@happypaws.org",
-    "phone": "+48 123 456 789",
-    "address": "ul. Zwierzęca 123<br>00-001 Miasto",
-    "followUs": "Śledź nas"
+  "contactInfo": {
+    "email": "E-mail",
+    "phone": "Telefon",
+    "address": "Adres"
   },
   "contacts": {
     "title": "Relacje",
