@@ -36,13 +36,36 @@ services:
     container_name: animalsys-backend-prod
     restart: always
     ports:
-      - "8080:8080"
-    env_file:
-      - .env.production
+      - "23000:8080"
     environment:
-      - ENVIRONMENT=production
-      - DB_URI=mongodb://mongodb:27017
-      - REDIS_HOST=redis
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DB_URI: ${DB_URI:-mongodb://mongodb:27017}
+      DB_NAME: ${DB_NAME:-animalsys}
+      DB_TIMEOUT: ${DB_TIMEOUT:-10s}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: ${REDIS_DB:-0}
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      JWT_ACCESS_DURATION: ${JWT_ACCESS_DURATION:-15m}
+      JWT_REFRESH_DURATION: ${JWT_REFRESH_DURATION:-168h}
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-/home/app/uploads}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      ORG_NAME: ${ORG_NAME:-Happy Paws Animal Foundation}
+      ORG_SHORT_NAME: ${ORG_SHORT_NAME:-Animal Foundation}
+      ORG_LEGAL_NAME: ${ORG_LEGAL_NAME:-Happy Paws Animal Foundation}
+      ORG_DOMAIN: ${ORG_DOMAIN:-happypaws.org}
+      ORG_DESCRIPTION: ${ORG_DESCRIPTION:-Dedicated to rescuing and rehoming animals in need}
+      ORG_EMAIL: ${ORG_EMAIL:-info@happypaws.org}
+      ORG_PHONE: ${ORG_PHONE:-+1-555-ANIMALS}
+      ORG_WEBSITE: ${ORG_WEBSITE:-https://happypaws.org}
+      ORG_ADDRESS: ${ORG_ADDRESS:-123 Rescue Lane, Animal City, AC 12345}
+      ORG_CENTER_NAME: ${ORG_CENTER_NAME:-Happy Paws Center}
+      ORG_DEFAULT_PASSWORD: ${ORG_DEFAULT_PASSWORD:-password123}
+      ORG_SUPER_ADMIN_FIRST_NAME: ${ORG_SUPER_ADMIN_FIRST_NAME:-Sarah}
+      ORG_SUPER_ADMIN_LAST_NAME: ${ORG_SUPER_ADMIN_LAST_NAME:-Johnson}
     volumes:
       - backend_uploads:/home/app/uploads
     depends_on:
@@ -64,7 +87,17 @@ services:
     container_name: animalsys-frontend-prod
     restart: always
     ports:
-      - "5173:80"
+      - "23001:80"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:23000/api/v1}
+      VITE_ORG_NAME: ${ORG_NAME:-Happy Paws Animal Foundation}
+      VITE_ORG_SHORT_NAME: ${ORG_SHORT_NAME:-Animal Foundation}
+      VITE_ORG_LEGAL_NAME: ${ORG_LEGAL_NAME:-Happy Paws Animal Foundation}
+      VITE_ORG_TAGLINE: ${ORG_TAGLINE:-Saving lives, one paw at a time}
+      VITE_ORG_WEBSITE: ${ORG_WEBSITE:-https://happypaws.org}
+      VITE_ORG_EMAIL: ${ORG_EMAIL:-info@happypaws.org}
+      VITE_ORG_PHONE: ${ORG_PHONE:-+1-555-ANIMALS}
+      VITE_ORG_ADDRESS: ${ORG_ADDRESS:-123 Rescue Lane, Animal City, AC 12345}
     networks:
       - animalsys-network
     healthcheck:
