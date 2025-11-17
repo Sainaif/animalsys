@@ -473,6 +473,7 @@ func parseAllowedOrigins(origins string) []string {
 	result := make([]string, 0, len(items))
 	for _, item := range items {
 		if trimmed := strings.TrimSpace(item); trimmed != "" {
+			trimmed = strings.Trim(trimmed, "\"'")
 			result = append(result, trimmed)
 		}
 	}
