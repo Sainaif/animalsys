@@ -1,5 +1,4 @@
 services:
-  # MongoDB
   mongodb:
     image: mongo:7.0
     container_name: animalsys-mongodb-prod
@@ -17,7 +16,6 @@ services:
       timeout: 10s
       retries: 5
 
-  # Redis
   redis:
     image: redis:7-alpine
     container_name: animalsys-redis-prod
@@ -33,13 +31,12 @@ services:
       timeout: 10s
       retries: 5
 
-  # Backend (Go)
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/sainaif/animalsys-backend:${IMAGE_TAG:-latest}
     container_name: animalsys-backend-prod
     restart: always
+    ports:
+      - "8080:8080"
     env_file:
       - .env.production
     environment:
@@ -62,38 +59,19 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend (Vue.js)
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/sainaif/animalsys-frontend:${IMAGE_TAG:-latest}
     container_name: animalsys-frontend-prod
     restart: always
+    ports:
+      - "5173:80"
     networks:
       - animalsys-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # Nginx
-  nginx:
-    image: nginx:alpine
-    container_name: animalsys-nginx-prod
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - backend_uploads:/app/uploads:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - animalsys-network
 
 volumes:
   mongodb_data:
