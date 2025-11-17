@@ -54,6 +54,9 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load configuration")
 	}
+	log.Info().
+		Str("cors_allowed_origins", cfg.CORS.AllowedOrigins).
+		Msg("CORS configuration loaded")
 
 	// Initialize logger
 	logger.Init(cfg.Log.Level, cfg.Environment)
@@ -439,6 +442,11 @@ func corsMiddleware(cfg *config.Config) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
+		log.Debug().
+			Str("origin", origin).
+			Bool("allow_all", allowAll).
+			Strs("allowed_origins", allowedOrigins).
+			Msg("processing CORS request")
 
 		if allowAll {
 			if origin != "" {
