@@ -446,8 +446,7 @@ func corsMiddleware(cfg *config.Config) gin.HandlerFunc {
 			} else {
 				c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 			}
-			// When allowing all origins, omit credentials to satisfy browsers
-			c.Writer.Header().Set("Access-Control-Allow-Credentials", "false")
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		} else if origin != "" && containsOrigin(allowedOrigins, origin) {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
