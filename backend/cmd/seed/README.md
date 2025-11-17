@@ -83,12 +83,12 @@ This seed script generates **3 years of realistic data** for an animal foundatio
 
 ```bash
 # From the project root
-docker-compose exec backend go run ./cmd/seed
+docker-compose exec backend ./seed
 
 # Or rebuild and run
 docker-compose down
 docker-compose up -d
-docker-compose exec backend go run ./cmd/seed
+docker-compose exec backend ./seed
 ```
 
 ### Reset & Seed in one step

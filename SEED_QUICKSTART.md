@@ -7,7 +7,7 @@
 make reseed
 
 # Using Docker (Recommended)
-docker-compose exec backend go run ./cmd/seed
+docker-compose exec backend ./seed
 
 # The script will:
 # 1. Clear ALL existing data

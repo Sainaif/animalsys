@@ -10,6 +10,6 @@ echo "🗑️  Dropping MongoDB database '${DB_NAME}' (service: ${MONGO_SERVICE}
 docker-compose exec "${MONGO_SERVICE}" mongosh "${DB_NAME}" --eval "db.dropDatabase()"
 
 echo "🌱 Running seed script from ${BACKEND_SERVICE}..."
-docker-compose exec "${BACKEND_SERVICE}" go run ./cmd/seed
+docker-compose exec "${BACKEND_SERVICE}" ./seed
 
 echo "✅ Database reseeded successfully."
