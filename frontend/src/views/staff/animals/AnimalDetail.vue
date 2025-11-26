@@ -379,10 +379,9 @@ const speciesLabel = computed(() => {
 })
 
 const genderLabel = computed(() => {
-  if (!animal.value?.sex) return t('animal.gender')
-  const key = `animal.${animal.value.sex}`
-  const translation = t(key)
-  return translation !== key ? translation : animal.value.sex
+  if (!animal.value) return ''
+  const sex = animal.value.sex ?? 'unknown'
+  return t(`animal.${sex}`)
 })
 
 const statusLabel = computed(() => {
