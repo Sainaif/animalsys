@@ -192,9 +192,21 @@ const router = createRouter({
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {
+      path: '/staff/events/new',
+      name: 'event-create',
+      component: () => import('@/views/staff/events/EventForm.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
       path: '/staff/events/:id',
       name: 'event-detail',
       component: () => import('@/views/staff/events/EventDetail.vue'),
+      meta: { requiresAuth: true, layout: 'staff' }
+    },
+    {
+      path: '/staff/events/:id/edit',
+      name: 'event-edit',
+      component: () => import('@/views/staff/events/EventForm.vue'),
       meta: { requiresAuth: true, layout: 'staff' }
     },
     {

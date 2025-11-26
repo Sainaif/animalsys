@@ -1,7 +1,7 @@
 export interface Event {
   id: string
   name: string | Record<string, string>
-  event_type: 'fundraiser' | 'adoption_event' | 'education' | 'volunteer' | 'community' | 'other'
+  event_type: 'fundraiser' | 'adoption_event' | 'education' | 'volunteer' | 'community' | 'shopping' | 'contribution' | 'other'
   description?: string | Record<string, string>
   start_date: string
   end_date?: string
@@ -22,7 +22,7 @@ export interface Event {
   volunteers_needed?: number
   volunteers_assigned?: number
   status: 'planned' | 'active' | 'completed' | 'cancelled'
-  budget?: number
+  budget: number
   raised_amount?: number
   current_amount?: number
   notes?: string

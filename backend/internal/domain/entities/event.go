@@ -10,13 +10,15 @@ import (
 type EventType string
 
 const (
-	EventTypeFundraising EventType = "fundraising"
-	EventTypeAdoption    EventType = "adoption"      // Adoption event/fair
-	EventTypeEducational EventType = "educational"   // Educational program
-	EventTypeVolunteer   EventType = "volunteer"     // Volunteer appreciation/training
-	EventTypeCommunity   EventType = "community"     // Community outreach
-	EventTypeSocial      EventType = "social"        // Social gathering
-	EventTypeOther       EventType = "other"
+	EventTypeFundraising  EventType = "fundraising"
+	EventTypeAdoption     EventType = "adoption"      // Adoption event/fair
+	EventTypeEducational  EventType = "educational"   // Educational program
+	EventTypeVolunteer    EventType = "volunteer"     // Volunteer appreciation/training
+	EventTypeCommunity    EventType = "community"     // Community outreach
+	EventTypeSocial       EventType = "social"        // Social gathering
+	EventTypeShopping     EventType = "shopping"
+	EventTypeContribution EventType = "contribution"
+	EventTypeOther        EventType = "other"
 )
 
 // EventStatus represents the status of an event
@@ -90,11 +92,14 @@ type Event struct {
 	// Campaign Association
 	CampaignID *primitive.ObjectID `json:"campaign_id,omitempty" bson:"campaign_id,omitempty"` // Link to fundraising campaign
 
+	// Financial
+	Budget      float64 `json:"budget,omitempty" bson:"budget,omitempty"`
+	FundsRaised float64 `json:"funds_raised,omitempty" bson:"funds_raised,omitempty"`
+
 	// Statistics
-	AttendeeCount      int     `json:"attendee_count" bson:"attendee_count"`
-	VolunteerCount     int     `json:"volunteer_count" bson:"volunteer_count"`
-	FundsRaised        float64 `json:"funds_raised,omitempty" bson:"funds_raised,omitempty"`
-	AnimalsAdopted     int     `json:"animals_adopted,omitempty" bson:"animals_adopted,omitempty"`
+	AttendeeCount  int `json:"attendee_count" bson:"attendee_count"`
+	VolunteerCount int `json:"volunteer_count" bson:"volunteer_count"`
+	AnimalsAdopted int `json:"animals_adopted,omitempty" bson:"animals_adopted,omitempty"`
 
 	// Additional Information
 	Notes string `json:"notes,omitempty" bson:"notes,omitempty"`
@@ -144,7 +149,11 @@ func (e *Event) UpdateStatistics(attendees, volunteers int, fundsRaised float64,
 	e.AttendeeCount = attendees
 	e.VolunteerCount = volunteers
 	if fundsRaised > 0 {
-		e.FundsRaised += fundsRaised
+		if e.Type == EventTypeShopping || e.Type == EventTypeContribution {
+			e.Budget += fundsRaised
+		} else {
+			e.FundsRaised += fundsRaised
+		}
 	}
 	if animalsAdopted > 0 {
 		e.AnimalsAdopted += animalsAdopted
@@ -176,6 +185,7 @@ func NewEvent(
 		},
 		AttendeeCount:  0,
 		VolunteerCount: 0,
+		Budget:         0,
 		FundsRaised:    0,
 		AnimalsAdopted: 0,
 		CreatedBy:      createdBy,

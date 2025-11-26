@@ -5,7 +5,7 @@
       <Button
         :label="$t('event.addEvent')"
         icon="pi pi-plus"
-        @click="router.push('/staff/events/new')"
+        @click="router.push({ name: 'event-create' })"
       />
     </div>
 
