@@ -204,33 +204,43 @@ func (uc *AnimalUseCase) UpdateAnimal(ctx context.Context, id primitive.ObjectID
 		animal.DateOfBirth = req.DateOfBirth
 	}
 	if req.AgeEstimated != nil {
+		changes["age_estimated"] = *req.AgeEstimated
 		animal.AgeEstimated = *req.AgeEstimated
 	}
 	if req.Color != nil {
+		changes["color"] = *req.Color
 		animal.Color = *req.Color
 	}
 	if req.Size != nil {
+		changes["size"] = *req.Size
 		animal.Size = *req.Size
 	}
 	if req.Weight != nil {
+		changes["weight"] = *req.Weight
 		animal.Weight = *req.Weight
 	}
 	if req.Description != nil {
+		changes["description"] = *req.Description
 		animal.Description = *req.Description
 	}
 	if req.Medical != nil {
+		changes["medical"] = *req.Medical
 		animal.Medical = *req.Medical
 	}
 	if req.Behavior != nil {
+		changes["behavior"] = *req.Behavior
 		animal.Behavior = *req.Behavior
 	}
 	if req.Location != nil {
+		changes["location"] = *req.Location
 		animal.Shelter.Location = *req.Location
 	}
 	if req.AdoptionFee != nil {
+		changes["adoption_fee"] = *req.AdoptionFee
 		animal.Adoption.AdoptionFee = *req.AdoptionFee
 	}
 	if req.Requirements != nil {
+		changes["requirements"] = *req.Requirements
 		animal.Adoption.Requirements = *req.Requirements
 	}
 
