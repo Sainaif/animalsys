@@ -1685,6 +1685,24 @@ func SetupRoutes(
 				partnerHandler.GetPartnersAcceptingIntakes,
 			)
 
+			// Rate partner
+			partners.POST("/:id/rate",
+				middleware.RequirePermission(middleware.PermissionUpdatePartners),
+				partnerHandler.RatePartner,
+			)
+
+			// Get partner-specific statistics
+			partners.GET("/:id/statistics",
+				middleware.RequirePermission(middleware.PermissionViewPartners),
+				partnerHandler.GetPartnerStatisticsDetail,
+			)
+
+			// Update partner capacity
+			partners.POST("/:id/update-capacity",
+				middleware.RequirePermission(middleware.PermissionUpdatePartners),
+				partnerHandler.UpdatePartnerCapacity,
+			)
+
 			// Get partner by ID
 			partners.GET("/:id",
 				middleware.RequirePermission(middleware.PermissionViewPartners),
@@ -1730,22 +1748,6 @@ func SetupRoutes(
 				partnerHandler.AddRating,
 			)
 
-			// Rate partner
-			partners.POST("/:id/rate",
-				middleware.RequirePermission(middleware.PermissionUpdatePartners),
-				partnerHandler.RatePartner,
-			)
-
-			// Get partner-specific statistics
-			partners.GET("/:id/statistics",
-				middleware.RequirePermission(middleware.PermissionViewPartners),
-				partnerHandler.GetPartnerStatisticsDetail,
-			)
-
-			partners.POST("/:id/update-capacity",
-				middleware.RequirePermission(middleware.PermissionUpdatePartners),
-				partnerHandler.UpdateCapacity,
-			)
 
 			// Update partner capacity
 			partners.PUT("/:id/capacity",

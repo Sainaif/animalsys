@@ -370,26 +370,129 @@ func (h *PartnerHandler) SetAgreementExpiry(c *gin.Context) {
 
 // GetPartnersAcceptingIntakes gets all partners currently accepting intakes
 func (h *PartnerHandler) GetPartnersAcceptingIntakes(c *gin.Context) {
-	// Return mock partners list
+	filter := &repositories.PartnerFilter{}
+
+	// Set the primary filter for this endpoint
+	acceptsIntakes := true
+	filter.AcceptsIntakes = &acceptsIntakes
+
+	// Check for optional capacity filter
+	if hasCapacityStr := c.Query("has_capacity"); hasCapacityStr != "" {
+		hasCapacity := hasCapacityStr == "true"
+		filter.HasCapacity = &hasCapacity
+	}
+
+	// Pagination
+	if limit, err := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64); err == nil {
+		filter.Limit = limit
+	}
+	if offset, err := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64); err == nil {
+		filter.Offset = offset
+	}
+
+	filter.SortBy = c.DefaultQuery("sort_by", "name")
+	filter.SortOrder = c.DefaultQuery("sort_order", "asc")
+
+	partners, total, err := h.partnerUseCase.ListPartners(c.Request.Context(), filter)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"partners": []interface{}{},
-		"total":    0,
+		"data":   partners,
+		"total":  total,
+		"limit":  filter.Limit,
+		"offset": filter.Offset,
 	})
 }
 
 
 // RatePartner rates a partner
 func (h *PartnerHandler) RatePartner(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Partner rated"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid partner ID"})
+		return
+	}
+
+	var req struct {
+		Rating float64 `json:"rating" binding:"required,min=0,max=5"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.partnerUseCase.AddRating(c.Request.Context(), id, userID, req.Rating); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Rating added successfully"})
 }
 
 // GetPartnerStatisticsDetail gets detailed statistics for a partner
 func (h *PartnerHandler) GetPartnerStatisticsDetail(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"transfers_completed": 0, "current_capacity": 0})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid partner ID"})
+		return
+	}
+
+	partner, err := h.partnerUseCase.GetPartnerByID(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	// For simplicity, we are not fetching detailed transfer stats here.
+	// A more advanced implementation could fetch transfer data.
+	response := gin.H{
+		"partner_id":            partner.ID,
+		"name":                  partner.Name,
+		"status":                partner.Status,
+		"accepts_intakes":       partner.AcceptsIntakes,
+		"current_capacity":      partner.CurrentCapacity,
+		"max_capacity":          partner.MaxCapacity,
+		"average_rating":        partner.Rating,
+		"total_ratings":         partner.TotalRatings,
+		"total_transfers_in":    partner.TotalTransfersIn,
+		"total_transfers_out":   partner.TotalTransfersOut,
+		"successful_placements": partner.SuccessfulPlacements,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // UpdatePartnerCapacity updates partner capacity
 func (h *PartnerHandler) UpdatePartnerCapacity(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Capacity updated"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid partner ID"})
+		return
+	}
+
+	var req struct {
+		CurrentCapacity int `json:"current_capacity" binding:"required,min=0"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.partnerUseCase.UpdateCapacity(c.Request.Context(), id, userID, req.CurrentCapacity); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Capacity updated successfully"})
 }
 
