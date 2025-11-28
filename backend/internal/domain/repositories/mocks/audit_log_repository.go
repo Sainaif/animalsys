@@ -20,9 +20,6 @@ func (m *AuditLogRepository) Create(ctx context.Context, log *entities.AuditLog)
 
 func (m *AuditLogRepository) FindByID(ctx context.Context, id primitive.ObjectID) (*entities.AuditLog, error) {
 	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
 	return args.Get(0).(*entities.AuditLog), args.Error(1)
 }
 
