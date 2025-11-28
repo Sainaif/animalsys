@@ -74,6 +74,112 @@ func (r *veterinaryVisitRepository) Update(ctx context.Context, visit *entities.
 	return nil
 }
 
+func (r *veterinaryVisitRepository) ListCombined(ctx context.Context, filter repositories.CombinedFilter) ([]*entities.VeterinaryRecord, int64, error) {
+	collection := r.db.Collection(mongodb.Collections.VeterinaryVisits)
+
+	matchStage := bson.D{}
+	if filter.AnimalID != nil {
+		matchStage = append(matchStage, bson.E{Key: "animal_id", Value: *filter.AnimalID})
+	}
+	if filter.FromDate != nil || filter.ToDate != nil {
+		dateFilter := bson.M{}
+		if filter.FromDate != nil {
+			dateFilter["$gte"] = *filter.FromDate
+		}
+		if filter.ToDate != nil {
+			dateFilter["$lte"] = *filter.ToDate
+		}
+		matchStage = append(matchStage, bson.E{Key: "date", Value: dateFilter})
+	}
+
+	sortOrder := -1
+	if filter.SortOrder == "asc" {
+		sortOrder = 1
+	}
+
+	pipeline := mongo.Pipeline{
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "record_type", Value: "visit"},
+				{Key: "date", Value: "$visit_date"},
+				{Key: "visit", Value: "$$ROOT"},
+			}},
+		},
+		bson.D{
+			{Key: "$unionWith", Value: bson.D{
+				{Key: "coll", Value: mongodb.Collections.Vaccinations},
+				{Key: "pipeline", Value: mongo.Pipeline{
+					bson.D{
+						{Key: "$project", Value: bson.D{
+							{Key: "record_type", Value: "vaccination"},
+							{Key: "date", Value: "$date_administered"},
+							{Key: "vaccination", Value: "$$ROOT"},
+						}},
+					},
+				}},
+			}},
+		},
+		bson.D{{Key: "$match", Value: matchStage}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: filter.SortBy, Value: sortOrder}}}},
+		bson.D{{Key: "$skip", Value: filter.Offset}},
+		bson.D{{Key: "$limit", Value: filter.Limit}},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to aggregate records")
+	}
+	defer cursor.Close(ctx)
+
+	var records []*entities.VeterinaryRecord
+	if err := cursor.All(ctx, &records); err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to decode records")
+	}
+
+	// Get total count
+	countPipeline := mongo.Pipeline{
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "date", Value: "$visit_date"},
+				{Key: "animal_id", Value: "$animal_id"},
+			}},
+		},
+		bson.D{
+			{Key: "$unionWith", Value: bson.D{
+				{Key: "coll", Value: mongodb.Collections.Vaccinations},
+				{Key: "pipeline", Value: mongo.Pipeline{
+					bson.D{
+						{Key: "$project", Value: bson.D{
+							{Key: "date", Value: "$date_administered"},
+							{Key: "animal_id", Value: "$animal_id"},
+						}},
+					},
+				}},
+			}},
+		},
+		bson.D{{Key: "$match", Value: matchStage}},
+		bson.D{{Key: "$count", Value: "total"}},
+	}
+
+	countCursor, err := collection.Aggregate(ctx, countPipeline)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to count records")
+	}
+	defer countCursor.Close(ctx)
+
+	var countResult []bson.M
+	if err := countCursor.All(ctx, &countResult); err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to decode count")
+	}
+
+	var total int64
+	if len(countResult) > 0 {
+		total = int64(countResult[0]["total"].(int32))
+	}
+
+	return records, total, nil
+}
+
 // Delete deletes a veterinary visit by ID
 func (r *veterinaryVisitRepository) Delete(ctx context.Context, id primitive.ObjectID) error {
 	collection := r.db.Collection(mongodb.Collections.VeterinaryVisits)

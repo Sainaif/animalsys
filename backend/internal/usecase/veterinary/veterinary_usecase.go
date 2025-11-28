@@ -10,6 +10,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// VeterinaryUseCaseInterface defines the interface for the veterinary use case.
+type VeterinaryUseCaseInterface interface {
+	CreateVisit(ctx context.Context, req *CreateVisitRequest, creatorID primitive.ObjectID) (*entities.VeterinaryVisit, error)
+	GetVisitByID(ctx context.Context, id primitive.ObjectID) (*entities.VeterinaryVisit, error)
+	UpdateVisit(ctx context.Context, id primitive.ObjectID, req *UpdateVisitRequest, updaterID primitive.ObjectID) (*entities.VeterinaryVisit, error)
+	DeleteVisit(ctx context.Context, id primitive.ObjectID, deleterID primitive.ObjectID) error
+	ListVisits(ctx context.Context, req *ListVisitsRequest) ([]*entities.VeterinaryVisit, int64, error)
+	GetVisitsByAnimalID(ctx context.Context, animalID primitive.ObjectID) ([]*entities.VeterinaryVisit, error)
+	CreateVaccination(ctx context.Context, req *CreateVaccinationRequest, creatorID primitive.ObjectID) (*entities.Vaccination, error)
+	GetVaccinationByID(ctx context.Context, id primitive.ObjectID) (*entities.Vaccination, error)
+	DeleteVaccination(ctx context.Context, id primitive.ObjectID, deleterID primitive.ObjectID) error
+	ListVaccinations(ctx context.Context, req *ListVaccinationsRequest) ([]*entities.Vaccination, int64, error)
+	GetVaccinationsByAnimalID(ctx context.Context, animalID primitive.ObjectID) ([]*entities.Vaccination, error)
+	GetDueVaccinations(ctx context.Context, days int) ([]*entities.Vaccination, error)
+	GetUpcomingVisits(ctx context.Context, days int) ([]*entities.VeterinaryVisit, error)
+	ListVeterinaryRecords(ctx context.Context, req *ListRecordsRequest) ([]*entities.VeterinaryRecord, int64, error)
+}
+
 // VeterinaryUseCase handles veterinary business logic
 type VeterinaryUseCase struct {
 	visitRepo        repositories.VeterinaryVisitRepository
@@ -114,6 +132,18 @@ type ListVaccinationsRequest struct {
 	Offset      int64      `form:"offset"`
 	SortBy      string     `form:"sort_by"`
 	SortOrder   string     `form:"sort_order"`
+}
+
+// ListRecordsRequest represents a request to list combined veterinary records.
+type ListRecordsRequest struct {
+	AnimalID   string     `form:"animal_id"`
+	RecordType string     `form:"record_type"` // "visit" or "vaccination"
+	FromDate   *time.Time `form:"from_date"`
+	ToDate     *time.Time `form:"to_date"`
+	Limit      int64      `form:"limit"`
+	Offset     int64      `form:"offset"`
+	SortBy     string     `form:"sort_by"`
+	SortOrder  string     `form:"sort_order"`
 }
 
 // CreateVisit creates a new veterinary visit
@@ -391,4 +421,94 @@ func (uc *VeterinaryUseCase) GetDueVaccinations(ctx context.Context, days int) (
 // GetUpcomingVisits retrieves upcoming scheduled visits
 func (uc *VeterinaryUseCase) GetUpcomingVisits(ctx context.Context, days int) ([]*entities.VeterinaryVisit, error) {
 	return uc.visitRepo.GetUpcomingVisits(ctx, days)
+}
+
+// ListVeterinaryRecords lists all veterinary records (visits and vaccinations) with filtering and pagination.
+func (uc *VeterinaryUseCase) ListVeterinaryRecords(ctx context.Context, req *ListRecordsRequest) ([]*entities.VeterinaryRecord, int64, error) {
+	if req.Limit <= 0 {
+		req.Limit = 20
+	}
+	if req.Offset < 0 {
+		req.Offset = 0
+	}
+	if req.SortBy == "" {
+		req.SortBy = "date"
+	}
+	if req.SortOrder == "" {
+		req.SortOrder = "desc"
+	}
+
+	var animalID *primitive.ObjectID
+	if req.AnimalID != "" {
+		id, err := primitive.ObjectIDFromHex(req.AnimalID)
+		if err != nil {
+			return nil, 0, errors.NewBadRequest("invalid animal ID")
+		}
+		animalID = &id
+	}
+
+	var allRecords []*entities.VeterinaryRecord
+	var total int64
+
+	// If a specific record type is requested, we can pass the pagination to the database.
+	if req.RecordType == "visit" {
+		visits, visitTotal, err := uc.visitRepo.List(ctx, repositories.VeterinaryVisitFilter{
+			AnimalID:  animalID,
+			FromDate:  req.FromDate,
+			ToDate:    req.ToDate,
+			Limit:     req.Limit,
+			Offset:    req.Offset,
+			SortBy:    "visit_date",
+			SortOrder: req.SortOrder,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		for _, v := range visits {
+			allRecords = append(allRecords, &entities.VeterinaryRecord{
+				RecordType: "visit",
+				Visit:      v,
+				Date:       v.VisitDate,
+			})
+		}
+		total = visitTotal
+		return allRecords, total, nil
+	}
+
+	if req.RecordType == "vaccination" {
+		vaccinations, vaccinationTotal, err := uc.vaccinationRepo.List(ctx, repositories.VaccinationFilter{
+			AnimalID:  animalID,
+			FromDate:  req.FromDate,
+			ToDate:    req.ToDate,
+			Limit:     req.Limit,
+			Offset:    req.Offset,
+			SortBy:    "date_administered",
+			SortOrder: req.SortOrder,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		for _, v := range vaccinations {
+			allRecords = append(allRecords, &entities.VeterinaryRecord{
+				RecordType:  "vaccination",
+				Vaccination: v,
+				Date:        v.DateAdministered,
+			})
+		}
+		total = vaccinationTotal
+		return allRecords, total, nil
+	}
+
+	if req.RecordType == "" {
+		return uc.visitRepo.ListCombined(ctx, repositories.CombinedFilter{
+			AnimalID:  animalID,
+			FromDate:  req.FromDate,
+			ToDate:    req.ToDate,
+			Limit:     req.Limit,
+			Offset:    req.Offset,
+			SortBy:    req.SortBy,
+			SortOrder: req.SortOrder,
+		})
+	}
+	return nil, 0, errors.NewBadRequest("invalid record_type")
 }

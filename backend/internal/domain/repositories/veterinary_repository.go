@@ -33,6 +33,9 @@ type VeterinaryVisitRepository interface {
 
 	// EnsureIndexes creates necessary indexes for the veterinary_visits collection
 	EnsureIndexes(ctx context.Context) error
+
+	// ListCombined returns a combined list of visits and vaccinations
+	ListCombined(ctx context.Context, filter CombinedFilter) ([]*entities.VeterinaryRecord, int64, error)
 }
 
 // VeterinaryVisitFilter defines filter criteria for listing veterinary visits
@@ -90,4 +93,15 @@ type VaccinationFilter struct {
 	Offset       int64
 	SortBy       string // Field to sort by
 	SortOrder    string // "asc" or "desc"
+}
+
+// CombinedFilter defines filter criteria for listing combined veterinary records
+type CombinedFilter struct {
+	AnimalID *primitive.ObjectID
+	FromDate *time.Time
+	ToDate   *time.Time
+	Limit    int64
+	Offset   int64
+	SortBy   string
+	SortOrder string
 }
