@@ -298,5 +298,73 @@ func (h *AuditLogHandler) DeleteOldLogs(c *gin.Context) {
 
 // SearchAuditLogs searches audit logs
 func (h *AuditLogHandler) SearchAuditLogs(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"logs": []interface{}{}, "total": 0})
+	var filter repositories.AuditLogFilter
+
+	// Bind query parameters
+	if userIDStr := c.Query("user_id"); userIDStr != "" {
+		userID, err := primitive.ObjectIDFromHex(userIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
+			return
+		}
+		filter.UserID = &userID
+	}
+	if entityIDStr := c.Query("entity_id"); entityIDStr != "" {
+		entityID, err := primitive.ObjectIDFromHex(entityIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid entity_id format"})
+			return
+		}
+		filter.EntityID = &entityID
+	}
+	filter.EntityType = c.Query("entity_type")
+	filter.Action = c.Query("action")
+	filter.Search = c.Query("q")
+	filter.Sort = c.Query("sort")
+
+	// Date range
+	if fromDateStr := c.Query("from_date"); fromDateStr != "" {
+		from, err := time.Parse(time.RFC3339, fromDateStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid from_date format, use RFC3339"})
+			return
+		}
+		primDate := primitive.NewDateTimeFromTime(from)
+		filter.FromDate = &primDate
+	}
+	if toDateStr := c.Query("to_date"); toDateStr != "" {
+		to, err := time.Parse(time.RFC3339, toDateStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid to_date format, use RFC3339"})
+			return
+		}
+		primDate := primitive.NewDateTimeFromTime(to)
+		filter.ToDate = &primDate
+	}
+
+	// Pagination
+	limit, err := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64)
+	if err != nil || limit <= 0 {
+		limit = 20
+	}
+	filter.Limit = limit
+	offset, err := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64)
+	if err != nil || offset < 0 {
+		offset = 0
+	}
+	filter.Offset = offset
+
+	// Fetch logs
+	logs, total, err := h.auditLogUseCase.ListAuditLogs(c.Request.Context(), &filter)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"logs":   logs,
+		"total":  total,
+		"limit":  filter.Limit,
+		"offset": filter.Offset,
+	})
 }
