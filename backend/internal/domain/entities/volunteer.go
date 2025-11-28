@@ -17,6 +17,27 @@ const (
 	VolunteerStatusAlumni    VolunteerStatus = "alumni"     // Former volunteer
 )
 
+// VolunteerRole represents the role of a volunteer
+type VolunteerRole string
+
+const (
+	VolunteerRoleAnimalCare     VolunteerRole = "animal_care"
+	VolunteerRoleAdoptionEvents VolunteerRole = "adoption_events"
+	VolunteerRoleFundraising    VolunteerRole = "fundraising"
+	VolunteerRoleAdministrative VolunteerRole = "administrative"
+	VolunteerRoleTransport      VolunteerRole = "transport"
+	VolunteerRoleFosterCare     VolunteerRole = "foster_care"
+)
+
+// IsValid checks if the role is valid
+func (r VolunteerRole) IsValid() bool {
+	switch r {
+	case VolunteerRoleAnimalCare, VolunteerRoleAdoptionEvents, VolunteerRoleFundraising, VolunteerRoleAdministrative, VolunteerRoleTransport, VolunteerRoleFosterCare:
+		return true
+	}
+	return false
+}
+
 // SkillLevel represents proficiency level in a skill
 type SkillLevel string
 
@@ -92,6 +113,7 @@ type Volunteer struct {
 	EmergencyContact EmergencyContact `json:"emergency_contact" bson:"emergency_contact"`
 
 	// Volunteer Details
+	Roles            []VolunteerRole  `json:"roles,omitempty" bson:"roles,omitempty"`
 	Skills           []VolunteerSkill `json:"skills,omitempty" bson:"skills,omitempty"`
 	Interests        []string         `json:"interests,omitempty" bson:"interests,omitempty"`
 	Availability     []Availability   `json:"availability,omitempty" bson:"availability,omitempty"`

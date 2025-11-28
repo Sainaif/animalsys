@@ -869,10 +869,6 @@ func SetupRoutes(
 				volunteerHandler.SuspendVolunteer,
 			)
 
-			volunteers.POST("/:id/add-hours",
-				middleware.RequirePermission(middleware.PermissionUpdateVolunteers),
-				volunteerHandler.AddHours,
-			)
 
 			volunteers.POST("/:id/commendation",
 				middleware.RequirePermission(middleware.PermissionUpdateVolunteers),
