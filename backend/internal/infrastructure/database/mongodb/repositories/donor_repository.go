@@ -371,6 +371,22 @@ func (r *donorRepository) GetDonorStatistics(ctx context.Context) (*repositories
 	return stats, nil
 }
 
+// FindDonorsByIDs finds donors by a list of IDs
+func (r *donorRepository) FindDonorsByIDs(ctx context.Context, ids []primitive.ObjectID) ([]*entities.Donor, error) {
+	collection := r.db.Collection(mongodb.Collections.Donors)
+	filter := bson.M{"_id": bson.M{"$in": ids}}
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, 500, "failed to find donors by ids")
+	}
+	defer cursor.Close(ctx)
+	var donors []*entities.Donor
+	if err := cursor.All(ctx, &donors); err != nil {
+		return nil, errors.Wrap(err, 500, "failed to decode donors")
+	}
+	return donors, nil
+}
+
 // EnsureIndexes creates necessary indexes for the donors collection
 func (r *donorRepository) EnsureIndexes(ctx context.Context) error {
 	collection := r.db.Collection(mongodb.Collections.Donors)

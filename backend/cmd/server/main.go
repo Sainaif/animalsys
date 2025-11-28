@@ -250,6 +250,7 @@ func main() {
 	)
 	donorUseCase := donorUC.NewDonorUseCase(
 		donorRepo,
+		donationRepo,
 		auditLogRepo,
 	)
 	donationUseCase := donationUC.NewDonationUseCase(

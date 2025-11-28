@@ -4,26 +4,29 @@ import (
 	"context"
 	"strings"
 
+	"github.com/sainaif/animalsys/backend/internal/delivery/http/dto"
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
 	"github.com/sainaif/animalsys/backend/internal/domain/repositories"
 	"github.com/sainaif/animalsys/backend/pkg/errors"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // DonorUseCase handles donor business logic
 type DonorUseCase struct {
 	donorRepo    repositories.DonorRepository
+	donationRepo repositories.DonationRepository
 	auditLogRepo repositories.AuditLogRepository
 }
 
 // NewDonorUseCase creates a new donor use case
 func NewDonorUseCase(
 	donorRepo repositories.DonorRepository,
+	donationRepo repositories.DonationRepository,
 	auditLogRepo repositories.AuditLogRepository,
 ) *DonorUseCase {
 	return &DonorUseCase{
 		donorRepo:    donorRepo,
+		donationRepo: donationRepo,
 		auditLogRepo: auditLogRepo,
 	}
 }
@@ -169,6 +172,103 @@ func (uc *DonorUseCase) UpdateDonorEngagement(ctx context.Context, id primitive.
 	// Audit log
 	auditLog := entities.NewAuditLog(userID, entities.ActionUpdate, "donor", "", "").
 		WithEntityID(id)
+	_ = uc.auditLogRepo.Create(ctx, auditLog)
+
+	return nil
+}
+
+// GetTopDonors returns a list of top donors.
+func (uc *DonorUseCase) GetTopDonors(ctx context.Context, limit int) ([]*dto.TopDonorResponse, error) {
+	if limit <= 0 {
+		return nil, errors.NewBadRequest("Limit must be a positive integer")
+	}
+	topDonorAggregates, err := uc.donationRepo.GetTopDonorsByTotalDonated(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+	var donorIDs []primitive.ObjectID
+	for _, agg := range topDonorAggregates {
+		donorIDs = append(donorIDs, agg.DonorID)
+	}
+	if len(donorIDs) == 0 {
+		return []*dto.TopDonorResponse{}, nil
+	}
+	donors, err := uc.donorRepo.FindDonorsByIDs(ctx, donorIDs)
+	if err != nil {
+		return nil, err
+	}
+	donorMap := make(map[primitive.ObjectID]*entities.Donor)
+	for _, donor := range donors {
+		donorMap[donor.ID] = donor
+	}
+	var response []*dto.TopDonorResponse
+	for _, agg := range topDonorAggregates {
+		if donor, ok := donorMap[agg.DonorID]; ok {
+			response = append(response, &dto.TopDonorResponse{
+				Donor:        *donor,
+				TotalDonated: agg.TotalAmount,
+			})
+		}
+	}
+	return response, nil
+}
+
+// GetRecurringDonors retrieves all donors with active recurring donations.
+func (uc *DonorUseCase) GetRecurringDonors(ctx context.Context) ([]*dto.RecurringDonorResponse, error) {
+	donations, err := uc.donationRepo.GetRecurringDonations(ctx)
+	if err != nil {
+		return nil, err
+	}
+	donorsMap := make(map[primitive.ObjectID][]*entities.Donation)
+	for _, donation := range donations {
+		donorsMap[donation.DonorID] = append(donorsMap[donation.DonorID], donation)
+	}
+	var donorIDs []primitive.ObjectID
+	for donorID := range donorsMap {
+		donorIDs = append(donorIDs, donorID)
+	}
+	if len(donorIDs) == 0 {
+		return []*dto.RecurringDonorResponse{}, nil
+	}
+	donors, err := uc.donorRepo.FindDonorsByIDs(ctx, donorIDs)
+	if err != nil {
+		return nil, err
+	}
+	var response []*dto.RecurringDonorResponse
+	for _, donor := range donors {
+		recurringDonations := donorsMap[donor.ID]
+		var recurringAmount float64
+		for _, donation := range recurringDonations {
+			recurringAmount += donation.Amount
+		}
+		response = append(response, &dto.RecurringDonorResponse{
+			Donor:           *donor,
+			RecurringCount:  len(recurringDonations),
+			RecurringAmount: recurringAmount,
+		})
+	}
+	return response, nil
+}
+
+// UpdateCommunicationPreferences updates a donor's communication preferences.
+func (uc *DonorUseCase) UpdateCommunicationPreferences(ctx context.Context, donorID primitive.ObjectID, prefs entities.DonorPreferences, userID primitive.ObjectID) error {
+	donor, err := uc.donorRepo.FindByID(ctx, donorID)
+	if err != nil {
+		return err
+	}
+
+	// Update preferences
+	donor.Preferences.EmailOptIn = prefs.EmailOptIn
+	donor.Preferences.SmsOptIn = prefs.SmsOptIn
+	donor.UpdatedBy = userID
+
+	if err := uc.donorRepo.Update(ctx, donor); err != nil {
+		return err
+	}
+
+	// Audit log
+	auditLog := entities.NewAuditLog(userID, entities.ActionUpdate, "donor", "communication_preferences", "").
+		WithEntityID(donorID)
 	_ = uc.auditLogRepo.Create(ctx, auditLog)
 
 	return nil

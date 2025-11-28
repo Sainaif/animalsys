@@ -37,6 +37,9 @@ type DonorRepository interface {
 	// GetDonorStatistics returns donor statistics
 	GetDonorStatistics(ctx context.Context) (*DonorStatistics, error)
 
+	// FindDonorsByIDs finds donors by a list of IDs
+	FindDonorsByIDs(ctx context.Context, ids []primitive.ObjectID) ([]*entities.Donor, error)
+
 	// EnsureIndexes creates necessary indexes for the donors collection
 	EnsureIndexes(ctx context.Context) error
 }
@@ -98,6 +101,9 @@ type DonationRepository interface {
 	// GetRecurringDonations returns all active recurring donations
 	GetRecurringDonations(ctx context.Context) ([]*entities.Donation, error)
 
+	// GetTopDonorsByTotalDonated aggregates donations to find top donors.
+	GetTopDonorsByTotalDonated(ctx context.Context, limit int) ([]*TopDonorResult, error)
+
 	// GetPendingThankYous returns donations without thank you sent
 	GetPendingThankYous(ctx context.Context) ([]*entities.Donation, error)
 
@@ -129,6 +135,12 @@ type DonationFilter struct {
 	Offset       int64
 	SortBy       string // Field to sort by
 	SortOrder    string // "asc" or "desc"
+}
+
+// TopDonorResult represents the result of a top donor aggregation
+type TopDonorResult struct {
+	DonorID     primitive.ObjectID `bson:"_id"`
+	TotalAmount float64            `bson:"total_amount"`
 }
 
 // DonationStatistics represents donation statistics

@@ -15,11 +15,11 @@ import (
 
 // DonorHandler handles donor-related HTTP requests
 type DonorHandler struct {
-	donorUseCase *donor.DonorUseCase
+	donorUseCase donor.DonorUseCaseInterface
 }
 
 // NewDonorHandler creates a new donor handler
-func NewDonorHandler(donorUseCase *donor.DonorUseCase) *DonorHandler {
+func NewDonorHandler(donorUseCase donor.DonorUseCaseInterface) *DonorHandler {
 	return &DonorHandler{
 		donorUseCase: donorUseCase,
 	}
@@ -286,20 +286,39 @@ func (h *DonorHandler) UpdateDonorEngagement(c *gin.Context) {
 
 // GetTopDonors gets the top donors by donation amount
 func (h *DonorHandler) GetTopDonors(c *gin.Context) {
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil || limit <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit parameter"})
+		return
+	}
+	if limit > 100 { // Max limit
+		limit = 100
+	}
+
+	donors, err := h.donorUseCase.GetTopDonors(c.Request.Context(), limit)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"donors": []interface{}{},
-		"limit": limit,
-		"total": 0,
+		"donors": donors,
+		"limit":  limit,
+		"total":  len(donors),
 	})
 }
 
 // GetRecurringDonors gets all recurring donors
 func (h *DonorHandler) GetRecurringDonors(c *gin.Context) {
+	donors, err := h.donorUseCase.GetRecurringDonors(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"donors": []interface{}{},
-		"total": 0,
+		"donors": donors,
+		"total":  len(donors),
 	})
 }
 
@@ -314,5 +333,25 @@ func HandleError(c *gin.Context, err error) {
 
 // UpdateCommunicationPreferences updates donor communication preferences
 func (h *DonorHandler) UpdateCommunicationPreferences(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid donor ID"})
+		return
+	}
+
+	var prefs entities.DonorPreferences
+	if err := c.ShouldBindJSON(&prefs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.donorUseCase.UpdateCommunicationPreferences(c.Request.Context(), id, prefs, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Preferences updated"})
 }

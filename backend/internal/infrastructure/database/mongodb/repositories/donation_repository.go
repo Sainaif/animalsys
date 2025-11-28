@@ -547,6 +547,29 @@ func (r *donationRepository) GetDonationStatistics(ctx context.Context) (*reposi
 	return stats, nil
 }
 
+// GetTopDonorsByTotalDonated aggregates donations to find top donors.
+func (r *donationRepository) GetTopDonorsByTotalDonated(ctx context.Context, limit int) ([]*repositories.TopDonorResult, error) {
+	collection := r.db.Collection(mongodb.Collections.Donations)
+	pipeline := mongo.Pipeline{
+		{{Key: "$group", Value: bson.D{{Key: "_id", Value: "$donor_id"}, {Key: "total_amount", Value: bson.D{{Key: "$sum", Value: "$amount"}}}}}},
+		{{Key: "$sort", Value: bson.D{{Key: "total_amount", Value: -1}}}},
+		{{Key: "$limit", Value: limit}},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var results []*repositories.TopDonorResult
+	if err = cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
 // EnsureIndexes creates necessary indexes for the donations collection
 func (r *donationRepository) EnsureIndexes(ctx context.Context) error {
 	collection := r.db.Collection(mongodb.Collections.Donations)

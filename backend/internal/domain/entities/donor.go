@@ -61,6 +61,8 @@ type DonorPreferences struct {
 	AnnualReport     bool             `json:"annual_report" bson:"annual_report"`
 	PreferredContact PreferredContact `json:"preferred_contact" bson:"preferred_contact"`
 	Anonymous        bool             `json:"anonymous" bson:"anonymous"` // Don't publish name
+	EmailOptIn       bool             `json:"email_opt_in" bson:"email_opt_in"`
+	SmsOptIn         bool             `json:"sms_opt_in" bson:"sms_opt_in"`
 }
 
 // Donor represents a donor to the foundation
