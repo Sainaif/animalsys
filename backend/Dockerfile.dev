@@ -1,5 +1,5 @@
 # Development Dockerfile for Go backend with Air hot reload
-FROM golang:1.22-alpine
+FROM mirror.gcr.io/library/golang:1.22-alpine
 
 # Install necessary tools
 RUN apk add --no-cache git make

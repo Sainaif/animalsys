@@ -1,7 +1,7 @@
 services:
   # MongoDB
   mongodb:
-    image: mongo:7.0
+    image: mirror.gcr.io/library/mongo:7.0
     container_name: animalsys-mongodb
     restart: unless-stopped
     environment:
@@ -21,7 +21,7 @@ services:
 
   # Redis
   redis:
-    image: redis:7-alpine
+    image: mirror.gcr.io/library/redis:7-alpine
     container_name: animalsys-redis
     restart: unless-stopped
     ports:
@@ -103,7 +103,7 @@ services:
 
   # Nginx
   nginx:
-    image: nginx:alpine
+    image: mirror.gcr.io/library/nginx:alpine
     container_name: animalsys-nginx
     restart: unless-stopped
     ports:

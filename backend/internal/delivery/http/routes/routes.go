@@ -48,6 +48,13 @@ func SetupRoutes(
 			c.JSON(200, gin.H{"message": "pong"})
 		})
 
+		// Test-only routes
+		if gin.Mode() == gin.DebugMode {
+			testHandler := handlers.NewTestHandler(jwtService, userRepo)
+			test := public.Group("/test")
+			test.POST("/generate-token", middleware.AuthMiddleware(jwtService, userRepo), testHandler.GenerateTestToken)
+		}
+
 		// Auth routes (public)
 		auth := public.Group("/auth")
 		{

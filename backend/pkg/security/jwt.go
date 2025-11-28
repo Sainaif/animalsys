@@ -34,14 +34,19 @@ func NewJWTService(secret string, accessDuration, refreshDuration time.Duration)
 }
 
 // GenerateAccessToken generates a new access token
-func (s *JWTService) GenerateAccessToken(userID primitive.ObjectID, email, role string) (string, error) {
+func (s *JWTService) GenerateAccessToken(userID primitive.ObjectID, email, role string, expiresIn ...time.Duration) (string, error) {
+	duration := s.accessTokenDuration
+	if len(expiresIn) > 0 {
+		duration = expiresIn[0]
+	}
+
 	now := time.Now()
 	claims := Claims{
 		UserID: userID.Hex(),
 		Email:  email,
 		Role:   role,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: now.Add(s.accessTokenDuration).Unix(),
+			ExpiresAt: now.Add(duration).Unix(),
 			IssuedAt:  now.Unix(),
 			NotBefore: now.Unix(),
 			Issuer:    "animalsys",
