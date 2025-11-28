@@ -77,8 +77,9 @@ type Task struct {
 	Checklist []ChecklistItem `json:"checklist,omitempty" bson:"checklist,omitempty"`
 
 	// Notes and attachments
-	Notes       string   `json:"notes,omitempty" bson:"notes,omitempty"`
-	Attachments []string `json:"attachments,omitempty" bson:"attachments,omitempty"` // Document IDs
+	Notes       string        `json:"notes,omitempty" bson:"notes,omitempty"`
+	Attachments []string      `json:"attachments,omitempty" bson:"attachments,omitempty"` // Document IDs
+	Comments    []TaskComment `json:"comments,omitempty" bson:"comments,omitempty"`
 
 	// Metadata
 	Tags      []string  `json:"tags,omitempty" bson:"tags,omitempty"`
@@ -95,6 +96,14 @@ type RecurringRule struct {
 	DayOfMonth   *int   `json:"day_of_month,omitempty" bson:"day_of_month,omitempty"`   // 1-31 for monthly
 	EndDate      *time.Time `json:"end_date,omitempty" bson:"end_date,omitempty"`
 	Occurrences  *int   `json:"occurrences,omitempty" bson:"occurrences,omitempty"`     // Stop after N occurrences
+}
+
+// TaskComment represents a comment on a task
+type TaskComment struct {
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Text      string             `json:"text" bson:"text"`
+	CreatedBy primitive.ObjectID `json:"created_by" bson:"created_by"`
+	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
 }
 
 // ChecklistItem represents an item in a task checklist
@@ -153,6 +162,19 @@ func (t *Task) AddChecklistItem(text string) {
 	}
 	t.Checklist = append(t.Checklist, item)
 	t.UpdatedAt = time.Now()
+}
+
+// AddComment adds a comment to the task
+func (t *Task) AddComment(text string, userID primitive.ObjectID) *TaskComment {
+	comment := &TaskComment{
+		ID:        primitive.NewObjectID(),
+		Text:      text,
+		CreatedBy: userID,
+		CreatedAt: time.Now(),
+	}
+	t.Comments = append(t.Comments, *comment)
+	t.UpdatedAt = time.Now()
+	return comment
 }
 
 // CompleteChecklistItem marks a checklist item as completed

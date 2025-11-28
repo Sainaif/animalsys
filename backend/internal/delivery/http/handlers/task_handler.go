@@ -441,10 +441,49 @@ func (h *TaskHandler) RemoveChecklistItem(c *gin.Context) {
 
 // AddTaskComment adds a comment to a task
 func (h *TaskHandler) AddTaskComment(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Comment added"})
+	idParam := c.Param("id")
+	taskID, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
+		return
+	}
+
+	var req struct {
+		Comment string `json:"comment" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	comment, err := h.taskUseCase.AddTaskComment(c.Request.Context(), taskID, req.Comment, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, comment)
 }
 
 // GetTaskComments gets comments for a task
 func (h *TaskHandler) GetTaskComments(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"comments": []interface{}{}, "total": 0})
+	idParam := c.Param("id")
+	taskID, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
+		return
+	}
+
+	comments, err := h.taskUseCase.GetTaskComments(c.Request.Context(), taskID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":  comments,
+		"total": len(comments),
+	})
 }
