@@ -33,6 +33,8 @@ type AuditLogFilter struct {
 	EntityID   *primitive.ObjectID
 	FromDate   *primitive.DateTime
 	ToDate     *primitive.DateTime
+	Search     string
+	Sort       string
 	Limit      int64
 	Offset     int64
 }

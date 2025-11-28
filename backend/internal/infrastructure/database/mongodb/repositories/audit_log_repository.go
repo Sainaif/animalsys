@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
@@ -66,19 +67,15 @@ func (r *auditLogRepository) List(ctx context.Context, filter repositories.Audit
 	if filter.UserID != nil {
 		mongoFilter["user_id"] = *filter.UserID
 	}
-
 	if filter.Action != "" {
 		mongoFilter["action"] = filter.Action
 	}
-
 	if filter.EntityType != "" {
 		mongoFilter["entity_type"] = filter.EntityType
 	}
-
 	if filter.EntityID != nil {
 		mongoFilter["entity_id"] = *filter.EntityID
 	}
-
 	if filter.FromDate != nil || filter.ToDate != nil {
 		timestampFilter := bson.M{}
 		if filter.FromDate != nil {
@@ -89,6 +86,15 @@ func (r *auditLogRepository) List(ctx context.Context, filter repositories.Audit
 		}
 		mongoFilter["timestamp"] = timestampFilter
 	}
+	if filter.Search != "" {
+		searchRegex := bson.M{"$regex": primitive.Regex{Pattern: filter.Search, Options: "i"}}
+		mongoFilter["$or"] = []bson.M{
+			{"action": searchRegex},
+			{"entity_type": searchRegex},
+			{"ip_address": searchRegex},
+			{"user_agent": searchRegex},
+		}
+	}
 
 	// Count total documents
 	total, err := collection.CountDocuments(ctx, mongoFilter)
@@ -96,9 +102,30 @@ func (r *auditLogRepository) List(ctx context.Context, filter repositories.Audit
 		return nil, 0, errors.Wrap(err, 500, "failed to count audit logs")
 	}
 
+	// Sorting
+	sortOptions := bson.D{{Key: "timestamp", Value: -1}} // Default sort
+	if filter.Sort != "" {
+		parts := strings.Split(filter.Sort, ":")
+		field := parts[0]
+		direction := -1 // Default desc
+		if len(parts) > 1 && strings.ToLower(parts[1]) == "asc" {
+			direction = 1
+		}
+		// Basic validation
+		allowedSortFields := map[string]bool{
+			"user_id":     true,
+			"action":      true,
+			"entity_type": true,
+			"timestamp":   true,
+		}
+		if allowedSortFields[field] {
+			sortOptions = bson.D{{Key: field, Value: direction}}
+		}
+	}
+
 	// Find documents with pagination
 	opts := options.Find().
-		SetSort(bson.D{{Key: "timestamp", Value: -1}}).
+		SetSort(sortOptions).
 		SetSkip(filter.Offset).
 		SetLimit(filter.Limit)
 
