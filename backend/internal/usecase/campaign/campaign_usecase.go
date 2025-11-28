@@ -8,23 +8,49 @@ import (
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
 	"github.com/sainaif/animalsys/backend/internal/domain/repositories"
 	"github.com/sainaif/animalsys/backend/pkg/errors"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+// CampaignDonor represents a donor with their total contribution to a campaign
+type CampaignDonor struct {
+	Donor       *entities.Donor `json:"donor"`
+	TotalAmount float64         `json:"total_amount"`
+}
+
+// CampaignProgress represents the progress of a fundraising campaign
+type CampaignProgress struct {
+	GoalAmount    float64 `json:"goal_amount"`
+	CurrentAmount float64 `json:"current_amount"`
+	Percentage    float64 `json:"percentage"`
+	DonationCount int     `json:"donation_count"`
+}
+
+// CampaignShareable represents a shareable campaign payload
+type CampaignShareable struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	URL         string `json:"url"`
+}
 
 // CampaignUseCase handles campaign business logic
 type CampaignUseCase struct {
 	campaignRepo repositories.CampaignRepository
+	donationRepo repositories.DonationRepository
+	donorRepo    repositories.DonorRepository
 	auditLogRepo repositories.AuditLogRepository
 }
 
 // NewCampaignUseCase creates a new campaign use case
 func NewCampaignUseCase(
 	campaignRepo repositories.CampaignRepository,
+	donationRepo repositories.DonationRepository,
+	donorRepo repositories.DonorRepository,
 	auditLogRepo repositories.AuditLogRepository,
 ) *CampaignUseCase {
 	return &CampaignUseCase{
 		campaignRepo: campaignRepo,
+		donationRepo: donationRepo,
+		donorRepo:    donorRepo,
 		auditLogRepo: auditLogRepo,
 	}
 }
@@ -270,4 +296,106 @@ func (uc *CampaignUseCase) validateCampaign(campaign *entities.Campaign) error {
 	}
 
 	return nil
+}
+
+// GetCampaignDonors gets all donors for a campaign
+func (uc *CampaignUseCase) GetCampaignDonors(ctx context.Context, id primitive.ObjectID, limit, offset int64) ([]*CampaignDonor, int64, error) {
+	// 1. Aggregate donations by donor at the database level
+	aggregationResults, totalDonors, err := uc.donationRepo.AggregateDonorsByCampaignID(ctx, id, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if len(aggregationResults) == 0 {
+		return []*CampaignDonor{}, 0, nil
+	}
+
+	// 2. Get unique donor IDs from aggregation results
+	donorIDs := make([]primitive.ObjectID, len(aggregationResults))
+	donorTotals := make(map[primitive.ObjectID]float64, len(aggregationResults))
+	for i, result := range aggregationResults {
+		donorIDs[i] = result.DonorID
+		donorTotals[result.DonorID] = result.TotalAmount
+	}
+
+	// 3. Fetch all donor details in a single query
+	donors, err := uc.donorRepo.FindManyByIDs(ctx, donorIDs)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 4. Map donor details to the campaign donor struct
+	donorMap := make(map[primitive.ObjectID]*entities.Donor, len(donors))
+	for _, donor := range donors {
+		donorMap[donor.ID] = donor
+	}
+
+	campaignDonors := make([]*CampaignDonor, len(aggregationResults))
+	for i, result := range aggregationResults {
+		campaignDonors[i] = &CampaignDonor{
+			Donor:       donorMap[result.DonorID],
+			TotalAmount: donorTotals[result.DonorID],
+		}
+	}
+
+	return campaignDonors, totalDonors, nil
+}
+
+// UpdateCampaignAmount updates campaign raised amount
+func (uc *CampaignUseCase) UpdateCampaignAmount(ctx context.Context, id primitive.ObjectID, amount float64, userID primitive.ObjectID) error {
+	if amount < 0 {
+		return errors.NewBadRequest("Amount cannot be negative")
+	}
+
+	campaign, err := uc.campaignRepo.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	campaign.CurrentAmount = amount
+	campaign.UpdatedBy = userID
+	campaign.UpdatedAt = time.Now()
+
+	if err := uc.campaignRepo.Update(ctx, campaign); err != nil {
+		return err
+	}
+
+	// Audit log
+	auditLog := entities.NewAuditLog(userID, entities.ActionUpdate, "campaign", "Updated current amount", "").
+		WithEntityID(id)
+	return uc.auditLogRepo.Create(ctx, auditLog)
+}
+
+// GetCampaignProgress gets campaign progress
+func (uc *CampaignUseCase) GetCampaignProgress(ctx context.Context, id primitive.ObjectID) (*CampaignProgress, error) {
+	campaign, err := uc.campaignRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	progress := &CampaignProgress{
+		GoalAmount:    campaign.GoalAmount,
+		CurrentAmount: campaign.CurrentAmount,
+		DonationCount: campaign.DonationCount,
+		Percentage:    campaign.GetProgressPercentage(),
+	}
+
+	return progress, nil
+}
+
+// ShareCampaign shares a campaign
+func (uc *CampaignUseCase) ShareCampaign(ctx context.Context, id primitive.ObjectID) (*CampaignShareable, error) {
+	campaign, err := uc.campaignRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Get base URL from config
+	shareable := &CampaignShareable{
+		Title:       campaign.Name.English,
+		Description: campaign.Description.English,
+		URL:         "/campaigns/" + id.Hex(),
+	}
+
+	return shareable, nil
 }

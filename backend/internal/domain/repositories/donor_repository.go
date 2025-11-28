@@ -16,6 +16,9 @@ type DonorRepository interface {
 	// FindByID finds a donor by ID
 	FindByID(ctx context.Context, id primitive.ObjectID) (*entities.Donor, error)
 
+	// FindManyByIDs finds multiple donors by their IDs
+	FindManyByIDs(ctx context.Context, ids []primitive.ObjectID) ([]*entities.Donor, error)
+
 	// Update updates an existing donor
 	Update(ctx context.Context, donor *entities.Donor) error
 
@@ -59,17 +62,17 @@ type DonorFilter struct {
 
 // DonorStatistics represents donor statistics
 type DonorStatistics struct {
-	TotalDonors         int64            `json:"total_donors" bson:"total_donors"`
-	ActiveDonors        int64            `json:"active_donors" bson:"active_donors"`
-	InactiveDonors      int64            `json:"inactive_donors" bson:"inactive_donors"`
-	MajorDonors         int64            `json:"major_donors" bson:"major_donors"`
-	LapsedDonors        int64            `json:"lapsed_donors" bson:"lapsed_donors"`
-	IndividualDonors    int64            `json:"individual_donors" bson:"individual_donors"`
-	OrganizationDonors  int64            `json:"organization_donors" bson:"organization_donors"`
-	AverageLifetimeValue float64         `json:"average_lifetime_value" bson:"average_lifetime_value"`
-	TotalLifetimeValue  float64          `json:"total_lifetime_value" bson:"total_lifetime_value"`
-	ByType              map[string]int64 `json:"by_type" bson:"by_type"`
-	ByStatus            map[string]int64 `json:"by_status" bson:"by_status"`
+	TotalDonors          int64            `json:"total_donors" bson:"total_donors"`
+	ActiveDonors         int64            `json:"active_donors" bson:"active_donors"`
+	InactiveDonors       int64            `json:"inactive_donors" bson:"inactive_donors"`
+	MajorDonors          int64            `json:"major_donors" bson:"major_donors"`
+	LapsedDonors         int64            `json:"lapsed_donors" bson:"lapsed_donors"`
+	IndividualDonors     int64            `json:"individual_donors" bson:"individual_donors"`
+	OrganizationDonors   int64            `json:"organization_donors" bson:"organization_donors"`
+	AverageLifetimeValue float64          `json:"average_lifetime_value" bson:"average_lifetime_value"`
+	TotalLifetimeValue   float64          `json:"total_lifetime_value" bson:"total_lifetime_value"`
+	ByType               map[string]int64 `json:"by_type" bson:"by_type"`
+	ByStatus             map[string]int64 `json:"by_status" bson:"by_status"`
 }
 
 // DonationRepository defines the interface for donation data access
@@ -95,6 +98,9 @@ type DonationRepository interface {
 	// GetByCampaignID returns all donations for a specific campaign
 	GetByCampaignID(ctx context.Context, campaignID primitive.ObjectID) ([]*entities.Donation, error)
 
+	// AggregateDonorsByCampaignID aggregates donor data for a campaign
+	AggregateDonorsByCampaignID(ctx context.Context, campaignID primitive.ObjectID, limit, offset int64) ([]*DonorAggregationResult, int64, error)
+
 	// GetRecurringDonations returns all active recurring donations
 	GetRecurringDonations(ctx context.Context) ([]*entities.Donation, error)
 
@@ -111,46 +117,52 @@ type DonationRepository interface {
 	EnsureIndexes(ctx context.Context) error
 }
 
+// DonorAggregationResult represents the result of a donor aggregation query
+type DonorAggregationResult struct {
+	DonorID     primitive.ObjectID `bson:"_id"`
+	TotalAmount float64            `bson:"total_amount"`
+}
+
 // DonationFilter defines filter criteria for listing donations
 type DonationFilter struct {
-	DonorID      *primitive.ObjectID
-	CampaignID   *primitive.ObjectID
-	Type         string
-	Status       string
-	MinAmount    *float64
-	MaxAmount    *float64
-	FromDate     *time.Time
-	ToDate       *time.Time
+	DonorID       *primitive.ObjectID
+	CampaignID    *primitive.ObjectID
+	Type          string
+	Status        string
+	MinAmount     *float64
+	MaxAmount     *float64
+	FromDate      *time.Time
+	ToDate        *time.Time
 	PaymentMethod string
-	Designation  string
-	IsRecurring  *bool
-	Anonymous    *bool
-	Limit        int64
-	Offset       int64
-	SortBy       string // Field to sort by
-	SortOrder    string // "asc" or "desc"
+	Designation   string
+	IsRecurring   *bool
+	Anonymous     *bool
+	Limit         int64
+	Offset        int64
+	SortBy        string // Field to sort by
+	SortOrder     string // "asc" or "desc"
 }
 
 // DonationStatistics represents donation statistics
 type DonationStatistics struct {
-	TotalDonations      int64            `json:"total_donations" bson:"total_donations"`
-	TotalAmount         float64          `json:"total_amount" bson:"total_amount"`
-	AverageDonation     float64          `json:"average_donation" bson:"average_donation"`
-	LargestDonation     float64          `json:"largest_donation" bson:"largest_donation"`
-	SmallestDonation    float64          `json:"smallest_donation" bson:"smallest_donation"`
-	DonationsToday      int64            `json:"donations_today" bson:"donations_today"`
-	DonationsThisWeek   int64            `json:"donations_this_week" bson:"donations_this_week"`
-	DonationsThisMonth  int64            `json:"donations_this_month" bson:"donations_this_month"`
-	DonationsThisYear   int64            `json:"donations_this_year" bson:"donations_this_year"`
-	AmountToday         float64          `json:"amount_today" bson:"amount_today"`
-	AmountThisWeek      float64          `json:"amount_this_week" bson:"amount_this_week"`
-	AmountThisMonth     float64          `json:"amount_this_month" bson:"amount_this_month"`
-	AmountThisYear      float64          `json:"amount_this_year" bson:"amount_this_year"`
-	RecurringDonations  int64            `json:"recurring_donations" bson:"recurring_donations"`
-	RecurringAmount     float64          `json:"recurring_amount" bson:"recurring_amount"`
-	ByType              map[string]int64 `json:"by_type" bson:"by_type"`
-	ByStatus            map[string]int64 `json:"by_status" bson:"by_status"`
-	ByPaymentMethod     map[string]int64 `json:"by_payment_method" bson:"by_payment_method"`
+	TotalDonations     int64            `json:"total_donations" bson:"total_donations"`
+	TotalAmount        float64          `json:"total_amount" bson:"total_amount"`
+	AverageDonation    float64          `json:"average_donation" bson:"average_donation"`
+	LargestDonation    float64          `json:"largest_donation" bson:"largest_donation"`
+	SmallestDonation   float64          `json:"smallest_donation" bson:"smallest_donation"`
+	DonationsToday     int64            `json:"donations_today" bson:"donations_today"`
+	DonationsThisWeek  int64            `json:"donations_this_week" bson:"donations_this_week"`
+	DonationsThisMonth int64            `json:"donations_this_month" bson:"donations_this_month"`
+	DonationsThisYear  int64            `json:"donations_this_year" bson:"donations_this_year"`
+	AmountToday        float64          `json:"amount_today" bson:"amount_today"`
+	AmountThisWeek     float64          `json:"amount_this_week" bson:"amount_this_week"`
+	AmountThisMonth    float64          `json:"amount_this_month" bson:"amount_this_month"`
+	AmountThisYear     float64          `json:"amount_this_year" bson:"amount_this_year"`
+	RecurringDonations int64            `json:"recurring_donations" bson:"recurring_donations"`
+	RecurringAmount    float64          `json:"recurring_amount" bson:"recurring_amount"`
+	ByType             map[string]int64 `json:"by_type" bson:"by_type"`
+	ByStatus           map[string]int64 `json:"by_status" bson:"by_status"`
+	ByPaymentMethod    map[string]int64 `json:"by_payment_method" bson:"by_payment_method"`
 }
 
 // CampaignRepository defines the interface for campaign data access
@@ -194,23 +206,23 @@ type CampaignRepository interface {
 
 // CampaignFilter defines filter criteria for listing campaigns
 type CampaignFilter struct {
-	Type           string
-	Status         string
-	Public         *bool
-	Featured       *bool
-	ManagerID      *primitive.ObjectID
-	StartDateFrom  *time.Time
-	StartDateTo    *time.Time
-	EndDateFrom    *time.Time
-	EndDateTo      *time.Time
-	GoalAmountMin  float64
-	GoalAmountMax  float64
-	Tags           []string
-	Search         string
-	Limit          int64
-	Offset         int64
-	SortBy         string // Field to sort by
-	SortOrder      string // "asc" or "desc"
+	Type          string
+	Status        string
+	Public        *bool
+	Featured      *bool
+	ManagerID     *primitive.ObjectID
+	StartDateFrom *time.Time
+	StartDateTo   *time.Time
+	EndDateFrom   *time.Time
+	EndDateTo     *time.Time
+	GoalAmountMin float64
+	GoalAmountMax float64
+	Tags          []string
+	Search        string
+	Limit         int64
+	Offset        int64
+	SortBy        string // Field to sort by
+	SortOrder     string // "asc" or "desc"
 }
 
 // CampaignStatistics represents campaign statistics

@@ -218,6 +218,57 @@ func (r *donationRepository) GetByDonorID(ctx context.Context, donorID primitive
 	return donations, nil
 }
 
+// AggregateDonorsByCampaignID aggregates donor data for a campaign
+func (r *donationRepository) AggregateDonorsByCampaignID(ctx context.Context, campaignID primitive.ObjectID, limit, offset int64) ([]*repositories.DonorAggregationResult, int64, error) {
+	collection := r.db.Collection(mongodb.Collections.Donations)
+
+	matchStage := bson.D{
+		{"$match", bson.D{
+			{"campaign_id", campaignID},
+			{"status", entities.DonationStatusCompleted},
+		}},
+	}
+	groupStage := bson.D{
+		{"$group", bson.D{
+			{"_id", "$donor_id"},
+			{"total_amount", bson.D{{"$sum", "$amount"}}},
+		}},
+	}
+	sortStage := bson.D{{"$sort", bson.D{{"total_amount", -1}}}}
+	skipStage := bson.D{{"$skip", offset}}
+	limitStage := bson.D{{"$limit", limit}}
+
+	pipeline := mongo.Pipeline{matchStage, groupStage, sortStage, skipStage, limitStage}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to aggregate donations")
+	}
+	defer cursor.Close(ctx)
+
+	var results []*repositories.DonorAggregationResult
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to decode aggregation results")
+	}
+
+	// Get total count for pagination
+	countPipeline := mongo.Pipeline{matchStage, groupStage}
+	countCursor, err := collection.Aggregate(ctx, countPipeline)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to count aggregated donations")
+	}
+	defer countCursor.Close(ctx)
+
+	var countResults []struct {
+		ID primitive.ObjectID `bson:"_id"`
+	}
+	if err := countCursor.All(ctx, &countResults); err != nil {
+		return nil, 0, errors.Wrap(err, 500, "failed to decode aggregation count")
+	}
+
+	return results, int64(len(countResults)), nil
+}
+
 // GetByCampaignID returns all donations for a specific campaign
 func (r *donationRepository) GetByCampaignID(ctx context.Context, campaignID primitive.ObjectID) ([]*entities.Donation, error) {
 	collection := r.db.Collection(mongodb.Collections.Donations)
