@@ -54,6 +54,41 @@ func (uc *TaskUseCase) CreateTask(ctx context.Context, task *entities.Task, user
 	return nil
 }
 
+// AddTaskComment adds a comment to a task
+func (uc *TaskUseCase) AddTaskComment(ctx context.Context, taskID primitive.ObjectID, text string, userID primitive.ObjectID) (*entities.TaskComment, error) {
+	if text == "" {
+		return nil, errors.NewBadRequest("Comment text cannot be empty")
+	}
+
+	task, err := uc.taskRepo.FindByID(ctx, taskID)
+	if err != nil {
+		return nil, err
+	}
+
+	comment := task.AddComment(text, userID)
+
+	if err := uc.taskRepo.AddTaskComment(ctx, taskID, comment); err != nil {
+		return nil, err
+	}
+
+	// Create audit log
+	_ = uc.auditLogRepo.Create(ctx,
+		entities.NewAuditLog(userID, entities.ActionUpdate, "task", task.Title, "added comment").
+			WithEntityID(taskID))
+
+	return comment, nil
+}
+
+// GetTaskComments gets all comments for a task
+func (uc *TaskUseCase) GetTaskComments(ctx context.Context, taskID primitive.ObjectID) ([]entities.TaskComment, error) {
+	task, err := uc.taskRepo.FindByID(ctx, taskID)
+	if err != nil {
+		return nil, err
+	}
+
+	return task.Comments, nil
+}
+
 // GetTaskByID retrieves a task by ID
 func (uc *TaskUseCase) GetTaskByID(ctx context.Context, id primitive.ObjectID) (*entities.Task, error) {
 	return uc.taskRepo.FindByID(ctx, id)

@@ -49,6 +49,9 @@ type TaskRepository interface {
 	// GetTaskStatistics returns task statistics
 	GetTaskStatistics(ctx context.Context) (*TaskStatistics, error)
 
+	// AddTaskComment adds a comment to a task
+	AddTaskComment(ctx context.Context, taskID primitive.ObjectID, comment *entities.TaskComment) error
+
 	// EnsureIndexes creates necessary indexes for the tasks collection
 	EnsureIndexes(ctx context.Context) error
 }

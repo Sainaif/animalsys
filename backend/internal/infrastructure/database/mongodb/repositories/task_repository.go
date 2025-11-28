@@ -465,6 +465,30 @@ func (r *taskRepository) GetTaskStatistics(ctx context.Context) (*repositories.T
 	return stats, nil
 }
 
+// AddTaskComment adds a comment to a task
+func (r *taskRepository) AddTaskComment(ctx context.Context, taskID primitive.ObjectID, comment *entities.TaskComment) error {
+	if comment.ID.IsZero() {
+		comment.ID = primitive.NewObjectID()
+	}
+
+	filter := bson.M{"_id": taskID}
+	update := bson.M{
+		"$push": bson.M{"comments": comment},
+		"$set":  bson.M{"updated_at": time.Now()},
+	}
+
+	result, err := r.collection().UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to add comment to task: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return errors.NewNotFound("Task not found")
+	}
+
+	return nil
+}
+
 // EnsureIndexes creates necessary indexes for the tasks collection
 func (r *taskRepository) EnsureIndexes(ctx context.Context) error {
 	indexes := []mongo.IndexModel{
