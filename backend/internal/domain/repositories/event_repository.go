@@ -62,6 +62,7 @@ type EventRepository interface {
 type VolunteerFilter struct {
 	Status     string
 	Skills     []string
+	Roles      []string
 	Search     string
 	HasUserID  *bool
 	SortBy     string
@@ -97,7 +98,7 @@ type VolunteerRepository interface {
 	GetVolunteersNeedingBackgroundCheck(ctx context.Context) ([]*entities.Volunteer, error)
 	GetVolunteersWithExpiredCertifications(ctx context.Context) ([]*entities.Volunteer, error)
 	GetTopVolunteers(ctx context.Context, limit int) ([]*entities.Volunteer, error)
-	UpdateHours(ctx context.Context, volunteerID primitive.ObjectID, hours float64) error
+	UpdateHours(ctx context.Context, volunteerID primitive.ObjectID, hours float64, notes string) error
 	IncrementEventsAttended(ctx context.Context, volunteerID primitive.ObjectID) error
 	GetVolunteerStatistics(ctx context.Context) (*VolunteerStatistics, error)
 	EnsureIndexes(ctx context.Context) error

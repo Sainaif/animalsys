@@ -161,6 +161,10 @@ func (r *volunteerRepository) List(ctx context.Context, filter *repositories.Vol
 		query["skills.name"] = bson.M{"$in": filter.Skills}
 	}
 
+	if len(filter.Roles) > 0 {
+		query["roles"] = bson.M{"$in": filter.Roles}
+	}
+
 	if filter.Search != "" {
 		query["$or"] = []bson.M{
 			{"first_name": bson.M{"$regex": filter.Search, "$options": "i"}},
@@ -309,7 +313,7 @@ func (r *volunteerRepository) GetTopVolunteers(ctx context.Context, limit int) (
 	return volunteers, nil
 }
 
-func (r *volunteerRepository) UpdateHours(ctx context.Context, volunteerID primitive.ObjectID, hours float64) error {
+func (r *volunteerRepository) UpdateHours(ctx context.Context, volunteerID primitive.ObjectID, hours float64, notes string) error {
 	filter := bson.M{"_id": volunteerID}
 	update := bson.M{
 		"$inc": bson.M{"total_hours": hours},
@@ -317,6 +321,10 @@ func (r *volunteerRepository) UpdateHours(ctx context.Context, volunteerID primi
 			"last_activity_date": time.Now(),
 			"updated_at":         time.Now(),
 		},
+	}
+
+	if notes != "" {
+		update["$push"] = bson.M{"notes": notes}
 	}
 
 	result, err := r.collection().UpdateOne(ctx, filter, update)

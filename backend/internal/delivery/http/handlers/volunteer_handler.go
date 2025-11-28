@@ -14,11 +14,11 @@ import (
 
 // VolunteerHandler handles volunteer-related HTTP requests
 type VolunteerHandler struct {
-	volunteerUseCase *volunteer.VolunteerUseCase
+	volunteerUseCase volunteer.VolunteerUseCase
 }
 
 // NewVolunteerHandler creates a new volunteer handler
-func NewVolunteerHandler(volunteerUseCase *volunteer.VolunteerUseCase) *VolunteerHandler {
+func NewVolunteerHandler(volunteerUseCase volunteer.VolunteerUseCase) *VolunteerHandler {
 	return &VolunteerHandler{
 		volunteerUseCase: volunteerUseCase,
 	}
@@ -318,38 +318,6 @@ func (h *VolunteerHandler) SuspendVolunteer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Volunteer suspended successfully"})
 }
 
-// AddHours adds volunteer hours
-// @Summary Add volunteer hours
-// @Tags volunteers
-// @Param id path string true "Volunteer ID"
-// @Param hours body map[string]float64 true "Hours"
-// @Success 200 {object} map[string]interface{}
-// @Router /volunteers/{id}/add-hours [post]
-func (h *VolunteerHandler) AddHours(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer ID"})
-		return
-	}
-
-	var req struct {
-		Hours float64 `json:"hours" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	userID := c.MustGet("user_id").(primitive.ObjectID)
-
-	if err := h.volunteerUseCase.AddHours(c.Request.Context(), id, req.Hours, userID); err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Hours added successfully"})
-}
 
 // AddCommendation adds a commendation to a volunteer
 // @Summary Add commendation
@@ -465,26 +433,137 @@ func (h *VolunteerHandler) GetVolunteerStatistics(c *gin.Context) {
 }
 
 // LogVolunteerHours logs volunteer hours
+// @Summary Log volunteer hours
+// @Tags volunteers
+// @Accept json
+// @Produce json
+// @Param id path string true "Volunteer ID"
+// @Param log body struct{ Hours float64 `json:"hours"`; Notes string `json:"notes"` } true "Log data"
+// @Success 200 {object} entities.Volunteer
+// @Router /volunteers/{id}/log-hours [post]
 func (h *VolunteerHandler) LogVolunteerHours(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Hours logged"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer ID"})
+		return
+	}
+
+	var req struct {
+		Hours float64 `json:"hours" binding:"required"`
+		Notes string  `json:"notes"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	volunteer, err := h.volunteerUseCase.LogHours(c.Request.Context(), id, req.Hours, req.Notes, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, volunteer)
 }
 
 // GetVolunteerHours gets volunteer hours
+// @Summary Get volunteer hours
+// @Tags volunteers
+// @Produce json
+// @Param id path string true "Volunteer ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /volunteers/{id}/hours [get]
 func (h *VolunteerHandler) GetVolunteerHours(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"hours": []interface{}{}, "total_hours": 0})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer ID"})
+		return
+	}
+
+	hours, err := h.volunteerUseCase.GetVolunteerHours(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"total_hours": hours})
 }
 
 // ActivateVolunteer activates a volunteer
+// @Summary Activate a volunteer
+// @Tags volunteers
+// @Produce json
+// @Param id path string true "Volunteer ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /volunteers/{id}/activate [post]
 func (h *VolunteerHandler) ActivateVolunteer(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.volunteerUseCase.ActivateVolunteer(c.Request.Context(), id, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Volunteer activated"})
 }
 
 // DeactivateVolunteer deactivates a volunteer
+// @Summary Deactivate a volunteer
+// @Tags volunteers
+// @Produce json
+// @Param id path string true "Volunteer ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /volunteers/{id}/deactivate [post]
 func (h *VolunteerHandler) DeactivateVolunteer(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.volunteerUseCase.DeactivateVolunteer(c.Request.Context(), id, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Volunteer deactivated"})
 }
 
 // GetVolunteersByRole gets volunteers by role
+// @Summary Get volunteers by role
+// @Tags volunteers
+// @Produce json
+// @Param role path string true "Volunteer Role"
+// @Success 200 {object} map[string]interface{}
+// @Router /volunteers/role/{role} [get]
 func (h *VolunteerHandler) GetVolunteersByRole(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"volunteers": []interface{}{}, "total": 0})
+	roleParam := c.Param("role")
+	role := entities.VolunteerRole(roleParam)
+
+	if !role.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid volunteer role"})
+		return
+	}
+
+	volunteers, total, err := h.volunteerUseCase.GetVolunteersByRole(c.Request.Context(), role)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"volunteers": volunteers, "total": total})
 }
