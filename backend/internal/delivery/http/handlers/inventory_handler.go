@@ -14,11 +14,11 @@ import (
 
 // InventoryHandler handles inventory-related HTTP requests
 type InventoryHandler struct {
-	inventoryUseCase *inventory.InventoryUseCase
+	inventoryUseCase inventory.IInventoryUseCase
 }
 
 // NewInventoryHandler creates a new inventory handler
-func NewInventoryHandler(inventoryUseCase *inventory.InventoryUseCase) *InventoryHandler {
+func NewInventoryHandler(inventoryUseCase inventory.IInventoryUseCase) *InventoryHandler {
 	return &InventoryHandler{
 		inventoryUseCase: inventoryUseCase,
 	}
@@ -185,13 +185,16 @@ func (h *InventoryHandler) ListInventoryItems(c *gin.Context) {
 func (h *InventoryHandler) GetInventoryItemsByCategory(c *gin.Context) {
 	category := entities.ItemCategory(c.Param("category"))
 
-	items, err := h.inventoryUseCase.GetInventoryItemsByCategory(c.Request.Context(), category)
+	items, total, err := h.inventoryUseCase.GetInventoryItemsByCategory(c.Request.Context(), category)
 	if err != nil {
 		HandleError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, items)
+	c.JSON(http.StatusOK, gin.H{
+		"items": items,
+		"total": total,
+	})
 }
 
 // GetLowStockItems gets items with low stock
@@ -379,20 +382,32 @@ func (h *InventoryHandler) DeactivateItem(c *gin.Context) {
 
 // GetOutOfStockItems gets all out-of-stock items
 func (h *InventoryHandler) GetOutOfStockItems(c *gin.Context) {
-	// Return mock out-of-stock items list
+	items, total, err := h.inventoryUseCase.GetOutOfStockItems(c.Request.Context())
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"items": []interface{}{},
-		"total": 0,
+		"items": items,
+		"total": total,
 	})
 }
 
-
 // GetInventoryHistory gets history for an inventory item
 func (h *InventoryHandler) GetInventoryHistory(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"history": []interface{}{}, "total": 0})
-}
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item ID"})
+		return
+	}
 
-// GetInventoryByCategory gets inventory items by category
-func (h *InventoryHandler) GetInventoryByCategory(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"items": []interface{}{}, "total": 0})
+	history, total, err := h.inventoryUseCase.GetInventoryHistory(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"history": history, "total": total})
 }

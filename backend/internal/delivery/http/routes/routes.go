@@ -1915,11 +1915,6 @@ func SetupRoutes(
 				inventoryHandler.GetItemsNeedingReorder,
 			)
 
-			// Get items by category
-			inventory.GET("/category/:category",
-				middleware.RequirePermission(middleware.PermissionViewInventory),
-				inventoryHandler.GetInventoryItemsByCategory,
-			)
 
 			// Get inventory statistics
 			inventory.GET("/statistics",

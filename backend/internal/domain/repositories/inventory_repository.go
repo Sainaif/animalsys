@@ -17,6 +17,7 @@ type InventoryRepository interface {
 	List(ctx context.Context, filter *InventoryFilter) ([]*entities.InventoryItem, int64, error)
 	GetByCategory(ctx context.Context, category entities.ItemCategory) ([]*entities.InventoryItem, error)
 	GetLowStockItems(ctx context.Context) ([]*entities.InventoryItem, error)
+	GetOutOfStockItems(ctx context.Context) ([]*entities.InventoryItem, int64, error)
 	GetExpiredItems(ctx context.Context) ([]*entities.InventoryItem, error)
 	GetExpiringSoonItems(ctx context.Context) ([]*entities.InventoryItem, error)
 	GetItemsNeedingReorder(ctx context.Context) ([]*entities.InventoryItem, error)

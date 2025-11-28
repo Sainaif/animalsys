@@ -23,6 +23,15 @@ const (
 	ItemCategoryOther          ItemCategory = "other"
 )
 
+// IsValid checks if the item category is valid
+func (c ItemCategory) IsValid() bool {
+	switch c {
+	case ItemCategoryFood, ItemCategoryMedicine, ItemCategorySupplies, ItemCategoryToys, ItemCategoryBedding, ItemCategoryCleaning, ItemCategoryEquipment, ItemCategoryGrooming, ItemCategoryMedicalSupplies, ItemCategoryOffice, ItemCategoryOther:
+		return true
+	}
+	return false
+}
+
 // ItemUnit represents the unit of measurement
 type ItemUnit string
 
