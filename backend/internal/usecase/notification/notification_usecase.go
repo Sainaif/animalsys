@@ -10,6 +10,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// NotificationUseCaseInterface defines the interface for the notification use case
+type NotificationUseCaseInterface interface {
+	GetNotificationPreferences(ctx context.Context, userID primitive.ObjectID) (*entities.NotificationPreferences, error)
+	UpdateNotificationPreferences(ctx context.Context, userID primitive.ObjectID, preferences *entities.NotificationPreferences) error
+	GetNotificationsByType(ctx context.Context, userID primitive.ObjectID, notificationType entities.NotificationType, limit, offset int64) ([]*entities.Notification, int64, error)
+	CreateNotification(ctx context.Context, notification *entities.Notification) error
+	GetNotificationByID(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) (*entities.Notification, error)
+	ListNotifications(ctx context.Context, filter *repositories.NotificationFilter) ([]*entities.Notification, int64, error)
+	GetUserNotifications(ctx context.Context, userID primitive.ObjectID) ([]*entities.Notification, error)
+	GetUnreadNotifications(ctx context.Context, userID primitive.ObjectID) ([]*entities.Notification, error)
+	GetUnreadCount(ctx context.Context, userID primitive.ObjectID) (int64, error)
+	MarkAsRead(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) error
+	MarkAsUnread(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) error
+	MarkAllAsRead(ctx context.Context, userID primitive.ObjectID) error
+	DismissNotification(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) error
+	DeleteNotification(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) error
+}
+
 type NotificationUseCase struct {
 	notificationRepo repositories.NotificationRepository
 	auditLogRepo     repositories.AuditLogRepository
@@ -18,7 +36,7 @@ type NotificationUseCase struct {
 func NewNotificationUseCase(
 	notificationRepo repositories.NotificationRepository,
 	auditLogRepo repositories.AuditLogRepository,
-) *NotificationUseCase {
+) NotificationUseCaseInterface {
 	return &NotificationUseCase{
 		notificationRepo: notificationRepo,
 		auditLogRepo:     auditLogRepo,
@@ -291,4 +309,43 @@ func (uc *NotificationUseCase) NotifyWarning(ctx context.Context, userID primiti
 func (uc *NotificationUseCase) NotifyError(ctx context.Context, userID primitive.ObjectID, title, message string) error {
 	notification := entities.NewErrorNotification(userID, title, message)
 	return uc.CreateNotification(ctx, notification)
+}
+
+// GetNotificationPreferences retrieves notification preferences for a user, creating defaults if none exist.
+func (uc *NotificationUseCase) GetNotificationPreferences(ctx context.Context, userID primitive.ObjectID) (*entities.NotificationPreferences, error) {
+	preferences, err := uc.notificationRepo.FindPreferencesByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if preferences == nil {
+		// Create and save default preferences
+		defaultPreferences := entities.NewNotificationPreferences(userID)
+		if err := uc.notificationRepo.UpsertPreferences(ctx, defaultPreferences); err != nil {
+			return nil, err
+		}
+		return defaultPreferences, nil
+	}
+
+	return preferences, nil
+}
+
+// UpdateNotificationPreferences updates notification preferences for a user.
+func (uc *NotificationUseCase) UpdateNotificationPreferences(ctx context.Context, userID primitive.ObjectID, preferences *entities.NotificationPreferences) error {
+	// Ensure the preferences are for the correct user
+	preferences.UserID = userID
+	return uc.notificationRepo.UpsertPreferences(ctx, preferences)
+}
+
+// GetNotificationsByType retrieves notifications of a specific type for a user, with pagination.
+func (uc *NotificationUseCase) GetNotificationsByType(ctx context.Context, userID primitive.ObjectID, notificationType entities.NotificationType, limit, offset int64) ([]*entities.Notification, int64, error) {
+	filter := &repositories.NotificationFilter{
+		UserID:    &userID,
+		Type:      string(notificationType),
+		Limit:     limit,
+		Offset:    offset,
+		SortBy:    "created_at",
+		SortOrder: "desc",
+	}
+	return uc.notificationRepo.List(ctx, filter)
 }

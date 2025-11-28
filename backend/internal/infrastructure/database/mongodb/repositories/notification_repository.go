@@ -119,6 +119,33 @@ func (r *notificationRepository) FindByID(ctx context.Context, id primitive.Obje
 	return &notification, nil
 }
 
+func (r *notificationRepository) preferencesCollection() *mongo.Collection {
+	return r.db.DB.Collection("notification_preferences")
+}
+
+func (r *notificationRepository) FindPreferencesByUserID(ctx context.Context, userID primitive.ObjectID) (*entities.NotificationPreferences, error) {
+	var preferences entities.NotificationPreferences
+	err := r.preferencesCollection().FindOne(ctx, bson.M{"user_id": userID}).Decode(&preferences)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil, not an error, if not found
+		}
+		return nil, err
+	}
+	return &preferences, nil
+}
+
+func (r *notificationRepository) UpsertPreferences(ctx context.Context, preferences *entities.NotificationPreferences) error {
+	preferences.UpdatedAt = time.Now()
+
+	filter := bson.M{"user_id": preferences.UserID}
+	update := bson.M{"$set": preferences}
+	opts := options.Update().SetUpsert(true)
+
+	_, err := r.preferencesCollection().UpdateOne(ctx, filter, update, opts)
+	return err
+}
+
 func (r *notificationRepository) List(ctx context.Context, filter *repositories.NotificationFilter) ([]*entities.Notification, int64, error) {
 	query := bson.M{}
 

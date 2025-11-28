@@ -14,11 +14,11 @@ import (
 
 // NotificationHandler handles notification-related HTTP requests
 type NotificationHandler struct {
-	notificationUseCase *notification.NotificationUseCase
+	notificationUseCase notification.NotificationUseCaseInterface
 }
 
 // NewNotificationHandler creates a new notification handler
-func NewNotificationHandler(notificationUseCase *notification.NotificationUseCase) *NotificationHandler {
+func NewNotificationHandler(notificationUseCase notification.NotificationUseCaseInterface) *NotificationHandler {
 	return &NotificationHandler{
 		notificationUseCase: notificationUseCase,
 	}
@@ -252,22 +252,63 @@ func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 
 // GetNotificationPreferences gets notification preferences for the current user
 func (h *NotificationHandler) GetNotificationPreferences(c *gin.Context) {
-	// Return mock preferences
-	c.JSON(http.StatusOK, gin.H{
-		"preferences": map[string]interface{}{
-			"email_enabled": true,
-			"push_enabled":  false,
-		},
-	})
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	preferences, err := h.notificationUseCase.GetNotificationPreferences(c.Request.Context(), userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, preferences)
 }
 
 
 // GetNotificationsByType gets notifications by type
 func (h *NotificationHandler) GetNotificationsByType(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"notifications": []interface{}{}, "total": 0})
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+	notificationType := entities.NotificationType(c.Param("type"))
+
+	// Validate notification type
+	switch notificationType {
+	case entities.NotificationTypeInfo, entities.NotificationTypeSuccess, entities.NotificationTypeWarning, entities.NotificationTypeError:
+		// valid
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid notification type"})
+		return
+	}
+
+	limit, _ := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64)
+	offset, _ := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64)
+
+	notifications, total, err := h.notificationUseCase.GetNotificationsByType(c.Request.Context(), userID, notificationType, limit, offset)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":   notifications,
+		"total":  total,
+		"limit":  limit,
+		"offset": offset,
+	})
 }
 
 // UpdateNotificationPreferences updates notification preferences
 func (h *NotificationHandler) UpdateNotificationPreferences(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Preferences updated"})
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	var preferences entities.NotificationPreferences
+	if err := c.ShouldBindJSON(&preferences); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.notificationUseCase.UpdateNotificationPreferences(c.Request.Context(), userID, &preferences); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, preferences)
 }

@@ -150,3 +150,24 @@ func NewErrorNotification(userID primitive.ObjectID, title, message string) *Not
 	notif.Icon = "exclamation-circle"
 	return notif
 }
+
+// NotificationPreferences represents user-specific notification settings
+type NotificationPreferences struct {
+	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	UserID       primitive.ObjectID `json:"user_id" bson:"user_id"`
+	EmailEnabled bool               `json:"email_enabled" bson:"email_enabled"`
+	PushEnabled  bool               `json:"push_enabled" bson:"push_enabled"`
+	Categories   map[string]bool    `json:"categories" bson:"categories"` // e.g., "adoption", "events"
+	UpdatedAt    time.Time          `json:"updated_at" bson:"updated_at"`
+}
+
+// NewNotificationPreferences creates default preferences for a user
+func NewNotificationPreferences(userID primitive.ObjectID) *NotificationPreferences {
+	return &NotificationPreferences{
+		UserID:       userID,
+		EmailEnabled: true,
+		PushEnabled:  false,
+		Categories:   make(map[string]bool), // Default to all categories enabled (or handle logic in use case)
+		UpdatedAt:    time.Now(),
+	}
+}
