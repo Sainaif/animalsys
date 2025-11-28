@@ -16,11 +16,11 @@ import (
 
 // EventHandler handles event-related HTTP requests
 type EventHandler struct {
-	eventUseCase *event.EventUseCase
+	eventUseCase event.EventUseCaseInterface
 }
 
 // NewEventHandler creates a new event handler
-func NewEventHandler(eventUseCase *event.EventUseCase) *EventHandler {
+func NewEventHandler(eventUseCase event.EventUseCaseInterface) *EventHandler {
 	return &EventHandler{
 		eventUseCase: eventUseCase,
 	}
@@ -464,39 +464,153 @@ func (h *EventHandler) GetEventStatistics(c *gin.Context) {
 
 // GetPastEvents gets past events
 func (h *EventHandler) GetPastEvents(c *gin.Context) {
-	// Return mock past events list
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+	events, err := h.eventUseCase.GetPastEvents(c.Request.Context(), limit)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"events": []interface{}{},
-		"total":  0,
+		"events": events,
+		"total":  len(events),
 	})
 }
 
 // RegisterForEvent registers a user for an event
 func (h *EventHandler) RegisterForEvent(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Registered successfully"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	var req entities.EventAttendance
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	attendance, err := h.eventUseCase.RegisterForEvent(c.Request.Context(), id, req, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, attendance)
 }
 
 // GetEventRegistrations gets all registrations for an event
 func (h *EventHandler) GetEventRegistrations(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"registrations": []interface{}{}, "total": 0})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	limit, _ := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64)
+	offset, _ := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64)
+
+	registrations, total, err := h.eventUseCase.GetEventRegistrations(c.Request.Context(), id, limit, offset)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"registrations": registrations,
+		"total":         total,
+	})
 }
 
 // GetEventStatisticsDetail gets detailed statistics for an event
 func (h *EventHandler) GetEventStatisticsDetail(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"attendees": 0, "registrations": 0})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	event, err := h.eventUseCase.GetEventStatisticsDetail(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"attendee_count":    event.AttendeeCount,
+		"volunteer_count":   event.VolunteerCount,
+		"funds_raised":      event.FundsRaised,
+		"animals_adopted":   event.AnimalsAdopted,
+		"registrations":     event.Registration.CurrentCount,
+	})
 }
 
 // PublishEvent publishes an event
 func (h *EventHandler) PublishEvent(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Event published"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.eventUseCase.PublishEvent(c.Request.Context(), id, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Event published successfully"})
 }
 
 // SendEventReminder sends reminder for an event
 func (h *EventHandler) SendEventReminder(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Reminders sent"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	count, err := h.eventUseCase.SendEventReminder(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":          "Reminders sent successfully",
+		"recipients_count": count,
+	})
 }
 
 // GetEventAttendance gets attendance for an event
 func (h *EventHandler) GetEventAttendance(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"attendance": []interface{}{}, "total": 0})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
+		return
+	}
+
+	limit, _ := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64)
+	offset, _ := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64)
+
+	attendance, total, err := h.eventUseCase.GetEventRegistrations(c.Request.Context(), id, limit, offset)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"attendance": attendance,
+		"total":      total,
+	})
 }
