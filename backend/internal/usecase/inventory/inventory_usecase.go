@@ -160,9 +160,28 @@ func (uc *InventoryUseCase) ListInventoryItems(ctx context.Context, filter *repo
 	return uc.inventoryRepo.List(ctx, filter)
 }
 
+// GetOutOfStockItems gets out-of-stock items
+func (uc *InventoryUseCase) GetOutOfStockItems(ctx context.Context) ([]*entities.InventoryItem, int64, error) {
+	return uc.inventoryRepo.GetOutOfStockItems(ctx)
+}
+
+// GetInventoryHistory gets the history of an inventory item
+func (uc *InventoryUseCase) GetInventoryHistory(ctx context.Context, itemID primitive.ObjectID) ([]*entities.StockTransaction, int64, error) {
+	filter := &repositories.StockTransactionFilter{
+		ItemID:    &itemID,
+		SortBy:    "created_at",
+		SortOrder: "desc",
+	}
+	return uc.stockTransactionRepo.List(ctx, filter)
+}
+
 // GetInventoryItemsByCategory gets inventory items by category
-func (uc *InventoryUseCase) GetInventoryItemsByCategory(ctx context.Context, category entities.ItemCategory) ([]*entities.InventoryItem, error) {
-	return uc.inventoryRepo.GetByCategory(ctx, category)
+func (uc *InventoryUseCase) GetInventoryItemsByCategory(ctx context.Context, category entities.ItemCategory) ([]*entities.InventoryItem, int64, error) {
+	items, err := uc.inventoryRepo.GetByCategory(ctx, category)
+	if err != nil {
+		return nil, 0, err
+	}
+	return items, int64(len(items)), nil
 }
 
 // GetLowStockItems gets items with low stock

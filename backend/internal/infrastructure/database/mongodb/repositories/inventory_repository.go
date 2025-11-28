@@ -212,6 +212,34 @@ func (r *inventoryRepository) GetByCategory(ctx context.Context, category entiti
 	return items, nil
 }
 
+// GetOutOfStockItems retrieves items that are out of stock
+func (r *inventoryRepository) GetOutOfStockItems(ctx context.Context) ([]*entities.InventoryItem, int64, error) {
+	filter := bson.M{
+		"is_active": true,
+		"$expr": bson.M{
+			"$lte": []string{"$current_stock", "$min_stock_level"},
+		},
+	}
+
+	total, err := r.collection().CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, errors.NewInternalServer("Failed to count out of stock items")
+	}
+
+	cursor, err := r.collection().Find(ctx, filter)
+	if err != nil {
+		return nil, 0, errors.NewInternalServer("Failed to query out of stock items")
+	}
+	defer cursor.Close(ctx)
+
+	var items []*entities.InventoryItem
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, 0, errors.NewInternalServer("Failed to decode out of stock items")
+	}
+
+	return items, total, nil
+}
+
 // GetLowStockItems gets items with low stock
 func (r *inventoryRepository) GetLowStockItems(ctx context.Context) ([]*entities.InventoryItem, error) {
 	query := bson.M{
