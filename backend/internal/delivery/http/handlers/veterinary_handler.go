@@ -14,12 +14,12 @@ import (
 
 // VeterinaryHandler wires veterinary HTTP endpoints to the use case layer.
 type VeterinaryHandler struct {
-	useCase  *veterinary.VeterinaryUseCase
+	useCase  veterinary.VeterinaryUseCaseInterface
 	validate *validator.Validate
 }
 
 // NewVeterinaryHandler creates a fully wired veterinary handler.
-func NewVeterinaryHandler(useCase *veterinary.VeterinaryUseCase) *VeterinaryHandler {
+func NewVeterinaryHandler(useCase veterinary.VeterinaryUseCaseInterface) *VeterinaryHandler {
 	return &VeterinaryHandler{
 		useCase:  useCase,
 		validate: validator.New(),
@@ -327,11 +327,80 @@ func (h *VeterinaryHandler) DeleteVaccination(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "vaccination deleted"})
 }
 
+// A request to create a veterinary record, which can be either a visit or a vaccination.
+type CreateRecordRequest struct {
+	RecordType  string                           `json:"record_type" binding:"required,oneof=visit vaccination"`
+	Visit       *veterinary.CreateVisitRequest       `json:"visit,omitempty"`
+	Vaccination *veterinary.CreateVaccinationRequest `json:"vaccination,omitempty"`
+}
+
 // Placeholder endpoints for future veterinary records features.
 func (h *VeterinaryHandler) CreateVeterinaryRecord(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+	userID, err := middleware.GetUserFromContext(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var req CreateRecordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	switch req.RecordType {
+	case "visit":
+		if req.Visit == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "visit data is required for record_type 'visit'"})
+			return
+		}
+		if err := h.validate.Struct(req.Visit); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		record, err := h.useCase.CreateVisit(c.Request.Context(), req.Visit, *userID)
+		if err != nil {
+			h.respondWithError(c, err)
+			return
+		}
+		c.JSON(http.StatusCreated, record)
+	case "vaccination":
+		if req.Vaccination == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "vaccination data is required for record_type 'vaccination'"})
+			return
+		}
+		if err := h.validate.Struct(req.Vaccination); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		record, err := h.useCase.CreateVaccination(c.Request.Context(), req.Vaccination, *userID)
+		if err != nil {
+			h.respondWithError(c, err)
+			return
+		}
+		c.JSON(http.StatusCreated, record)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid record_type"})
+	}
 }
 
 func (h *VeterinaryHandler) ListVeterinaryRecords(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+	var req veterinary.ListRecordsRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	records, total, err := h.useCase.ListVeterinaryRecords(c.Request.Context(), &req)
+	if err != nil {
+		h.respondWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"records": records,
+		"total":   total,
+		"limit":   req.Limit,
+		"offset":  req.Offset,
+	})
 }
