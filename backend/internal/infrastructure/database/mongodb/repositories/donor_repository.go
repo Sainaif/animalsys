@@ -55,6 +55,26 @@ func (r *donorRepository) FindByID(ctx context.Context, id primitive.ObjectID) (
 	return &donor, nil
 }
 
+// FindManyByIDs finds multiple donors by their IDs
+func (r *donorRepository) FindManyByIDs(ctx context.Context, ids []primitive.ObjectID) ([]*entities.Donor, error) {
+	collection := r.db.Collection(mongodb.Collections.Donors)
+
+	filter := bson.M{"_id": bson.M{"$in": ids}}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, 500, "failed to query donors")
+	}
+	defer cursor.Close(ctx)
+
+	var donors []*entities.Donor
+	if err := cursor.All(ctx, &donors); err != nil {
+		return nil, errors.Wrap(err, 500, "failed to decode donors")
+	}
+
+	return donors, nil
+}
+
 // Update updates an existing donor
 func (r *donorRepository) Update(ctx context.Context, donor *entities.Donor) error {
 	donor.UpdatedAt = time.Now()

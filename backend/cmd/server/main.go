@@ -260,6 +260,8 @@ func main() {
 	)
 	campaignUseCase := campaignUC.NewCampaignUseCase(
 		campaignRepo,
+		donationRepo,
+		donorRepo,
 		auditLogRepo,
 	)
 	eventUseCase := eventUC.NewEventUseCase(

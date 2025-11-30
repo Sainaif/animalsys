@@ -7,6 +7,7 @@ import (
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
 	"github.com/sainaif/animalsys/backend/internal/domain/repositories"
 	"github.com/sainaif/animalsys/backend/internal/usecase/campaign"
+	"github.com/sainaif/animalsys/backend/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,11 +15,11 @@ import (
 
 // CampaignHandler handles campaign-related HTTP requests
 type CampaignHandler struct {
-	campaignUseCase *campaign.CampaignUseCase
+	campaignUseCase campaign.ICampaignUseCase
 }
 
 // NewCampaignHandler creates a new campaign handler
-func NewCampaignHandler(campaignUseCase *campaign.CampaignUseCase) *CampaignHandler {
+func NewCampaignHandler(campaignUseCase campaign.ICampaignUseCase) *CampaignHandler {
 	return &CampaignHandler{
 		campaignUseCase: campaignUseCase,
 	}
@@ -35,7 +36,7 @@ func NewCampaignHandler(campaignUseCase *campaign.CampaignUseCase) *CampaignHand
 func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 	var campaign entities.Campaign
 	if err := c.ShouldBindJSON(&campaign); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		HandleError(c, errors.NewBadRequest(err.Error()))
 		return
 	}
 
@@ -57,10 +58,9 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 // @Success 200 {object} entities.Campaign
 // @Router /campaigns/{id} [get]
 func (h *CampaignHandler) GetCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -83,16 +83,15 @@ func (h *CampaignHandler) GetCampaign(c *gin.Context) {
 // @Success 200 {object} entities.Campaign
 // @Router /campaigns/{id} [put]
 func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
 	var campaign entities.Campaign
 	if err := c.ShouldBindJSON(&campaign); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		HandleError(c, errors.NewBadRequest(err.Error()))
 		return
 	}
 
@@ -114,10 +113,9 @@ func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
 // @Success 204
 // @Router /campaigns/{id} [delete]
 func (h *CampaignHandler) DeleteCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -269,10 +267,9 @@ func (h *CampaignHandler) GetPublicCampaigns(c *gin.Context) {
 // @Success 200 {array} entities.Campaign
 // @Router /users/{id}/campaigns [get]
 func (h *CampaignHandler) GetCampaignsByManager(c *gin.Context) {
-	managerIDParam := c.Param("id")
-	managerID, err := primitive.ObjectIDFromHex(managerIDParam)
+	managerID, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid manager ID"})
+		HandleError(c, errors.NewBadRequest("Invalid manager ID"))
 		return
 	}
 
@@ -292,10 +289,9 @@ func (h *CampaignHandler) GetCampaignsByManager(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /campaigns/{id}/activate [post]
 func (h *CampaignHandler) ActivateCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -316,10 +312,9 @@ func (h *CampaignHandler) ActivateCampaign(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /campaigns/{id}/pause [post]
 func (h *CampaignHandler) PauseCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -340,10 +335,9 @@ func (h *CampaignHandler) PauseCampaign(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /campaigns/{id}/complete [post]
 func (h *CampaignHandler) CompleteCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -364,10 +358,9 @@ func (h *CampaignHandler) CompleteCampaign(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /campaigns/{id}/cancel [post]
 func (h *CampaignHandler) CancelCampaign(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idParam)
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign ID"})
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
 		return
 	}
 
@@ -398,21 +391,115 @@ func (h *CampaignHandler) GetCampaignStatistics(c *gin.Context) {
 }
 
 // GetCampaignDonors gets all donors for a campaign
+// @Summary Get campaign donors
+// @Tags campaigns
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Param limit query int false "Limit"
+// @Param offset query int false "Offset"
+// @Success 200 {object} map[string]interface{}
+// @Router /campaigns/{id}/donors [get]
 func (h *CampaignHandler) GetCampaignDonors(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"donors": []interface{}{}, "total": 0})
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
+		return
+	}
+
+	limit, _ := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64)
+	offset, _ := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64)
+
+	donors, total, err := h.campaignUseCase.GetCampaignDonors(c.Request.Context(), id, limit, offset)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"donors": donors,
+		"total":  total,
+		"limit":  limit,
+		"offset": offset,
+	})
 }
 
 // UpdateCampaignAmount updates campaign raised amount
+// @Summary Update campaign amount
+// @Tags campaigns
+// @Accept json
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Param amount body float64 true "New amount"
+// @Success 200 {object} map[string]interface{}
+// @Router /campaigns/{id}/update-amount [post]
 func (h *CampaignHandler) UpdateCampaignAmount(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Amount updated"})
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
+		return
+	}
+
+	var payload struct {
+		Amount float64 `json:"amount"`
+	}
+
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		HandleError(c, errors.NewBadRequest("Invalid request payload: "+err.Error()))
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.campaignUseCase.UpdateCampaignAmount(c.Request.Context(), id, payload.Amount, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Campaign amount updated successfully"})
 }
 
 // GetCampaignProgress gets campaign progress
+// @Summary Get campaign progress
+// @Tags campaigns
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Success 200 {object} campaign.CampaignProgress
+// @Router /campaigns/{id}/progress [get]
 func (h *CampaignHandler) GetCampaignProgress(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"progress": 0, "goal": 0})
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
+		return
+	}
+
+	progress, err := h.campaignUseCase.GetCampaignProgress(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, progress)
 }
 
 // ShareCampaign shares a campaign
+// @Summary Share campaign
+// @Tags campaigns
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Success 200 {object} campaign.CampaignShareable
+// @Router /campaigns/{id}/share [post]
 func (h *CampaignHandler) ShareCampaign(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Campaign shared"})
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		HandleError(c, errors.NewBadRequest("Invalid campaign ID"))
+		return
+	}
+
+	shareable, err := h.campaignUseCase.ShareCampaign(c.Request.Context(), id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, shareable)
 }
