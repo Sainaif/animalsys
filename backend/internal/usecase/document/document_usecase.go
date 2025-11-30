@@ -58,6 +58,58 @@ func (uc *DocumentUseCase) CreateDocument(ctx context.Context, document *entitie
 	return nil
 }
 
+// ArchiveDocument archives a document
+func (uc *DocumentUseCase) ArchiveDocument(ctx context.Context, documentID, userID primitive.ObjectID) error {
+	document, err := uc.documentRepo.FindByID(ctx, documentID)
+	if err != nil {
+		return err
+	}
+
+	// Only uploader can archive
+	if document.UploadedBy != userID {
+		return errors.NewForbidden("Only the uploader can archive this document")
+	}
+
+	document.Archive()
+
+	if err := uc.documentRepo.Update(ctx, document); err != nil {
+		return err
+	}
+
+	// Create audit log
+	_ = uc.auditLogRepo.Create(ctx,
+		entities.NewAuditLog(userID, entities.ActionUpdate, "document", document.Title, "archived document").
+			WithEntityID(documentID))
+
+	return nil
+}
+
+// UnarchiveDocument unarchives a document
+func (uc *DocumentUseCase) UnarchiveDocument(ctx context.Context, documentID, userID primitive.ObjectID) error {
+	document, err := uc.documentRepo.FindByID(ctx, documentID)
+	if err != nil {
+		return err
+	}
+
+	// Only uploader can unarchive
+	if document.UploadedBy != userID {
+		return errors.NewForbidden("Only the uploader can unarchive this document")
+	}
+
+	document.Unarchive()
+
+	if err := uc.documentRepo.Update(ctx, document); err != nil {
+		return err
+	}
+
+	// Create audit log
+	_ = uc.auditLogRepo.Create(ctx,
+		entities.NewAuditLog(userID, entities.ActionUpdate, "document", document.Title, "unarchived document").
+			WithEntityID(documentID))
+
+	return nil
+}
+
 // GetDocumentByID retrieves a document by ID
 func (uc *DocumentUseCase) GetDocumentByID(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) (*entities.Document, error) {
 	document, err := uc.documentRepo.FindByID(ctx, id)
@@ -132,19 +184,68 @@ func (uc *DocumentUseCase) DeleteDocument(ctx context.Context, id primitive.Obje
 	return nil
 }
 
-// ListDocuments lists documents with filtering and pagination
-func (uc *DocumentUseCase) ListDocuments(ctx context.Context, filter *repositories.DocumentFilter) ([]*entities.Document, int64, error) {
+// SearchDocuments searches documents with filtering and pagination, and access control
+func (uc *DocumentUseCase) SearchDocuments(ctx context.Context, filter *repositories.DocumentFilter, userID primitive.ObjectID) ([]*entities.Document, int64, error) {
+	filter.UserID = &userID
 	return uc.documentRepo.List(ctx, filter)
 }
 
-// GetDocumentsByRelatedEntity gets documents by related entity
-func (uc *DocumentUseCase) GetDocumentsByRelatedEntity(ctx context.Context, entityType string, entityID primitive.ObjectID) ([]*entities.Document, error) {
-	return uc.documentRepo.GetByRelatedEntity(ctx, entityType, entityID)
+// GetDocumentsByRelatedEntity gets documents by related entity, filtered by access
+func (uc *DocumentUseCase) GetDocumentsByRelatedEntity(ctx context.Context, entityType string, entityID primitive.ObjectID, userID primitive.ObjectID) ([]*entities.Document, error) {
+	// This repository method doesn't support access control, so we filter here.
+	// For a production system, this should be moved to the repository layer.
+	documents, err := uc.documentRepo.GetByRelatedEntity(ctx, entityType, entityID)
+	if err != nil {
+		return nil, err
+	}
+
+	accessibleDocs := make([]*entities.Document, 0)
+	for _, doc := range documents {
+		if doc.HasAccess(userID) {
+			accessibleDocs = append(accessibleDocs, doc)
+		}
+	}
+
+	return accessibleDocs, nil
 }
 
-// GetDocumentsByType gets documents by type
-func (uc *DocumentUseCase) GetDocumentsByType(ctx context.Context, docType entities.DocumentType) ([]*entities.Document, error) {
-	return uc.documentRepo.GetByType(ctx, docType)
+// GetDocumentsByType gets documents by type, filtered by access
+func (uc *DocumentUseCase) GetDocumentsByType(ctx context.Context, docType entities.DocumentType, userID primitive.ObjectID) ([]*entities.Document, error) {
+	// This repository method doesn't support access control, so we filter here.
+	// For a production system, this should be moved to the repository layer.
+	documents, err := uc.documentRepo.GetByType(ctx, docType)
+	if err != nil {
+		return nil, err
+	}
+
+	accessibleDocs := make([]*entities.Document, 0)
+	for _, doc := range documents {
+		if doc.HasAccess(userID) {
+			accessibleDocs = append(accessibleDocs, doc)
+		}
+	}
+
+	return accessibleDocs, nil
+}
+
+// GetDocumentsByCategory gets documents by category, filtered by access
+func (uc *DocumentUseCase) GetDocumentsByCategory(ctx context.Context, category entities.DocumentType, userID primitive.ObjectID) ([]*entities.Document, error) {
+	// Assuming category is treated the same as type for now
+	// This repository method doesn't support access control, so we filter here.
+	// For a production system, this should be moved to the repository layer.
+	documents, err := uc.documentRepo.GetByType(ctx, category)
+	if err != nil {
+		return nil, err
+	}
+
+	accessibleDocs := make([]*entities.Document, 0)
+	for _, doc := range documents {
+		if doc.HasAccess(userID) {
+			accessibleDocs = append(accessibleDocs, doc)
+		}
+	}
+
+	return accessibleDocs, nil
 }
 
 // GetDocumentsByUploader gets documents uploaded by a specific user

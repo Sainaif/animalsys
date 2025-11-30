@@ -66,6 +66,10 @@ type Document struct {
 	// Download tracking
 	DownloadCount int       `json:"download_count" bson:"download_count"`
 	LastDownloadAt *time.Time `json:"last_download_at,omitempty" bson:"last_download_at,omitempty"`
+
+	// Archiving
+	IsArchived bool       `json:"is_archived" bson:"is_archived"`
+	ArchivedAt *time.Time `json:"archived_at,omitempty" bson:"archived_at,omitempty"`
 }
 
 // NewDocument creates a new document
@@ -203,5 +207,20 @@ func (d *Document) MakePublic() {
 // MakePrivate makes the document private
 func (d *Document) MakePrivate() {
 	d.IsPublic = false
+	d.UpdatedAt = time.Now()
+}
+
+// Archive archives the document
+func (d *Document) Archive() {
+	d.IsArchived = true
+	now := time.Now()
+	d.ArchivedAt = &now
+	d.UpdatedAt = now
+}
+
+// Unarchive unarchives the document
+func (d *Document) Unarchive() {
+	d.IsArchived = false
+	d.ArchivedAt = nil
 	d.UpdatedAt = time.Now()
 }

@@ -96,6 +96,19 @@ func (r *documentRepository) Delete(ctx context.Context, id primitive.ObjectID) 
 func (r *documentRepository) List(ctx context.Context, filter *repositories.DocumentFilter) ([]*entities.Document, int64, error) {
 	query := bson.M{}
 
+	if !filter.IncludeArchived {
+		query["is_archived"] = bson.M{"$ne": true}
+	}
+
+	// Access control
+	if filter.UserID != nil {
+		query["$or"] = []bson.M{
+			{"is_public": true},
+			{"uploaded_by": filter.UserID},
+			{"accessible_by": filter.UserID},
+		}
+	}
+
 	// Apply filters
 	if filter.Type != "" {
 		query["type"] = filter.Type

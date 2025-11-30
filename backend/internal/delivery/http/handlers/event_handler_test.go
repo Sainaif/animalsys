@@ -7,22 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/sainaif/animalsys/backend/internal/domain/entities"
 	"github.com/sainaif/animalsys/backend/internal/usecase/event/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-func setupRouter() *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	r.Use(func(c *gin.Context) {
-		c.Set("user_id", primitive.NewObjectID())
-	})
-	return r
-}
 
 func TestEventHandler_GetPastEvents(t *testing.T) {
 	mockUseCase := new(mocks.EventUseCase)

@@ -156,7 +156,9 @@ func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 	filter.SortBy = c.DefaultQuery("sort_by", "created_at")
 	filter.SortOrder = c.DefaultQuery("sort_order", "desc")
 
-	documents, total, err := h.documentUseCase.ListDocuments(c.Request.Context(), filter)
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	documents, total, err := h.documentUseCase.SearchDocuments(c.Request.Context(), filter, userID)
 	if err != nil {
 		HandleError(c, err)
 		return
@@ -440,35 +442,165 @@ func (h *DocumentHandler) SetExpiration(c *gin.Context) {
 
 // GetDocumentsByEntity gets documents for an entity
 func (h *DocumentHandler) GetDocumentsByEntity(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"documents": []interface{}{}, "total": 0})
+	entityType := c.Param("entity_type")
+	entityIDStr := c.Param("entity_id")
+
+	entityID, err := primitive.ObjectIDFromHex(entityIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid entity ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	documents, err := h.documentUseCase.GetDocumentsByRelatedEntity(c.Request.Context(), entityType, entityID, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"documents": documents, "total": len(documents)})
 }
 
 // GetDocumentsByType gets documents by type
 func (h *DocumentHandler) GetDocumentsByType(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"documents": []interface{}{}, "total": 0})
+	docType := c.Param("type")
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	documents, err := h.documentUseCase.GetDocumentsByType(c.Request.Context(), entities.DocumentType(docType), userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"documents": documents, "total": len(documents)})
 }
 
 // GetDocumentsByCategory gets documents by category
 func (h *DocumentHandler) GetDocumentsByCategory(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"documents": []interface{}{}, "total": 0})
+	category := c.Param("category")
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	documents, err := h.documentUseCase.GetDocumentsByCategory(c.Request.Context(), entities.DocumentType(category), userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"documents": documents, "total": len(documents)})
 }
 
 // SearchDocuments searches documents
 func (h *DocumentHandler) SearchDocuments(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"documents": []interface{}{}, "total": 0})
+	filter := &repositories.DocumentFilter{}
+
+	// Parse query parameters
+	filter.Type = c.Query("type")
+	filter.Search = c.Query("q")
+	if filter.Search == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter 'q' is required"})
+		return
+	}
+	filter.IncludeArchived = c.Query("include_archived") == "true"
+
+	if tags := c.QueryArray("tags"); len(tags) > 0 {
+		filter.Tags = tags
+	}
+
+	// Pagination
+	if limit, err := strconv.ParseInt(c.DefaultQuery("limit", "20"), 10, 64); err == nil {
+		filter.Limit = limit
+	}
+	if offset, err := strconv.ParseInt(c.DefaultQuery("offset", "0"), 10, 64); err == nil {
+		filter.Offset = offset
+	}
+
+	filter.SortBy = c.DefaultQuery("sort_by", "created_at")
+	filter.SortOrder = c.DefaultQuery("sort_order", "desc")
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	documents, total, err := h.documentUseCase.SearchDocuments(c.Request.Context(), filter, userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"documents": documents,
+		"total":     total,
+		"limit":     filter.Limit,
+		"offset":    filter.Offset,
+	})
 }
 
 // ShareDocument shares a document
 func (h *DocumentHandler) ShareDocument(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Document shared"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid document ID"})
+		return
+	}
+
+	var req struct {
+		UserID string `json:"user_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	targetUserID, err := primitive.ObjectIDFromHex(req.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.documentUseCase.GrantAccess(c.Request.Context(), id, targetUserID, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Document shared successfully"})
 }
 
 // ArchiveDocument archives a document
 func (h *DocumentHandler) ArchiveDocument(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Document archived"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid document ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.documentUseCase.ArchiveDocument(c.Request.Context(), id, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Document archived successfully"})
 }
 
 // UnarchiveDocument unarchives a document
 func (h *DocumentHandler) UnarchiveDocument(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Document unarchived"})
+	idParam := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid document ID"})
+		return
+	}
+
+	userID := c.MustGet("user_id").(primitive.ObjectID)
+
+	if err := h.documentUseCase.UnarchiveDocument(c.Request.Context(), id, userID); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Document unarchived successfully"})
 }

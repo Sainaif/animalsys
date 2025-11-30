@@ -66,6 +66,8 @@ type DocumentFilter struct {
 	IsExpired       *bool
 	Search          string
 	Tags            []string
+	IncludeArchived bool
+	UserID          *primitive.ObjectID // For access control
 	Limit           int64
 	Offset          int64
 	SortBy          string // Field to sort by
