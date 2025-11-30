@@ -125,4 +125,8 @@ type NotificationRepository interface {
 	DeleteExpired(ctx context.Context) (int64, error)
 	FindByGroupKey(ctx context.Context, userID primitive.ObjectID, groupKey string) (*entities.Notification, error)
 	EnsureIndexes(ctx context.Context) error
+
+	// Preferences
+	FindPreferencesByUserID(ctx context.Context, userID primitive.ObjectID) (*entities.NotificationPreferences, error)
+	UpsertPreferences(ctx context.Context, preferences *entities.NotificationPreferences) error
 }
